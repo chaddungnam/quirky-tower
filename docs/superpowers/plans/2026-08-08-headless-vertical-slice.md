@@ -266,7 +266,7 @@ git push origin main
 - Produces: `RunSimulator.simulate(seed: int, options: Dictionary = {}) -> Dictionary`.
 - Produces command: `godot --headless --path . --script scripts_dev/qa/headless/run_smoke.gd -- --seed=424242`.
 
-- [ ] **Step 1: Write the failing smoke assertions**
+- [x] **Step 1: Write the failing smoke assertions**
 
 For seed `424242`, run once without Boost and twice with `ad` and `paid`. Assert:
 
@@ -277,15 +277,15 @@ For seed `424242`, run once without Boost and twice with `ad` and `paid`. Assert
 - story event IDs are ordered and never duplicated;
 - `country=ALN` is preserved exactly.
 
-- [ ] **Step 2: Verify the smoke fails**
+- [x] **Step 2: Verify the smoke fails**
 
 Run the smoke script and expect a missing simulator parse error.
 
-- [ ] **Step 3: Implement the deterministic bot**
+- [x] **Step 3: Implement the deterministic bot**
 
 Create one `RandomNumberGenerator`, set `seed`, and generate input values with `randf()`. Choose Quirks at floors 4, 8, and 12 from the catalog by the same RNG. Return only JSON-serializable summary data.
 
-- [ ] **Step 4: Verify and publish**
+- [x] **Step 4: Verify and publish**
 
 Run the smoke twice, compare output, run all headless tests and the guard, then commit and push:
 
