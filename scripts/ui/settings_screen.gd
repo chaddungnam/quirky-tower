@@ -11,16 +11,16 @@ var _values := {"bgm": true, "sfx": true, "vibration": true}
 
 
 func _ready() -> void:
-	get_node("Background").color = Tokens.color(self, Tokens.CREAM)
+	get_node("Background").color = Tokens.color(self, Tokens.BACKGROUND)
 	get_node("Content/Title").add_theme_font_size_override("font_size", Tokens.TITLE_SIZE)
-	get_node("Content/Title").add_theme_color_override("font_color", Tokens.color(self, Tokens.CORAL))
-	get_node("Content/Hint").add_theme_color_override("font_color", Tokens.color(self, Tokens.NAVY))
+	get_node("Content/Title").add_theme_color_override("font_color", Tokens.color(self, Tokens.PRIMARY))
+	get_node("Content/Hint").add_theme_color_override("font_color", Tokens.color(self, Tokens.TEXT))
 	for key in ["bgm", "sfx", "vibration"]:
 		var button := get_node("Content/Rows/%sButton" % key.capitalize()) as Button
-		Tokens.style_button(button, Tokens.NAVY)
+		Tokens.style_button(button, Tokens.SURFACE)
 		button.pressed.connect(_toggle.bind(key))
-	Tokens.style_button(get_node("Content/Rows/LanguageButton"), Tokens.TEAL)
-	Tokens.style_button(get_node("Content/Rows/BackButton"), Tokens.CORAL)
+	Tokens.style_button(get_node("Content/Rows/LanguageButton"), Tokens.SECONDARY)
+	Tokens.style_button(get_node("Content/Rows/BackButton"), Tokens.WARNING)
 	get_node("Content/Rows/LanguageButton").pressed.connect(func() -> void: language_requested.emit())
 	get_node("Content/Rows/BackButton").pressed.connect(func() -> void: back_requested.emit())
 

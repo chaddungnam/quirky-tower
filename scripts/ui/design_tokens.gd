@@ -1,6 +1,16 @@
 extends RefCounted
 
 const THEME_TYPE := "Quirky"
+const BACKGROUND := "background"
+const SURFACE := "surface"
+const TEXT := "text"
+const PRIMARY := "primary"
+const SECONDARY := "secondary"
+const WARNING := "warning"
+const SECRET := "secret"
+const DANGER := "danger"
+
+# Legacy aliases keep older prototype scenes on the same centralized palette.
 const CREAM := "cream"
 const NAVY := "navy"
 const CORAL := "coral"
@@ -35,12 +45,13 @@ static func panel_style(control: Control, role: String, radius := RADIUS) -> Sty
 
 
 static func style_button(button: Button, role: String, height := TOUCH_HEIGHT) -> void:
+	var text_role := TEXT if role in [BACKGROUND, SURFACE] else BACKGROUND
 	button.custom_minimum_size.y = height
 	button.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	button.add_theme_font_size_override("font_size", BUTTON_SIZE)
-	button.add_theme_color_override("font_color", color(button, CREAM))
-	button.add_theme_color_override("font_hover_color", color(button, CREAM))
-	button.add_theme_color_override("font_pressed_color", color(button, CREAM))
+	button.add_theme_color_override("font_color", color(button, text_role))
+	button.add_theme_color_override("font_hover_color", color(button, text_role))
+	button.add_theme_color_override("font_pressed_color", color(button, TEXT))
 	button.add_theme_stylebox_override("normal", panel_style(button, role))
 	button.add_theme_stylebox_override("hover", panel_style(button, role))
-	button.add_theme_stylebox_override("pressed", panel_style(button, NAVY))
+	button.add_theme_stylebox_override("pressed", panel_style(button, SURFACE))

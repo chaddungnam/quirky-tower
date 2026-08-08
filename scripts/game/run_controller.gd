@@ -19,7 +19,7 @@ var _current_challenge: Control
 
 
 func _ready() -> void:
-	get_node("Background").color = Tokens.color(self, Tokens.CREAM)
+	get_node("Background").color = Tokens.color(self, Tokens.BACKGROUND)
 	restart_run()
 
 

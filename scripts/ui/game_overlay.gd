@@ -4,7 +4,7 @@ const Tokens = preload("res://scripts/ui/design_tokens.gd")
 
 
 func _ready() -> void:
-	var style := Tokens.panel_style(self, Tokens.CREAM)
+	var style := Tokens.panel_style(self, Tokens.SURFACE)
 	get_node("Center/Card").add_theme_stylebox_override("panel", style)
 
 
@@ -50,7 +50,7 @@ func _add_action(text: String, action: Callable, option_id := "") -> void:
 	button.set_meta("option_id", option_id)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	get_node("Center/Card/Content/ActionScroll/Actions").add_child(button)
-	Tokens.style_button(button, Tokens.CORAL)
+	Tokens.style_button(button, Tokens.WARNING)
 	button.pressed.connect(func() -> void:
 		if action.is_valid():
 			action.call()

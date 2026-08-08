@@ -20,6 +20,10 @@ func _run() -> void:
 	trial.setup(0.4, {}, "timing_ring")
 	trial.begin()
 	assert(trial.get("_phase") == "route", "a floor begins with route choice")
+	assert(
+		trial.get_node("StageDisplay/WorldViewport/TowerStage3D") is Node3D,
+		"the floor embeds one reusable native 3D stage"
+	)
 	var actions = trial.get_node("RoutePanel/Content/RouteActions")
 	assert(actions.get_child_count() == 3, "three risk routes are offered")
 	var first_button: Button = actions.get_child(0)
@@ -28,10 +32,16 @@ func _run() -> void:
 		first_button.get_theme_color("font_color") != normal_style.bg_color,
 		"route button text contrasts with its background"
 	)
+	var route_colors: Array = []
+	for button in actions.get_children():
+		route_colors.append((button as Button).get_theme_stylebox("normal").bg_color)
+	assert(
+		route_colors[0] != route_colors[1] and route_colors[1] != route_colors[2],
+		"safe, bold, and chaos routes have distinct selection roles"
+	)
 	actions.get_child(2).pressed.emit()
 	assert(trial.get("_phase") == "dodge", "route choice starts direct control")
 	assert(is_equal_approx(float(trial.get("_score_multiplier")), 1.5), "chaos route carries x1.5")
-	trial.set("_obstacles", [])
 	trial.set("_elapsed", 3.1)
 	trial._process(0.0)
 	assert(trial.get("_phase") == "smash", "surviving the dodge opens the smash timing")

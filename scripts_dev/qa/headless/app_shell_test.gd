@@ -1,6 +1,7 @@
 extends SceneTree
 
 const MainScene = preload("res://scenes/app/main.tscn")
+const Tokens = preload("res://scripts/ui/design_tokens.gd")
 const LANGUAGE_CODES := [
 	"ko", "en", "de", "ja", "fr", "es", "it", "zh_CN", "zh_TW", "ar",
 ]
@@ -20,6 +21,11 @@ func _run() -> void:
 	app.get_node("SplashScreen").finish_now()
 	assert(app.get_node("HomeScreen").visible, "banner completion opens home")
 	assert(not app.get_node("SplashScreen").visible, "banner closes after completion")
+	var home := app.get_node("HomeScreen") as Control
+	assert(
+		home.get_node("Content/Title").get_theme_color("font_color") == Tokens.color(home, Tokens.PRIMARY),
+		"home uses the shared Tower primary role"
+	)
 
 	app.get_node("HomeScreen/Content/SettingsButton").pressed.emit()
 	assert(app.get_node("SettingsScreen").visible, "settings button opens settings")
@@ -45,6 +51,10 @@ func _run() -> void:
 	app.get_node("HomeScreen/Content/PlayButton").pressed.emit()
 	assert(app.get_node("RunScreen").visible, "play opens the existing run")
 	assert(not app.get_node("HomeScreen").visible, "home closes during the run")
+	assert(
+		app.get_node("RunScreen/Background").color == Tokens.color(app, Tokens.BACKGROUND),
+		"the run and 3D world share the dark Tower background role"
+	)
 	await process_frame
 	var challenge_slot = app.get_node("RunScreen/ChallengeSlot")
 	assert(challenge_slot.get_child_count() == 1, "run restart leaves one active challenge")

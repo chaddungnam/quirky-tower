@@ -3,6 +3,7 @@ extends Control
 signal finished
 
 const Tokens = preload("res://scripts/ui/design_tokens.gd")
+const DisplayFont = preload("res://assets/fonts/DoHyeon-Regular.ttf")
 const DURATION := 1.5
 
 var _elapsed := 0.0
@@ -10,15 +11,17 @@ var _finished := false
 
 
 func _ready() -> void:
-	get_node("Background").color = Tokens.color(self, Tokens.NAVY)
+	get_node("Background").color = Tokens.color(self, Tokens.BACKGROUND)
+	get_node("Center/Content/Company").add_theme_font_override("font", DisplayFont)
+	get_node("Center/Content/Title").add_theme_font_override("font", DisplayFont)
 	get_node("Center/Content/Company").add_theme_color_override(
-		"font_color", Tokens.color(self, Tokens.GOLD)
+		"font_color", Tokens.color(self, Tokens.PRIMARY)
 	)
 	get_node("Center/Content/Title").add_theme_color_override(
-		"font_color", Tokens.color(self, Tokens.CREAM)
+		"font_color", Tokens.color(self, Tokens.TEXT)
 	)
 	get_node("Center/Content/Hint").add_theme_color_override(
-		"font_color", Tokens.color(self, Tokens.TEAL)
+		"font_color", Tokens.color(self, Tokens.SECONDARY)
 	)
 
 

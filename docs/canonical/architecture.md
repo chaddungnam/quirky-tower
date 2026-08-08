@@ -4,7 +4,7 @@
 
 ```text
 JSON data -> GameCatalog -> RunSimulator/RunEngine -> RunState -> headless report
-TowerTrial scene -> RunController -> RunEngine -> RunState -> HUD/GameOverlay
+TowerStage3D -> TowerTrial scene -> RunController -> RunEngine -> RunState -> HUD/GameOverlay
 ```
 
 - `GameCatalog`: JSON 로딩과 참조 검증
@@ -13,11 +13,13 @@ TowerTrial scene -> RunController -> RunEngine -> RunState -> HUD/GameOverlay
 - `RunEngine`: 한 층의 성공·실패·콤보·스토리·체크포인트 처리
 - `RunSimulator`: 고정 시드 런과 대량 집계
 - `RunController`: 통합 층 도전, Quirk·스토리·종료 화면 흐름
+- `TowerStage3D`: 고정 카메라 무대, 픽셀 진행자, 저폴리 장애물, 실제 3D 충돌. 점수와 런 상태는 알지 못한다.
 
 ## 화면 폴더
 
 - `scenes/app`: 실행 진입점
 - `scenes/game`: 런 화면과 독립된 도전 씬
+- `scenes/game/world`: 인게임 3D 무대와 충돌 구성
 - `scenes/ui/components`: 공통 HUD와 오버레이
 - `scripts/game`: 화면 흐름과 사용자 입력
 - `scripts/ui`, `ui/themes`: 공통 디자인 토큰과 테마
