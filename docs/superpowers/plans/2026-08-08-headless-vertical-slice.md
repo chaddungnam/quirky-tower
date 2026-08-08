@@ -211,7 +211,7 @@ git push origin main
 - Produces: `SponsorBoost.apply(state: RunState, source: String) -> Dictionary` where source is `ad` or `paid`.
 - Produces: `RunEngine.resolve_floor(state: RunState, catalog: GameCatalog, input_value: float) -> Dictionary`.
 
-- [ ] **Step 1: Write failing engine tests**
+- [x] **Step 1: Write failing engine tests**
 
 Assert:
 
@@ -226,25 +226,25 @@ Assert:
 - a second Boost in one run is refused;
 - country `ALN` remains a normal single grouping value in the result.
 
-- [ ] **Step 2: Verify the engine test fails**
+- [x] **Step 2: Verify the engine test fails**
 
 Run the test with Godot headless.
 
 Expected: FAIL because the three implementation files are missing.
 
-- [ ] **Step 3: Implement Quirk modifiers**
+- [x] **Step 3: Implement Quirk modifiers**
 
 Support exactly four IDs: `wide_window`, `overheat_combo`, `replay`, `reroute`. Return a flat modifier dictionary consumed by existing challenge and run rules.
 
-- [ ] **Step 4: Implement Boost equality and limits**
+- [x] **Step 4: Implement Boost equality and limits**
 
 Accept only `ad` or `paid`, apply one extra heart for `sponsor_guard`, store source for analytics, and compare gameplay snapshots after removing the analytics-only source key. The second application returns `{ "ok": false, "reason": "run_limit" }`.
 
-- [ ] **Step 5: Implement the run engine**
+- [x] **Step 5: Implement the run engine**
 
 Resolve one floor per call from catalog data. The engine owns combo, heart, score, checkpoint, story event, and finish/game-over transitions. It emits a result dictionary; it does not print, save files, or touch a scene.
 
-- [ ] **Step 6: Verify and publish**
+- [x] **Step 6: Verify and publish**
 
 Run all headless tests and the project guard, then commit and push:
 

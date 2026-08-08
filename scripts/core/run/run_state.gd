@@ -11,6 +11,7 @@ var combo := 0
 var score := 0
 var quirks: Array = []
 var checkpoint_floor := 1
+var checkpoint_snapshot: Dictionary = {}
 var boost_used := false
 var boost_source := ""
 var replay_used := false
@@ -39,6 +40,7 @@ static func restore(data: Dictionary) -> TowerRunState:
 	state.score = int(data.get("score", 0))
 	state.quirks = data.quirks.duplicate()
 	state.checkpoint_floor = int(data.get("checkpoint_floor", 1))
+	state.checkpoint_snapshot = data.get("checkpoint_snapshot", {}).duplicate(true)
 	state.boost_used = bool(data.get("boost_used", false))
 	state.boost_source = str(data.get("boost_source", ""))
 	state.replay_used = bool(data.get("replay_used", false))
@@ -58,6 +60,7 @@ func snapshot() -> Dictionary:
 		"score": score,
 		"quirks": quirks.duplicate(),
 		"checkpoint_floor": checkpoint_floor,
+		"checkpoint_snapshot": checkpoint_snapshot.duplicate(true),
 		"boost_used": boost_used,
 		"boost_source": boost_source,
 		"replay_used": replay_used,
