@@ -1,6 +1,13 @@
 # Quirky Tower 현재 문서
 
 - [현재 작업 상태](work_state.md)
+- [제품 범위](product.md)
+- [게임 규칙](gameplay.md)
+- [스토리](story.md)
+- [BM](economy.md)
+- [아키텍처](architecture.md)
+- [디자인 정책](design_policy.md)
+- [QA](qa.md)
 - [승인된 헤드리스 프로토타입 설계](../superpowers/specs/2026-08-08-quirky-tower-headless-prototype-design.md)
 - [헤드리스 구현 계획](../superpowers/plans/2026-08-08-headless-vertical-slice.md)
 

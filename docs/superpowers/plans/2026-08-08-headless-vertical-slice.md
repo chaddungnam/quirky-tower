@@ -363,15 +363,15 @@ git push origin main
 **Interfaces:**
 - Produces: current, linked documentation under 600 lines per file and one copyable QA command sequence.
 
-- [ ] **Step 1: Write concise canonical documents**
+- [x] **Step 1: Write concise canonical documents**
 
 Each document records only its current contract and links back to the approved design. `economy.md` states capped pay-or-watch equality; `design_policy.md` states the future Theme/DesignTokens/component rule; `architecture.md` states the core dependency boundary; `qa.md` lists exact headless commands and the real-device gap.
 
-- [ ] **Step 2: Update the current work state**
+- [x] **Step 2: Update the current work state**
 
 Mark the headless vertical slice with observed PASS/FAIL counts and balance artifact path. Set the next P0 to human review of simulation balance before creating production UI.
 
-- [ ] **Step 3: Run the complete verification sequence**
+- [x] **Step 3: Run the complete verification sequence**
 
 ```bash
 bash scripts_dev/qa/check_project.sh
@@ -385,7 +385,7 @@ git diff --check
 
 Expected: every command exits `0`; the report records `10,000` runs and zero impossible states.
 
-- [ ] **Step 4: Commit, push, and verify the remote**
+- [x] **Step 4: Commit, push, and verify the remote**
 
 ```bash
 git add docs/canonical
