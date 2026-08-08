@@ -1,4 +1,3 @@
-class_name RunHud
 extends Control
 
 

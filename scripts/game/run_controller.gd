@@ -1,4 +1,3 @@
-class_name RunController
 extends Control
 
 const GameCatalog = preload("res://scripts/core/run/game_catalog.gd")
@@ -6,7 +5,7 @@ const RunState = preload("res://scripts/core/run/run_state.gd")
 const RunEngine = preload("res://scripts/core/run/run_engine.gd")
 const QuirkRules = preload("res://scripts/core/quirks/quirk_rules.gd")
 const Tokens = preload("res://scripts/ui/design_tokens.gd")
-const ChallengeScenes := {
+const CHALLENGE_SCENES := {
 	"timing_ring": preload("res://scenes/game/challenges/timing_ring.tscn"),
 	"tap_panic": preload("res://scenes/game/challenges/tap_panic.tscn"),
 	"drag_dodge": preload("res://scenes/game/challenges/drag_dodge.tscn"),
@@ -47,7 +46,9 @@ func submit_challenge(input_value: float) -> void:
 	_last_result = RunEngine.resolve_floor(_state, _catalog, input_value)
 	_update_hud()
 	var title := "SUCCESS" if bool(_last_result.success) else "FAIL"
-	var body := "+%d SCORE" % int(_last_result.score_delta) if bool(_last_result.success) else "HEARTS %d" % _state.hearts
+	var body := "+%d SCORE" % int(_last_result.score_delta)
+	if not bool(_last_result.success):
+		body = "HEARTS %d" % _state.hearts
 	get_node("GameOverlay").show_message(title, body, "CONTINUE", continue_flow)
 
 
@@ -109,7 +110,8 @@ func _present_floor() -> void:
 		_phase = "quirk"
 		var options: Array = []
 		for quirk_id in available_quirks():
-			options.append({"id": quirk_id, "label": str(quirk_id).replace("_", " ").capitalize()})
+			var label := str(quirk_id).replace("_", " ").capitalize()
+			options.append({"id": quirk_id, "label": label})
 		get_node("GameOverlay").show_choices("CHOOSE A QUIRK", options, choose_quirk)
 	else:
 		_spawn_challenge()
@@ -118,7 +120,7 @@ func _present_floor() -> void:
 func _spawn_challenge() -> void:
 	_clear_challenge()
 	var challenge_id := current_challenge_id()
-	var scene: PackedScene = ChallengeScenes.get(challenge_id)
+	var scene: PackedScene = CHALLENGE_SCENES.get(challenge_id)
 	if scene == null:
 		_phase = "error"
 		get_node("GameOverlay").show_message("SCENE ERROR", challenge_id, "RETRY", restart_run)
@@ -146,7 +148,8 @@ func _show_story(event_id: String) -> void:
 	for event in _catalog.story_events:
 		if str(event.get("id", "")) == event_id:
 			var title := str(event.get("speaker", "HOST"))
-			get_node("GameOverlay").show_message(title, str(event.get("text", "")), "CONTINUE", continue_flow)
+			var body := str(event.get("text", ""))
+			get_node("GameOverlay").show_message(title, body, "CONTINUE", continue_flow)
 			return
 	get_node("GameOverlay").show_message("STORY", event_id, "CONTINUE", continue_flow)
 

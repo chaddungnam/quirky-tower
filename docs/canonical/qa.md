@@ -16,10 +16,15 @@ done
 ## 현재 증거
 
 - catalog, challenge rules, run engine: PASS
+- main scene, 공통 UI, 도전 씬 계약, 15층 플레이 흐름: PASS
 - 고정 시드 424242: 15층 완주, 스토리 3비트, 광고/결제 동등성, 체크포인트 복원 PASS
 - 10,000런: 불가능 상태 0, 광고/결제 불일치 0
 - 파일 크기와 core 의존성 검사: PASS
+- Godot MCP macOS 런타임: 실행 즉시 1층, 실제 Timing 탭, Tap Panic 판정, Drag 이동, 게임오버·재시작, Quirk 3회, 스토리 3회, 15층 완료 PASS
+- 런타임 오류: 0
 
 ## 아직 증명하지 않은 것
 
-헤드리스 결과는 실제 손가락 입력, 화면 연출, Android/iOS 안전 영역, 햅틱, 네이티브 광고, 스토어 결제, Supabase, 실제 친구·랭킹 네트워크를 증명하지 않는다.
+macOS 마우스와 자동 흐름 검증은 실제 손가락 손맛, Android/iOS 안전 영역, 햅틱, 오디오, 네이티브 광고, 스토어 결제, Supabase, 실제 친구·랭킹 네트워크를 증명하지 않는다.
+
+출시 export 전에는 `godot_mcp` 플러그인을 비활성화해 개발용 MCP autoload 2개가 제거됐는지 확인한다.

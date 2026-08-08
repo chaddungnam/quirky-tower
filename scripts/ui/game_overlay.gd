@@ -1,11 +1,11 @@
-class_name GameOverlay
 extends Control
 
 const Tokens = preload("res://scripts/ui/design_tokens.gd")
 
 
 func _ready() -> void:
-	get_node("Center/Card").add_theme_stylebox_override("panel", Tokens.panel_style(self, Tokens.CREAM))
+	var style := Tokens.panel_style(self, Tokens.CREAM)
+	get_node("Center/Card").add_theme_stylebox_override("panel", style)
 
 
 func show_message(title: String, body: String, action_text: String, action: Callable) -> void:

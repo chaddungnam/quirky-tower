@@ -1,4 +1,3 @@
-class_name DesignTokens
 extends RefCounted
 
 const THEME_TYPE := "Quirky"

@@ -1,4 +1,3 @@
-class_name TapPanicChallenge
 extends Control
 
 signal finished(input_value: float)

@@ -1,4 +1,3 @@
-class_name DragDodgeChallenge
 extends Control
 
 signal finished(input_value: float)
@@ -76,7 +75,9 @@ func _move_obstacles(delta: float) -> void:
 		_obstacles[index].position.y += speed * delta
 		if _obstacles[index].position.y > arena.end.y:
 			_obstacles[index].position.y = arena.position.y - 60.0
-			_obstacles[index].position.x = arena.position.x + fmod(float(index * 197 + int(_elapsed * 53.0)), maxf(1.0, arena.size.x - _obstacles[index].size.x))
+			var span := maxf(1.0, arena.size.x - _obstacles[index].size.x)
+			var offset := fmod(float(index * 197 + int(_elapsed * 53.0)), span)
+			_obstacles[index].position.x = arena.position.x + offset
 
 
 func _has_collision() -> bool:

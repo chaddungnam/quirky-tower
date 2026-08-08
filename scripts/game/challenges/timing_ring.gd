@@ -1,4 +1,3 @@
-class_name TimingRingChallenge
 extends Control
 
 signal finished(input_value: float)
@@ -43,12 +42,16 @@ func _draw() -> void:
 	var track_width := minf(size.x * 0.78, 560.0)
 	var track := Rect2(center.x - track_width * 0.5, center.y - 18.0, track_width, 36.0)
 	draw_style_box(Tokens.panel_style(self, Tokens.NAVY, 18), track)
-	var target_width := maxf(0.08, 0.25 - _difficulty * 0.2 + float(_modifiers.get("window_bonus", 0.0)))
-	var target := Rect2(center.x - track_width * target_width, center.y - 18.0, track_width * target_width * 2.0, 36.0)
+	var bonus := float(_modifiers.get("window_bonus", 0.0))
+	var target_width := maxf(0.08, 0.25 - _difficulty * 0.2 + bonus)
+	var target_position := Vector2(center.x - track_width * target_width, center.y - 18.0)
+	var target := Rect2(target_position, Vector2(track_width * target_width * 2.0, 36.0))
 	draw_style_box(Tokens.panel_style(self, Tokens.TEAL, 18), target)
 	var normalized := pingpong(_phase, 1.0)
 	var needle_x := track.position.x + track_width * normalized
-	draw_line(Vector2(needle_x, center.y - 76.0), Vector2(needle_x, center.y + 76.0), Tokens.color(self, Tokens.CORAL), 12.0, true)
+	var needle_start := Vector2(needle_x, center.y - 76.0)
+	var needle_end := Vector2(needle_x, center.y + 76.0)
+	draw_line(needle_start, needle_end, Tokens.color(self, Tokens.CORAL), 12.0, true)
 
 
 func _finish() -> void:
