@@ -23,7 +23,7 @@ func show_choices(title: String, options: Array, action: Callable) -> void:
 	for option in options:
 		var option_id := str(option.get("id", ""))
 		var label := str(option.get("label", option_id.replace("_", " ").capitalize()))
-		_add_action(label, func() -> void: action.call(option_id))
+		_add_action(label, action.bind(option_id))
 	show()
 
 

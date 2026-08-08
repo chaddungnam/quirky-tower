@@ -52,6 +52,7 @@ func _init() -> void:
 
 	var reroute_state = RunState.new_run(7, "DE")
 	reroute_state.quirks = ["reroute"]
+	assert(RunEngine.challenge_id_for_floor(reroute_state, catalog) == "tap_panic", "UI and engine share rerouted challenge lookup")
 	var rerouted: Dictionary = RunEngine.resolve_floor(reroute_state, catalog, 1.0)
 	assert(rerouted.challenge_id != "timing_ring", "reroute deterministically changes the challenge")
 

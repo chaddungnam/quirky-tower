@@ -13,12 +13,8 @@ static func resolve_floor(state, catalog, input_value: float) -> Dictionary:
 		return {"success": false, "error": "floor out of range", "status": state.status}
 
 	var floor_data: Dictionary = catalog.floors[floor_index]
-	var challenge_id := str(floor_data.challenge_id)
+	var challenge_id := challenge_id_for_floor(state, catalog)
 	var modifiers := QuirkRules.modifiers(state.quirks)
-	if int(modifiers.challenge_shift) != 0:
-		var challenge_ids: Array = catalog.challenges.keys()
-		var current_index := challenge_ids.find(challenge_id)
-		challenge_id = str(challenge_ids[(current_index + int(modifiers.challenge_shift)) % challenge_ids.size()])
 
 	var evaluation: Dictionary = ChallengeRules.evaluate(challenge_id, input_value, float(floor_data.difficulty), modifiers)
 	var current_floor: int = state.floor
@@ -63,6 +59,19 @@ static func resolve_floor(state, catalog, input_value: float) -> Dictionary:
 		"status": state.status,
 		"country": state.country,
 	}
+
+
+static func challenge_id_for_floor(state, catalog) -> String:
+	var floor_index: int = state.floor - 1
+	if floor_index < 0 or floor_index >= catalog.floors.size():
+		return ""
+	var challenge_id := str(catalog.floors[floor_index].challenge_id)
+	var shift := int(QuirkRules.modifiers(state.quirks).challenge_shift)
+	if shift == 0:
+		return challenge_id
+	var challenge_ids: Array = catalog.challenges.keys()
+	var current_index := challenge_ids.find(challenge_id)
+	return str(challenge_ids[(current_index + shift) % challenge_ids.size()])
 
 
 static func _story_event_for_floor(events: Array, floor_number: int) -> String:
