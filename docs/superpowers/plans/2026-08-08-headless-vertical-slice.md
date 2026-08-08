@@ -160,7 +160,7 @@ git push origin main
 - Produces: `ChallengeRules.evaluate(challenge_id: String, input_value: float, difficulty: float, modifiers: Dictionary = {}) -> Dictionary` with keys `success`, `quality`, `score`.
 - Produces: `RunState.new_run(seed: int, country: String) -> RunState`, `snapshot() -> Dictionary`, and `restore(data: Dictionary) -> RunState`.
 
-- [ ] **Step 1: Write failing rule tests**
+- [x] **Step 1: Write failing rule tests**
 
 Assert these boundaries:
 
@@ -172,21 +172,21 @@ Assert these boundaries:
 
 Assert a `RunState` snapshot round-trip preserves seed, floor, hearts, combo, score, Quirks, checkpoint, boost usage, and `country` including faction code `ALN`.
 
-- [ ] **Step 2: Verify the tests fail**
+- [x] **Step 2: Verify the tests fail**
 
 Run both new test scripts with Godot `--headless --script`.
 
 Expected: FAIL because the rule and state classes are missing.
 
-- [ ] **Step 3: Implement the three direct evaluators**
+- [x] **Step 3: Implement the three direct evaluators**
 
 Use a `match challenge_id` in one class. Do not create a base challenge interface or three one-method classes. Clamp quality to `0.0..1.0` and calculate integer score from quality and difficulty.
 
-- [ ] **Step 4: Implement serializable RunState**
+- [x] **Step 4: Implement serializable RunState**
 
 Initial values are floor `1`, hearts `3`, combo `0`, score `0`, empty Quirks, checkpoint floor `1`, and unused Sponsor Boost. Reject snapshots with unsupported `version`, floor outside `1..15`, negative hearts, or non-array Quirks.
 
-- [ ] **Step 5: Verify and publish**
+- [x] **Step 5: Verify and publish**
 
 Run both focused tests plus the project guard, then commit and push:
 
