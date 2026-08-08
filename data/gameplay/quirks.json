@@ -1,0 +1,6 @@
+[
+  {"id": "wide_window", "window_bonus": 0.12},
+  {"id": "overheat_combo", "combo_bonus": 0.50, "failure_penalty": 1},
+  {"id": "replay", "charges": 1},
+  {"id": "reroute", "challenge_shift": 1}
+]

@@ -1,0 +1,7 @@
+[
+  {"code": "KR", "kind": "country", "ko": "대한민국", "en": "South Korea"},
+  {"code": "DE", "kind": "country", "ko": "독일", "en": "Germany"},
+  {"code": "ALN", "kind": "faction", "ko": "외계인", "en": "Alien"},
+  {"code": "SGV", "kind": "faction", "ko": "그림자정부", "en": "Shadow Government"},
+  {"code": "RPT", "kind": "faction", "ko": "렙틸리언", "en": "Reptilian"}
+]

@@ -1,0 +1,5 @@
+[
+  {"id": "timing_ring", "base_difficulty": 0.35, "base_score": 120},
+  {"id": "tap_panic", "base_difficulty": 0.45, "base_score": 100},
+  {"id": "drag_dodge", "base_difficulty": 0.40, "base_score": 110}
+]

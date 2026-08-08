@@ -110,11 +110,11 @@ Expected: structural QA passes and `main` is clean against `origin/main`.
 **Interfaces:**
 - Produces: `GameCatalog.load_default() -> GameCatalog`, `GameCatalog.validate() -> PackedStringArray`, and dictionaries named `challenges`, `quirks`, `floors`, `story_events`, `sponsor_boost`, `country_entries`.
 
-- [ ] **Step 1: Write the catalog test**
+- [x] **Step 1: Write the catalog test**
 
 The test loads all six JSON files, asserts there are exactly 3 challenge IDs (`timing_ring`, `tap_panic`, `drag_dodge`), 4 Quirk IDs, 15 floors, story triggers at 5/10/15, one Sponsor Boost, and both `DE` and `ALN` country codes. It also constructs an invalid catalog and asserts `validate()` reports its missing challenge reference.
 
-- [ ] **Step 2: Run the test and verify it fails**
+- [x] **Step 2: Run the test and verify it fails**
 
 Run:
 
@@ -124,7 +124,7 @@ Run:
 
 Expected: FAIL because `game_catalog.gd` does not exist.
 
-- [ ] **Step 3: Add the minimum JSON content**
+- [x] **Step 3: Add the minimum JSON content**
 
 - Challenges carry `id`, `base_difficulty`, `base_score`.
 - Quirks carry `id` and their one tuneable value.
@@ -133,11 +133,11 @@ Expected: FAIL because `game_catalog.gd` does not exist.
 - Sponsor Boost contains `id: sponsor_guard`, `hearts: 1`, `run_limit: 1`, `daily_limit: 5`.
 - Country entries include ordinary codes `KR`, `DE` and faction codes `ALN`, `SGV`, `RPT`, all in one array.
 
-- [ ] **Step 4: Implement strict loading and validation**
+- [x] **Step 4: Implement strict loading and validation**
 
 `GameCatalog` uses `FileAccess.get_file_as_string()` and `JSON.parse_string()`. Empty, malformed, or wrong-shaped files produce a validation error containing the exact resource path. Cross-reference every floor challenge ID and reject duplicate country codes.
 
-- [ ] **Step 5: Verify and publish**
+- [x] **Step 5: Verify and publish**
 
 Run the catalog test, the project guard, and `git diff --check`; then commit and push:
 
