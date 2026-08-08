@@ -1,0 +1,14 @@
+[gd_resource type="Theme" format=3]
+
+[resource]
+default_font_size = 26
+Button/font_sizes/font_size = 24
+Label/colors/font_color = Color(0.141, 0.196, 0.29, 1)
+Label/font_sizes/font_size = 26
+Quirky/colors/coral = Color(1, 0.353, 0.373, 1)
+Quirky/colors/cream = Color(1, 0.957, 0.847, 1)
+Quirky/colors/gold = Color(0.957, 0.773, 0.259, 1)
+Quirky/colors/navy = Color(0.141, 0.196, 0.29, 1)
+Quirky/colors/orange = Color(0.969, 0.549, 0.239, 1)
+Quirky/colors/red = Color(0.82, 0.173, 0.212, 1)
+Quirky/colors/teal = Color(0.184, 0.714, 0.659, 1)
