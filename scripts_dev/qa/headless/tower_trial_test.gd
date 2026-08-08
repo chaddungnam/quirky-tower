@@ -1,0 +1,43 @@
+extends SceneTree
+
+const TrialScene = preload("res://scenes/game/challenges/tower_trial.tscn")
+
+
+func _init() -> void:
+	call_deferred("_run")
+
+
+func _run() -> void:
+	var trial = TrialScene.instantiate()
+	root.add_child(trial)
+	var emitted: Array = []
+	trial.finished.connect(
+		func(input_value: float, score_multiplier: float) -> void:
+			emitted.append({"input": input_value, "multiplier": score_multiplier})
+	)
+	trial.setup(0.4, {}, "timing_ring")
+	trial.begin()
+	assert(trial.get("_phase") == "route", "a floor begins with route choice")
+	var actions = trial.get_node("RoutePanel/Content/RouteActions")
+	assert(actions.get_child_count() == 3, "three risk routes are offered")
+	actions.get_child(2).pressed.emit()
+	assert(trial.get("_phase") == "dodge", "route choice starts direct control")
+	assert(is_equal_approx(float(trial.get("_score_multiplier")), 1.5), "chaos route carries x1.5")
+	trial.set("_obstacles", [])
+	trial.set("_elapsed", 3.1)
+	trial._process(0.0)
+	assert(trial.get("_phase") == "smash", "surviving the dodge opens the smash timing")
+	trial.set("_needle_phase", 0.5)
+	var tap := InputEventMouseButton.new()
+	tap.button_index = MOUSE_BUTTON_LEFT
+	tap.position = Vector2(360.0, 640.0)
+	tap.pressed = true
+	trial._gui_input(tap)
+	trial._process(0.6)
+	assert(not emitted.is_empty(), "smash feedback emits the floor result")
+	assert(float(emitted[0].input) >= 0.0 and float(emitted[0].input) <= 1.0, "input stays normalized")
+	assert(is_equal_approx(float(emitted[0].multiplier), 1.5), "selected risk reward reaches the run")
+	trial.free()
+
+	print("PASS tower_trial_test")
+	quit(0)
