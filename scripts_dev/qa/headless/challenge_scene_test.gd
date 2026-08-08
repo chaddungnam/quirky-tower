@@ -2,7 +2,7 @@ extends SceneTree
 
 
 func _init() -> void:
-	for challenge_id in ["timing_ring", "tap_panic", "drag_dodge"]:
+	for challenge_id in ["timing_ring", "tap_panic", "drag_dodge", "tower_trial"]:
 		var path := "res://scenes/game/challenges/%s.tscn" % challenge_id
 		var scene = load(path)
 		assert(scene != null, "%s loads" % path)

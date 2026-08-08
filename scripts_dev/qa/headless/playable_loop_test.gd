@@ -10,6 +10,10 @@ func _init() -> void:
 func _run() -> void:
 	var screen = RunScreenScene.instantiate()
 	root.add_child(screen)
+	assert(
+		screen.get_node("ChallengeSlot").get_child(0).name == "TowerTrial",
+		"every floor starts through the integrated tower trial"
+	)
 	for cleared_floor in range(1, 16):
 		assert(screen.get_run_snapshot().floor == cleared_floor, "expected floor %d" % cleared_floor)
 		if screen.needs_quirk_choice():

@@ -5,11 +5,8 @@ const RunState = preload("res://scripts/core/run/run_state.gd")
 const RunEngine = preload("res://scripts/core/run/run_engine.gd")
 const QuirkRules = preload("res://scripts/core/quirks/quirk_rules.gd")
 const Tokens = preload("res://scripts/ui/design_tokens.gd")
-const CHALLENGE_SCENES := {
-	"timing_ring": preload("res://scenes/game/challenges/timing_ring.tscn"),
-	"tap_panic": preload("res://scenes/game/challenges/tap_panic.tscn"),
-	"drag_dodge": preload("res://scenes/game/challenges/drag_dodge.tscn"),
-}
+const TOWER_TRIAL_SCENE = preload("res://scenes/game/challenges/tower_trial.tscn")
+const CHALLENGE_IDS := ["timing_ring", "tap_panic", "drag_dodge"]
 const QUIRK_FLOORS := [4, 8, 12]
 
 var _catalog
@@ -38,12 +35,12 @@ func restart_run() -> void:
 	_present_floor()
 
 
-func submit_challenge(input_value: float) -> void:
+func submit_challenge(input_value: float, score_multiplier := 1.0) -> void:
 	if _phase != "challenge":
 		return
 	_phase = "result"
 	_clear_challenge()
-	_last_result = RunEngine.resolve_floor(_state, _catalog, input_value)
+	_last_result = RunEngine.resolve_floor(_state, _catalog, input_value, score_multiplier)
 	_update_hud()
 	var title := "SUCCESS" if bool(_last_result.success) else "FAIL"
 	var body := "+%d SCORE" % int(_last_result.score_delta)
@@ -120,15 +117,18 @@ func _present_floor() -> void:
 func _spawn_challenge() -> void:
 	_clear_challenge()
 	var challenge_id := current_challenge_id()
-	var scene: PackedScene = CHALLENGE_SCENES.get(challenge_id)
-	if scene == null:
+	if challenge_id not in CHALLENGE_IDS:
 		_phase = "error"
 		get_node("GameOverlay").show_message("SCENE ERROR", challenge_id, "RETRY", restart_run)
 		return
-	_current_challenge = scene.instantiate()
+	_current_challenge = TOWER_TRIAL_SCENE.instantiate()
 	get_node("ChallengeSlot").add_child(_current_challenge)
 	var floor_data: Dictionary = _catalog.floors[_state.floor - 1]
-	_current_challenge.setup(float(floor_data.difficulty), QuirkRules.modifiers(_state.quirks))
+	_current_challenge.setup(
+		float(floor_data.difficulty),
+		QuirkRules.modifiers(_state.quirks),
+		challenge_id
+	)
 	_current_challenge.finished.connect(submit_challenge)
 	_phase = "challenge"
 	_current_challenge.begin()
