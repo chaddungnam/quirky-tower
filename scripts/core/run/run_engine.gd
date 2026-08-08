@@ -5,7 +5,7 @@ const ChallengeRules = preload("res://scripts/core/challenges/challenge_rules.gd
 const QuirkRules = preload("res://scripts/core/quirks/quirk_rules.gd")
 
 
-static func resolve_floor(state, catalog, input_value: float) -> Dictionary:
+static func resolve_floor(state, catalog, input_value: float, score_multiplier := 1.0) -> Dictionary:
 	if state.status != "running":
 		return {"success": false, "error": "run is not active", "status": state.status}
 	var floor_index: int = state.floor - 1
@@ -23,7 +23,8 @@ static func resolve_floor(state, catalog, input_value: float) -> Dictionary:
 	if evaluation.success:
 		state.combo += 1
 		var combo_multiplier := 1.0 + float(state.combo - 1) * 0.15
-		score_delta = int(round(float(evaluation.score) * combo_multiplier * float(modifiers.combo_multiplier)))
+		var route_multiplier := clampf(float(score_multiplier), 1.0, 1.5)
+		score_delta = int(round(float(evaluation.score) * combo_multiplier * float(modifiers.combo_multiplier) * route_multiplier))
 		state.score += score_delta
 		if current_floor == 15:
 			state.status = "complete"

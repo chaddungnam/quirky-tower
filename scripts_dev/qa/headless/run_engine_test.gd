@@ -13,6 +13,11 @@ func _init() -> void:
 	var success: Dictionary = RunEngine.resolve_floor(success_state, catalog, 0.5)
 	assert(success.success and success_state.floor == 2, "success advances one floor")
 	assert(success_state.combo == 1 and success_state.score > 0, "success builds combo and score")
+	var safe_route_state = RunState.new_run(20, "DE")
+	var risky_route_state = RunState.new_run(20, "DE")
+	RunEngine.resolve_floor(safe_route_state, catalog, 0.5, 1.0)
+	RunEngine.resolve_floor(risky_route_state, catalog, 0.5, 1.5)
+	assert(risky_route_state.score > safe_route_state.score, "risk route multiplies successful score")
 
 	var fail_state = RunState.new_run(2, "DE")
 	fail_state.combo = 3
