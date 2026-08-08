@@ -1,6 +1,7 @@
 extends SceneTree
 
 const TrialScene = preload("res://scenes/game/challenges/tower_trial.tscn")
+const AppTheme = preload("res://ui/themes/app_theme.tres")
 
 
 func _init() -> void:
@@ -9,6 +10,7 @@ func _init() -> void:
 
 func _run() -> void:
 	var trial = TrialScene.instantiate()
+	trial.theme = AppTheme
 	root.add_child(trial)
 	var emitted: Array = []
 	trial.finished.connect(
@@ -20,6 +22,12 @@ func _run() -> void:
 	assert(trial.get("_phase") == "route", "a floor begins with route choice")
 	var actions = trial.get_node("RoutePanel/Content/RouteActions")
 	assert(actions.get_child_count() == 3, "three risk routes are offered")
+	var first_button: Button = actions.get_child(0)
+	var normal_style: StyleBoxFlat = first_button.get_theme_stylebox("normal")
+	assert(
+		first_button.get_theme_color("font_color") != normal_style.bg_color,
+		"route button text contrasts with its background"
+	)
 	actions.get_child(2).pressed.emit()
 	assert(trial.get("_phase") == "dodge", "route choice starts direct control")
 	assert(is_equal_approx(float(trial.get("_score_multiplier")), 1.5), "chaos route carries x1.5")

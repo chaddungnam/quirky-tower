@@ -138,11 +138,11 @@ func _build_route_buttons() -> void:
 		var button := Button.new()
 		button.text = "%s\n%s" % [route.label, route.detail]
 		button.custom_minimum_size.y = 104.0
+		actions.add_child(button)
 		button.add_theme_stylebox_override("normal", Tokens.panel_style(button, Tokens.NAVY, 20))
 		button.add_theme_stylebox_override("hover", Tokens.panel_style(button, Tokens.CORAL, 20))
 		button.add_theme_color_override("font_color", Tokens.color(button, Tokens.CREAM))
 		button.pressed.connect(func() -> void: _choose_route(route))
-		actions.add_child(button)
 
 
 func _clear_route_buttons() -> void:
