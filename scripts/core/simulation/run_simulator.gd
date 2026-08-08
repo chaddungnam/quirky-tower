@@ -72,6 +72,65 @@ static func simulate(seed: int, options: Dictionary = {}) -> Dictionary:
 	}
 
 
+static func balance_report(run_count: int) -> Dictionary:
+	var catalog = GameCatalog.load_default()
+	var floor_reach := {}
+	for floor_number in range(1, 16):
+		floor_reach[str(floor_number)] = 0
+	var challenge_successes := _challenge_counter(catalog)
+	var quirk_selections := {}
+	for quirk_id in catalog.quirks:
+		quirk_selections[quirk_id] = 0
+	var combo_histogram := {}
+	var completed := {"unboosted": 0, "ad": 0, "paid": 0}
+	var boost_gameplay := {
+		"ad": {"completed": 0, "total_score": 0, "total_floor": 0, "total_turns": 0},
+		"paid": {"completed": 0, "total_score": 0, "total_floor": 0, "total_turns": 0},
+	}
+	var impossible_states := 0
+	var boost_parity_mismatches := 0
+
+	for seed in range(1, run_count + 1):
+		var options := {"country": "ALN", "bot_skill": 0.2 + float(seed % 8) * 0.08}
+		var unboosted := simulate(seed, options)
+		var ad := simulate(seed, options.merged({"boost_source": "ad"}, true))
+		var paid := simulate(seed, options.merged({"boost_source": "paid"}, true))
+		completed.unboosted += int(unboosted.status == "complete")
+		completed.ad += int(ad.status == "complete")
+		completed.paid += int(paid.status == "complete")
+		_accumulate_boost(boost_gameplay.ad, ad)
+		_accumulate_boost(boost_gameplay.paid, paid)
+		if _without_boost_source(ad) != _without_boost_source(paid):
+			boost_parity_mismatches += 1
+
+		var primary: Dictionary = [unboosted, ad, paid][seed % 3]
+		for floor_number in range(1, int(primary.floor_reached) + 1):
+			floor_reach[str(floor_number)] += 1
+		for challenge_id in primary.challenge_successes:
+			challenge_successes[challenge_id] += int(primary.challenge_successes[challenge_id])
+		for quirk_id in primary.selected_quirks:
+			quirk_selections[quirk_id] += 1
+		var combo_key := str(primary.max_combo)
+		combo_histogram[combo_key] = int(combo_histogram.get(combo_key, 0)) + 1
+		impossible_states += int(primary.impossible)
+
+	return {
+		"run_count": run_count,
+		"floor_reach": floor_reach,
+		"challenge_successes": challenge_successes,
+		"quirk_selections": quirk_selections,
+		"combo_histogram": combo_histogram,
+		"completion_rates": {
+			"unboosted": float(completed.unboosted) / float(run_count),
+			"ad": float(completed.ad) / float(run_count),
+			"paid": float(completed.paid) / float(run_count),
+		},
+		"boost_gameplay": boost_gameplay,
+		"boost_parity_mismatches": boost_parity_mismatches,
+		"impossible_states": impossible_states,
+	}
+
+
 static func _choose_quirk(state, quirk_ids: Array, rng: RandomNumberGenerator) -> void:
 	var available := quirk_ids.filter(func(id: String) -> bool: return not state.quirks.has(id))
 	if not available.is_empty():
@@ -96,3 +155,16 @@ static func _challenge_counter(catalog) -> Dictionary:
 	for challenge_id in catalog.challenges:
 		counter[challenge_id] = 0
 	return counter
+
+
+static func _without_boost_source(summary: Dictionary) -> Dictionary:
+	var copy := summary.duplicate(true)
+	copy.erase("boost_source")
+	return copy
+
+
+static func _accumulate_boost(total: Dictionary, summary: Dictionary) -> void:
+	total.completed += int(summary.status == "complete")
+	total.total_score += int(summary.score)
+	total.total_floor += int(summary.floor_reached)
+	total.total_turns += int(summary.turns)

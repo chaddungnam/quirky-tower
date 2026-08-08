@@ -308,7 +308,7 @@ git push origin main
 - Produces command: `godot --headless --path . --script scripts_dev/qa/headless/run_balance.gd -- --runs=10000`.
 - Produces ignored artifact: `qa_output/headless_balance.json`.
 
-- [ ] **Step 1: Write report assertions before aggregation**
+- [x] **Step 1: Write report assertions before aggregation**
 
 The script exits non-zero unless the report includes:
 
@@ -321,21 +321,21 @@ The script exits non-zero unless the report includes:
 - zero impossible states;
 - identical ad and paid gameplay aggregates.
 
-- [ ] **Step 2: Run and verify the report fails**
+- [x] **Step 2: Run and verify the report fails**
 
 Run with `--runs=10`.
 
 Expected: FAIL because aggregation is not implemented.
 
-- [ ] **Step 3: Implement one-pass aggregation**
+- [x] **Step 3: Implement one-pass aggregation**
 
 Loop seeds `1..run_count`, rotate Boost mode by seed modulo 3, and update dictionaries in memory. Write one JSON result at the end; do not retain every run.
 
-- [ ] **Step 4: Run the full balance pass**
+- [x] **Step 4: Run the full balance pass**
 
 Run with `--runs=10000` and assert it completes without parse errors, impossible states, or ad/paid divergence.
 
-- [ ] **Step 5: Verify and publish**
+- [x] **Step 5: Verify and publish**
 
 Ignore generated `qa_output/*.json` while retaining `.gitkeep`. Run all QA and commit code only:
 
