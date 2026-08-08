@@ -3,42 +3,35 @@ extends Control
 signal finished(input_value: float)
 
 const Tokens = preload("res://scripts/ui/design_tokens.gd")
-const PLAYER_RADIUS := 34.0
 
 var _difficulty := 0.5
 var _active := false
-var _elapsed := 0.0
-var _player := Vector2.ZERO
-var _obstacles: Array[Rect2] = []
+var _dodged := 0
+var _hazard_count := 3
+
+@onready var _stage = $StageDisplay/WorldViewport/TowerStage3D
+
+
+func _ready() -> void:
+	_stage.player_hit.connect(_on_player_hit)
+	_stage.hazard_dodged.connect(_on_hazard_dodged)
+	_stage.all_hazards_cleared.connect(_on_all_hazards_cleared)
+	$HitFlash.color = Tokens.color(self, Tokens.DANGER)
 
 
 func setup(difficulty: float, _modifiers: Dictionary = {}) -> void:
 	_difficulty = clampf(difficulty, 0.0, 1.0)
+	_hazard_count = 3 + int(round(_difficulty * 2.0))
 
 
 func begin() -> void:
-	var arena := _arena_rect()
-	_player = Vector2(arena.get_center().x, arena.end.y - 90.0)
-	_obstacles = [
-		Rect2(arena.position.x + 30.0, arena.position.y + 80.0, 210.0, 36.0),
-		Rect2(arena.end.x - 270.0, arena.position.y + 330.0, 240.0, 36.0),
-		Rect2(arena.position.x + 150.0, arena.position.y + 580.0, 190.0, 36.0),
-	]
-	_elapsed = 0.0
+	_dodged = 0
 	_active = true
-	queue_redraw()
-
-
-func _process(delta: float) -> void:
-	if not _active:
-		return
-	_elapsed += delta
-	_move_obstacles(delta)
-	if _has_collision():
-		_finish(0.0)
-	elif _elapsed >= 4.0:
-		_finish(0.5)
-	queue_redraw()
+	$Status.text = "0 / %d" % _hazard_count
+	$Status.add_theme_color_override("font_color", Tokens.color(self, Tokens.TEXT))
+	$HitFlash.modulate.a = 0.0
+	_stage.configure({"hazards": _hazard_count, "speed_bonus": 0.0, "id": "safe"}, _difficulty)
+	_stage.start_dodge()
 
 
 func _gui_input(event: InputEvent) -> void:
@@ -46,46 +39,48 @@ func _gui_input(event: InputEvent) -> void:
 		return
 	if event is InputEventScreenDrag:
 		_set_player_x(event.position.x)
+	elif event is InputEventScreenTouch and event.pressed:
+		_set_player_x(event.position.x)
 	elif event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_LEFT:
+		_set_player_x(event.position.x)
+	elif event is InputEventMouseButton and event.pressed:
 		_set_player_x(event.position.x)
 
 
-func _draw() -> void:
-	var arena := _arena_rect()
-	draw_style_box(Tokens.panel_style(self, Tokens.CREAM, 28), arena)
-	for obstacle in _obstacles:
-		draw_style_box(Tokens.panel_style(self, Tokens.NAVY, 18), obstacle)
-	draw_circle(_player, PLAYER_RADIUS, Tokens.color(self, Tokens.ORANGE), true, -1.0, true)
-
-
-func _arena_rect() -> Rect2:
-	return Rect2(34.0, 110.0, maxf(1.0, size.x - 68.0), maxf(1.0, size.y - 170.0))
-
-
 func _set_player_x(value: float) -> void:
-	var arena := _arena_rect()
-	_player.x = clampf(value, arena.position.x + PLAYER_RADIUS, arena.end.x - PLAYER_RADIUS)
-	queue_redraw()
+	var axis := clampf(value / maxf(1.0, size.x) * 2.0 - 1.0, -1.0, 1.0)
+	_stage.set_player_axis(axis)
 
 
-func _move_obstacles(delta: float) -> void:
-	var arena := _arena_rect()
-	var speed := 150.0 + _difficulty * 180.0
-	for index in range(_obstacles.size()):
-		_obstacles[index].position.y += speed * delta
-		if _obstacles[index].position.y > arena.end.y:
-			_obstacles[index].position.y = arena.position.y - 60.0
-			var span := maxf(1.0, arena.size.x - _obstacles[index].size.x)
-			var offset := fmod(float(index * 197 + int(_elapsed * 53.0)), span)
-			_obstacles[index].position.x = arena.position.x + offset
+func _on_player_hit() -> void:
+	if not _active:
+		return
+	$Status.text = "BONK!"
+	$Status.add_theme_color_override("font_color", Tokens.color(self, Tokens.DANGER))
+	$HitFlash.modulate.a = 0.42
+	var tween := create_tween()
+	tween.tween_property($HitFlash, "modulate:a", 0.0, 0.24)
+	_finish(0.0)
 
 
-func _has_collision() -> bool:
-	var player_rect := Rect2(_player - Vector2.ONE * PLAYER_RADIUS, Vector2.ONE * PLAYER_RADIUS * 2.0)
-	for obstacle in _obstacles:
-		if player_rect.intersects(obstacle):
-			return true
-	return false
+func _on_hazard_dodged(near_miss: bool) -> void:
+	if not _active:
+		return
+	_dodged += 1
+	$Status.text = "NEAR MISS +" if near_miss else "DODGE %d/%d" % [_dodged, _hazard_count]
+	$Status.add_theme_color_override(
+		"font_color", Tokens.color(self, Tokens.WARNING if near_miss else Tokens.PRIMARY)
+	)
+	$Status.pivot_offset = $Status.size * 0.5
+	$Status.scale = Vector2(0.72, 0.72)
+	var tween := create_tween()
+	tween.tween_property($Status, "scale", Vector2(1.18, 1.18), 0.08)
+	tween.tween_property($Status, "scale", Vector2.ONE, 0.16).set_trans(Tween.TRANS_BACK)
+
+
+func _on_all_hazards_cleared() -> void:
+	if _active:
+		_finish(0.5)
 
 
 func _finish(input_value: float) -> void:

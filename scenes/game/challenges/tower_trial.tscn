@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/game/challenges/tower_trial.gd" id="1"]
-[ext_resource type="PackedScene" path="res://scenes/game/world/tower_stage_3d.tscn" id="2_stage"]
+[ext_resource type="PackedScene" path="res://scenes/ui/components/mascot_guide.tscn" id="2"]
 
 [node name="TowerTrial" type="Control"]
 layout_mode = 3
@@ -13,7 +13,16 @@ grow_vertical = 2
 mouse_filter = 0
 script = ExtResource("1")
 
-[node name="StageDisplay" type="SubViewportContainer" parent="."]
+[node name="ChallengeSlot" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="IntroLayer" type="Control" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,90 +30,131 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-stretch = true
 
-[node name="WorldViewport" type="SubViewport" parent="StageDisplay"]
-handle_input_locally = false
-size = Vector2i(720, 1280)
-render_target_update_mode = 4
-
-[node name="TowerStage3D" parent="StageDisplay/WorldViewport" instance=ExtResource("2_stage")]
-
-[node name="HeaderBackdrop" type="ColorRect" parent="."]
+[node name="Dim" type="ColorRect" parent="IntroLayer"]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_bottom = 150.0
+anchor_bottom = 1.0
 grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
-color = Color(0.035, 0.047, 0.09, 0.84)
+color = Color(0.035, 0.047, 0.09, 0.88)
 
-[node name="Prompt" type="Label" parent="."]
+[node name="Center" type="CenterContainer" parent="IntroLayer"]
 layout_mode = 1
-anchors_preset = 10
+anchors_preset = 15
 anchor_right = 1.0
-offset_top = 18.0
-offset_bottom = 70.0
+anchor_bottom = 1.0
+offset_left = 44.0
+offset_right = -44.0
+offset_bottom = -160.0
 grow_horizontal = 2
-theme_override_font_sizes/font_size = 38
-text = "어느 길로 돌파할까?"
-horizontal_alignment = 1
+grow_vertical = 2
 
-[node name="Broadcast" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 28.0
-offset_top = 70.0
-offset_right = -28.0
-offset_bottom = 106.0
-grow_horizontal = 2
-theme_override_font_sizes/font_size = 21
-text = "생방송은 위험할수록 뜨거워집니다"
-horizontal_alignment = 1
-text_overrun_behavior = 3
+[node name="Card" type="PanelContainer" parent="IntroLayer/Center"]
+custom_minimum_size = Vector2(540, 260)
+layout_mode = 2
 
-[node name="Heat" type="Label" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 28.0
-offset_top = 108.0
-offset_right = -28.0
-offset_bottom = 144.0
-grow_horizontal = 2
-theme_override_colors/font_color = Color(0.82, 0.173, 0.212, 1)
-theme_override_font_sizes/font_size = 22
-text = "방송 열기 0%"
-horizontal_alignment = 2
-
-[node name="RoutePanel" type="PanelContainer" parent="."]
-layout_mode = 1
-anchors_preset = 10
-anchor_right = 1.0
-offset_left = 48.0
-offset_top = 164.0
-offset_right = -48.0
-offset_bottom = 720.0
-grow_horizontal = 2
-
-[node name="Content" type="VBoxContainer" parent="RoutePanel"]
+[node name="Content" type="VBoxContainer" parent="IntroLayer/Center/Card"]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="Title" type="Label" parent="RoutePanel/Content"]
+[node name="ModeTitle" type="Label" parent="IntroLayer/Center/Card/Content"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 31
-text = "위험을 고르면 점수가 커진다"
+theme_override_colors/font_color = Color(0.69, 0.95, 0.26, 1)
+theme_override_font_sizes/font_size = 58
+text = "SIGNAL LOCK"
 horizontal_alignment = 1
 
-[node name="Subtitle" type="Label" parent="RoutePanel/Content"]
+[node name="Instruction" type="Label" parent="IntroLayer/Center/Card/Content"]
 layout_mode = 2
-theme_override_font_sizes/font_size = 21
-text = "한 층 안에서 회피하고 마지막 문을 부수세요"
+theme_override_font_sizes/font_size = 32
+text = "꼭대기에서 탭!"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="GoLabel" type="Label" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -150.0
+offset_top = -80.0
+offset_right = 150.0
+offset_bottom = 80.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0.69, 0.95, 0.26, 1)
+theme_override_font_sizes/font_size = 92
+text = "GO!"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="ResultLayer" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Flash" type="ColorRect" parent="ResultLayer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Center" type="CenterContainer" parent="ResultLayer"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 64.0
+offset_right = -64.0
+offset_bottom = -120.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Card" type="PanelContainer" parent="ResultLayer/Center"]
+custom_minimum_size = Vector2(520, 230)
+layout_mode = 2
+
+[node name="Content" type="VBoxContainer" parent="ResultLayer/Center/Card"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ResultTitle" type="Label" parent="ResultLayer/Center/Card/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.69, 0.95, 0.26, 1)
+theme_override_font_sizes/font_size = 76
+text = "CLEAR!"
 horizontal_alignment = 1
 
-[node name="RouteActions" type="VBoxContainer" parent="RoutePanel/Content"]
+[node name="ResultDetail" type="Label" parent="ResultLayer/Center/Card/Content"]
 layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 16
+theme_override_font_sizes/font_size = 38
+text = "+120"
+horizontal_alignment = 1
+
+[node name="MascotGuide" parent="." instance=ExtResource("2")]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -390.0
+offset_top = -230.0
+offset_right = -30.0
+offset_bottom = -90.0
+grow_horizontal = 0
+grow_vertical = 0

@@ -41,19 +41,18 @@ func submit_challenge(input_value: float, score_multiplier := 1.0) -> void:
 	if _phase != "challenge":
 		return
 	_phase = "result"
-	_clear_challenge()
 	_last_result = RunEngine.resolve_floor(_state, _catalog, input_value, score_multiplier)
-	_update_hud()
-	var title := "SUCCESS" if bool(_last_result.success) else "FAIL"
-	var body := "+%d SCORE" % int(_last_result.score_delta)
-	if not bool(_last_result.success):
-		body = "HEARTS %d" % _state.hearts
-	get_node("GameOverlay").show_message(title, body, "CONTINUE", continue_flow)
+	_last_result["hearts"] = _state.hearts
+	if is_instance_valid(_current_challenge) and _current_challenge.has_method("show_resolution"):
+		_current_challenge.show_resolution(_last_result)
+	else:
+		get_node("GameOverlay").show_message("RESULT", "", "CONTINUE", continue_flow)
 
 
 func continue_flow() -> void:
 	if _phase == "result" and str(_last_result.get("story_event_id", "")) != "":
 		_phase = "story"
+		_clear_challenge()
 		_show_story(str(_last_result.story_event_id))
 		return
 	if _phase not in ["result", "story"]:
@@ -103,6 +102,7 @@ func get_run_snapshot() -> Dictionary:
 
 
 func _present_floor() -> void:
+	_clear_challenge()
 	get_node("GameOverlay").close()
 	_update_hud()
 	if needs_quirk_choice():
@@ -132,8 +132,14 @@ func _spawn_challenge() -> void:
 		challenge_id
 	)
 	_current_challenge.finished.connect(submit_challenge)
+	_current_challenge.resolution_finished.connect(_on_resolution_finished)
 	_phase = "challenge"
 	_current_challenge.begin()
+
+
+func _on_resolution_finished() -> void:
+	if _phase == "result":
+		continue_flow()
 
 
 func _clear_challenge() -> void:
@@ -159,6 +165,7 @@ func _show_story(event_id: String) -> void:
 
 func _show_run_end() -> void:
 	_phase = "end"
+	_clear_challenge()
 	var title := "TOWER COMPLETE" if _state.status == "complete" else "GAME OVER"
 	var body := "SCORE %d" % _state.score
 	get_node("GameOverlay").show_actions(title, body, [

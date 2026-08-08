@@ -1,12 +1,14 @@
 extends Node3D
 
 signal player_hit
+signal hazard_dodged(near_miss: bool)
+signal all_hazards_cleared
 
 const AppTheme = preload("res://ui/themes/app_theme.tres")
 const Tokens = preload("res://scripts/ui/design_tokens.gd")
 const PLAYER_Z := 3.35
 const FAR_Z := -10.0
-const WRAP_Z := 4.6
+const PASS_Z := 4.45
 const PLAYER_SPAN := 2.85
 
 var _difficulty := 0.5
@@ -14,7 +16,8 @@ var _route: Dictionary = {}
 var _player_axis := 0.0
 var _active := false
 var _speed := 5.5
-var _touching: Dictionary = {}
+var _resolved: Dictionary = {}
+var _cleared_count := 0
 
 @onready var _camera: Camera3D = $Camera
 @onready var _player: CharacterBody3D = $Player
@@ -33,9 +36,9 @@ func _ready() -> void:
 func configure(route: Dictionary, difficulty: float) -> void:
 	_route = route.duplicate()
 	_difficulty = clampf(difficulty, 0.0, 1.0)
-	_speed = 5.0 + _difficulty * 3.0 + float(_route.get("speed_bonus", 0.0)) / 35.0
+	_speed = 5.6 + _difficulty * 2.4 + float(_route.get("speed_bonus", 0.0)) / 70.0
 	_clear_hazards()
-	var count := maxi(1, int(_route.get("hazards", 2)))
+	var count := maxi(2, int(_route.get("hazards", 3)))
 	for index in range(count):
 		_add_hazard(index, count)
 	_apply_route_color(_route_color(str(_route.get("id", "safe"))))
@@ -43,37 +46,21 @@ func configure(route: Dictionary, difficulty: float) -> void:
 
 func start_dodge() -> void:
 	_active = true
+	_resolved.clear()
+	_cleared_count = 0
 	_exit.position.z = FAR_Z
 	_exit.scale = Vector3.ONE * 0.42
 	_player.position = Vector3(0.0, 0.58, PLAYER_Z)
-	for hazard in _hazards.get_children():
+	_sprite.modulate = Color.WHITE
+	for hazard: Area3D in _hazards.get_children():
 		hazard.show()
-		(hazard as Area3D).monitoring = true
+		hazard.monitoring = true
+		var visual := hazard.get_node("LowPolyVisual") as GeometryInstance3D
+		visual.transparency = 0.0
 
 
 func set_player_axis(axis: float) -> void:
 	_player_axis = clampf(axis, -1.0, 1.0)
-
-
-func show_smash() -> void:
-	_active = false
-	for hazard in _hazards.get_children():
-		(hazard as Area3D).monitoring = false
-		hazard.hide()
-	_exit.position.z = -3.8
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property(_exit, "position:z", -2.9, 0.22).set_trans(Tween.TRANS_BACK)
-	tween.tween_property(_exit, "scale", Vector3.ONE, 0.22).set_trans(Tween.TRANS_BACK)
-
-
-func show_feedback(quality: float) -> void:
-	_active = false
-	var spread := 2.4 if quality >= 0.62 else 1.65
-	var tween := create_tween().set_parallel(true)
-	tween.tween_property($Exit/DoorLeft, "position:x", -spread, 0.24).set_trans(Tween.TRANS_BACK)
-	tween.tween_property($Exit/DoorRight, "position:x", spread, 0.24).set_trans(Tween.TRANS_BACK)
-	tween.tween_property(_sprite, "scale", Vector3(1.25, 0.78, 1.0), 0.1)
-	tween.chain().tween_property(_sprite, "scale", Vector3.ONE, 0.18).set_trans(Tween.TRANS_BACK)
 
 
 func reset_stage() -> void:
@@ -86,25 +73,84 @@ func reset_stage() -> void:
 	$Exit/DoorLeft.position.x = -1.4
 	$Exit/DoorRight.position.x = 1.4
 	_sprite.scale = Vector3.ONE
+	_sprite.modulate = Color.WHITE
+	_resolved.clear()
+	_cleared_count = 0
 	_clear_hazards()
 	_apply_route_color(_route_color("safe"))
 
 
 func _physics_process(delta: float) -> void:
 	var target_x := _player_axis * PLAYER_SPAN
-	_player.velocity = Vector3((target_x - _player.position.x) * 15.0, 0.0, 0.0)
+	_player.velocity = Vector3((target_x - _player.position.x) * 16.0, 0.0, 0.0)
 	_player.move_and_slide()
 	_player.position.z = PLAYER_Z
 	if not _active:
 		return
-	for index in range(_hazards.get_child_count()):
-		var hazard := _hazards.get_child(index) as Area3D
+	for hazard: Area3D in _hazards.get_children():
+		if _resolved.has(hazard.get_instance_id()):
+			continue
 		hazard.position.z += _speed * delta
-		if hazard.position.z > WRAP_Z:
-			hazard.position.z = -8.5 - float(index) * 2.8
-			_touching.erase(hazard.get_instance_id())
 		_update_hazard_scale(hazard)
-	_report_collisions()
+		if hazard.overlaps_body(_player):
+			_resolve_hit(hazard)
+			break
+		if hazard.position.z > PASS_Z:
+			_resolve_dodge(hazard)
+
+
+func _resolve_hit(hazard: Area3D) -> void:
+	var key := hazard.get_instance_id()
+	if _resolved.has(key):
+		return
+	_resolved[key] = "hit"
+	_active = false
+	for other: Area3D in _hazards.get_children():
+		other.monitoring = false
+	var visual := hazard.get_node("LowPolyVisual") as MeshInstance3D
+	var material := visual.get_active_material(0).duplicate() as StandardMaterial3D
+	material.albedo_color = AppTheme.get_color(Tokens.DANGER, Tokens.THEME_TYPE)
+	material.emission = material.albedo_color.darkened(0.25)
+	visual.material_override = material
+	_sprite.modulate = AppTheme.get_color(Tokens.DANGER, Tokens.THEME_TYPE)
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(hazard, "scale", hazard.scale * 1.18, 0.08)
+	tween.tween_property(_sprite, "scale", Vector3(1.35, 0.65, 1.0), 0.08)
+	var hit_direction := signf(hazard.position.x + 0.01)
+	tween.tween_property(_sprite, "position:x", _sprite.position.x - hit_direction * 0.24, 0.08)
+	player_hit.emit()
+
+
+func _resolve_dodge(hazard: Area3D) -> void:
+	var key := hazard.get_instance_id()
+	if _resolved.has(key):
+		return
+	_resolved[key] = "dodge"
+	hazard.monitoring = false
+	_cleared_count += 1
+	var shape := hazard.get_node("Collision").shape as BoxShape3D
+	var half_width := shape.size.x * hazard.scale.x * 0.5
+	var near_miss := absf(_player.position.x - hazard.position.x) < half_width + 0.55
+	var visual := hazard.get_node("LowPolyVisual") as GeometryInstance3D
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property(hazard, "scale", Vector3(hazard.scale.x * 1.12, 0.04, 1.0), 0.16)
+	tween.tween_property(visual, "transparency", 1.0, 0.16)
+	tween.chain().tween_callback(hazard.hide)
+	hazard_dodged.emit(near_miss)
+	if _cleared_count == _hazards.get_child_count():
+		_active = false
+		_open_exit()
+		all_hazards_cleared.emit()
+
+
+func _open_exit() -> void:
+	_exit.position.z = -3.2
+	_exit.scale = Vector3.ONE
+	var tween := create_tween().set_parallel(true)
+	tween.tween_property($Exit/DoorLeft, "position:x", -2.5, 0.24).set_trans(Tween.TRANS_BACK)
+	tween.tween_property($Exit/DoorRight, "position:x", 2.5, 0.24).set_trans(Tween.TRANS_BACK)
+	tween.tween_property(_sprite, "scale", Vector3(0.82, 1.22, 1.0), 0.10)
+	tween.chain().tween_property(_sprite, "scale", Vector3.ONE, 0.16).set_trans(Tween.TRANS_BACK)
 
 
 func _add_hazard(index: int, count: int) -> void:
@@ -113,10 +159,10 @@ func _add_hazard(index: int, count: int) -> void:
 	hazard.collision_layer = 2
 	hazard.collision_mask = 1
 	hazard.monitoring = true
-	hazard.position = Vector3(_lane_x(index, count), 0.42, -7.8 - float(index) * 3.0)
+	hazard.position = Vector3(_lane_x(index, count), 0.42, -7.2 - float(index) * 2.35)
 	_hazards.add_child(hazard)
 
-	var width := 2.35 + float(index % 2) * 0.65
+	var width := 2.25 + float(index % 2) * 0.72
 	var shape := BoxShape3D.new()
 	shape.size = Vector3(width, 0.62, 0.62)
 	var collision := CollisionShape3D.new()
@@ -150,27 +196,13 @@ func _hazard_material(index: int) -> StandardMaterial3D:
 	return material
 
 
-func _report_collisions() -> void:
-	# ponytail: four hazards max; use signals only if this count grows materially.
-	for child in _hazards.get_children():
-		var hazard := child as Area3D
-		var key := hazard.get_instance_id()
-		if hazard.overlaps_body(_player):
-			if not _touching.has(key):
-				_touching[key] = true
-				player_hit.emit()
-		else:
-			_touching.erase(key)
-
-
 func _update_hazard_scale(hazard: Area3D) -> void:
-	var progress := clampf(inverse_lerp(-9.0, WRAP_Z, hazard.position.z), 0.0, 1.0)
+	var progress := clampf(inverse_lerp(-9.0, PASS_Z, hazard.position.z), 0.0, 1.0)
 	var depth_scale := lerpf(0.52, 1.08, progress)
 	hazard.scale = Vector3(depth_scale, depth_scale, 1.0)
 
 
 func _clear_hazards() -> void:
-	_touching.clear()
 	for child in _hazards.get_children():
 		_hazards.remove_child(child)
 		child.queue_free()
@@ -208,8 +240,7 @@ func _make_floor_texture() -> ImageTexture:
 	var line := dark.lightened(0.16)
 	for y in range(16):
 		for x in range(16):
-			var is_line := x % 4 == 0 or y % 4 == 0
-			image.set_pixel(x, y, line if is_line else dark)
+			image.set_pixel(x, y, line if x % 4 == 0 or y % 4 == 0 else dark)
 	return ImageTexture.create_from_image(image)
 
 

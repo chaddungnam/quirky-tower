@@ -17,13 +17,18 @@ func _run() -> void:
 	assert(app.get_node("SplashScreen").visible, "app starts on the banner")
 	assert(not app.get_node("HomeScreen").visible, "home waits for the banner")
 	assert(not app.get_node("RunScreen").visible, "the run does not start behind the banner")
+	assert(
+		app.get_node("RunScreen").process_mode == Node.PROCESS_MODE_DISABLED,
+		"hidden gameplay is frozen behind splash and home"
+	)
 
 	app.get_node("SplashScreen").finish_now()
 	assert(app.get_node("HomeScreen").visible, "banner completion opens home")
 	assert(not app.get_node("SplashScreen").visible, "banner closes after completion")
 	var home := app.get_node("HomeScreen") as Control
 	assert(
-		home.get_node("Content/Title").get_theme_color("font_color") == Tokens.color(home, Tokens.PRIMARY),
+		home.get_node("Content/Title").get_theme_color("font_color")
+		== Tokens.color(home, Tokens.PRIMARY),
 		"home uses the shared Tower primary role"
 	)
 
@@ -32,6 +37,9 @@ func _run() -> void:
 	app.get_node("SettingsScreen/Content/Rows/LanguageButton").pressed.emit()
 	var overlay = app.get_node("ChoiceOverlay")
 	assert(overlay.visible, "language opens the shared choice popup")
+	var overlay_card := overlay.get_node("Center/Card") as Control
+	assert(overlay_card.offset_transform_enabled, "shared popup uses layout-safe entrance motion")
+	assert(overlay_card.offset_transform_scale.x < 1.0, "popup starts with a visible pop-in beat")
 	var actions = overlay.get_node("Center/Card/Content/ActionScroll/Actions")
 	assert(actions.get_child_count() == 11, "ten languages and one vertical cancel action are shown")
 	var language_count := 0
@@ -50,6 +58,10 @@ func _run() -> void:
 	assert(app.get_node("HomeScreen").visible, "back returns to home")
 	app.get_node("HomeScreen/Content/PlayButton").pressed.emit()
 	assert(app.get_node("RunScreen").visible, "play opens the existing run")
+	assert(
+		app.get_node("RunScreen").process_mode == Node.PROCESS_MODE_INHERIT,
+		"gameplay resumes only after play is pressed"
+	)
 	assert(not app.get_node("HomeScreen").visible, "home closes during the run")
 	assert(
 		app.get_node("RunScreen/Background").color == Tokens.color(app, Tokens.BACKGROUND),

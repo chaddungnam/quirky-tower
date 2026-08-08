@@ -13,6 +13,7 @@ func _ready() -> void:
 	get_node("SettingsScreen").back_requested.connect(show_home)
 	get_node("SettingsScreen").language_requested.connect(_show_language_choices)
 	get_node("RunScreen").home_requested.connect(show_home)
+	_set_screen_processing()
 	_apply_language()
 
 
@@ -71,5 +72,15 @@ func _apply_language() -> void:
 
 func _show_only(screen: Control) -> void:
 	for path in ["SplashScreen", "HomeScreen", "SettingsScreen", "RunScreen"]:
-		get_node(path).visible = get_node(path) == screen
+		var candidate := get_node(path) as Control
+		candidate.visible = candidate == screen
+		candidate.process_mode = (
+			Node.PROCESS_MODE_INHERIT if candidate == screen else Node.PROCESS_MODE_DISABLED
+		)
 	get_node("ChoiceOverlay").close()
+
+
+func _set_screen_processing() -> void:
+	for path in ["SplashScreen", "HomeScreen", "SettingsScreen", "RunScreen"]:
+		var screen := get_node(path) as Control
+		screen.process_mode = Node.PROCESS_MODE_INHERIT if screen.visible else Node.PROCESS_MODE_DISABLED

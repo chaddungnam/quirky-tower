@@ -20,5 +20,5 @@ offset_top = 54.0
 offset_bottom = 108.0
 grow_horizontal = 2
 theme_override_font_sizes/font_size = 34
-text = "정중앙에서 멈춰!"
+text = "꼭대기에서 탭!"
 horizontal_alignment = 1

@@ -4,7 +4,9 @@
 
 ```text
 JSON data -> GameCatalog -> RunSimulator/RunEngine -> RunState -> headless report
-TowerStage3D -> TowerTrial scene -> RunController -> RunEngine -> RunState -> HUD/GameOverlay
+TimingRing/TapPanic/DragDodge -> TowerTrial -> RunController -> RunEngine -> RunState
+TowerStage3D -> DragDodge
+RunState -> RunHud/GameOverlay
 ```
 
 - `GameCatalog`: JSON 로딩과 참조 검증
@@ -12,8 +14,9 @@ TowerStage3D -> TowerTrial scene -> RunController -> RunEngine -> RunState -> HU
 - `RunState`: 버전이 있는 저장 스냅샷
 - `RunEngine`: 한 층의 성공·실패·콤보·스토리·체크포인트 처리
 - `RunSimulator`: 고정 시드 런과 대량 집계
-- `RunController`: 통합 층 도전, Quirk·스토리·종료 화면 흐름
-- `TowerStage3D`: 고정 카메라 무대, 픽셀 진행자, 저폴리 장애물, 실제 3D 충돌. 점수와 런 상태는 알지 못한다.
+- `RunController`: 층별 도전, Quirk·스토리·종료 화면 흐름
+- `TowerTrial`: 세 도전 씬 중 현재 층 하나를 열고 예고·결과·마스코트 전환을 공통 처리
+- `TowerStage3D`: Drag Dodge의 고정 카메라 무대, 픽셀 진행자, 저폴리 장애물, 실제 3D 충돌. 점수와 런 상태는 알지 못한다.
 
 ## 화면 폴더
 
