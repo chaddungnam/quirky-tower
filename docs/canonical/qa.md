@@ -16,11 +16,12 @@ done
 ## 현재 증거
 
 - catalog, challenge rules, run engine: PASS
-- main scene, 공통 UI, 도전 씬 계약, 자동 15층 상태 흐름: PASS
+- main scene, 공통 UI, 통합 도전 씬 계약, 자동 15층 상태 흐름: PASS
 - 고정 시드 424242: 15층 완주, 스토리 3비트, 광고/결제 동등성, 체크포인트 복원 PASS
 - 10,000런: 불가능 상태 0, 광고/결제 불일치 0
 - 파일 크기와 core 의존성 검사: PASS
-- Godot MCP macOS 런타임: 실제 Timing 성공 입력, 결과 버튼, 2층 진입 PASS
+- 통합 도전 회귀 테스트: 세 경로, 경로 버튼 대비, 회피·파괴 상태, 정규화 입력, ×1.50 전달 PASS
+- Godot MCP macOS 런타임: 방송사고 경로 버튼, 직접 마우스 드래그, 타이밍 탭, PERFECT 피드백, ×1.50 점수, 결과 버튼, 2층 진입 PASS
 - 결과 버튼 회귀 테스트: 신호 처리 중 locked object 크래시 재현 후 수정 PASS
 - 현재 검증 구간 런타임 오류: 0
 
