@@ -34,7 +34,7 @@
 - Consumes: Godot 4.7 at `/Applications/Godot.app/Contents/MacOS/Godot`.
 - Produces: `bash scripts_dev/qa/check_project.sh`, the single structural QA entrypoint used by all later tasks.
 
-- [ ] **Step 1: Fetch and verify the upstream addon**
+- [x] **Step 1: Fetch and verify the upstream addon**
 
 Download release `v0.7.2` from `regiellis/godot-mcp-go` into a temporary directory. Verify SHA-256 exactly:
 
@@ -44,7 +44,7 @@ Download release `v0.7.2` from `regiellis/godot-mcp-go` into a temporary directo
 
 Extract only the packaged `addons/godot_mcp` tree into this repository. Do not copy House Duck's modified MCP.
 
-- [ ] **Step 2: Enable the editor plugin**
+- [x] **Step 2: Enable the editor plugin**
 
 Add this project setting, using the actual `plugin.cfg` path found in the verified archive:
 
@@ -54,7 +54,7 @@ Add this project setting, using the actual `plugin.cfg` path found in the verifi
 enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
 ```
 
-- [ ] **Step 3: Write the failing structure check**
+- [x] **Step 3: Write the failing structure check**
 
 Create `scripts_dev/qa/check_project.sh` so it exits non-zero when:
 
@@ -69,17 +69,17 @@ It must print warnings at 500 `.gd` lines and 600 `.md` lines, then run Godot he
 /Applications/Godot.app/Contents/MacOS/Godot --headless --path . --editor --quit
 ```
 
-- [ ] **Step 4: Run the check and verify the missing canonical index fails**
+- [x] **Step 4: Run the check and verify the missing canonical index fails**
 
 Run: `bash scripts_dev/qa/check_project.sh`
 
 Expected: FAIL naming `docs/canonical/README.md` before the index is created.
 
-- [ ] **Step 5: Add the canonical index and work state**
+- [x] **Step 5: Add the canonical index and work state**
 
 `docs/canonical/README.md` links to the approved design, this implementation plan, and `work_state.md`. `work_state.md` records the current P0 as “headless 15-floor vertical slice” and the policy to commit and push completed project work automatically.
 
-- [ ] **Step 6: Verify and publish**
+- [x] **Step 6: Verify and publish**
 
 Run:
 
