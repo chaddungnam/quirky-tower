@@ -4,7 +4,7 @@
 
 ```text
 JSON data -> GameCatalog -> RunSimulator/RunEngine -> RunState -> headless report
-Challenge scene -> RunController -> RunEngine -> RunState -> HUD/GameOverlay
+TowerTrial scene -> RunController -> RunEngine -> RunState -> HUD/GameOverlay
 ```
 
 - `GameCatalog`: JSON 로딩과 참조 검증
@@ -12,7 +12,7 @@ Challenge scene -> RunController -> RunEngine -> RunState -> HUD/GameOverlay
 - `RunState`: 버전이 있는 저장 스냅샷
 - `RunEngine`: 한 층의 성공·실패·콤보·스토리·체크포인트 처리
 - `RunSimulator`: 고정 시드 런과 대량 집계
-- `RunController`: 도전 씬 교체, Quirk·스토리·종료 화면 흐름
+- `RunController`: 통합 층 도전, Quirk·스토리·종료 화면 흐름
 
 ## 화면 폴더
 

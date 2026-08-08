@@ -10,6 +10,7 @@
 - [QA](qa.md)
 - [Quirky Ball 동일 도구 적용 프롬프트](../handoffs/quirky-ball-free-godot-docs-prompt.md)
 - [최소 플레이 루프 설계](../superpowers/specs/2026-08-08-minimal-playable-loop-design.md)
+- [통합 층 도전 설계](../superpowers/specs/2026-08-08-integrated-tower-trial-design.md)
 - [승인된 헤드리스 프로토타입 설계](../superpowers/specs/2026-08-08-quirky-tower-headless-prototype-design.md)
 - [헤드리스 구현 계획](../superpowers/plans/2026-08-08-headless-vertical-slice.md)
 
