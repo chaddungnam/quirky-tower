@@ -24,6 +24,13 @@ func _init() -> void:
 	assert(overlay.get_node("Center/Card/Content/Actions").get_child_count() == 1, "one action is shown")
 	overlay.show_choices("QUIRK", [{"id": "wide_window", "label": "Wide Window"}], func(_id): pass)
 	assert(overlay.get_node("Center/Card/Content/Actions").get_child_count() == 1, "choices replace old actions")
+	overlay.show_message("FAIL", "HEARTS 2", "CONTINUE", func(): overlay.close())
+	var action_button: Button = overlay.get_node("Center/Card/Content/Actions").get_child(0)
+	action_button.pressed.emit()
+	assert(
+		overlay.get_node("Center/Card/Content/Actions").get_child_count() == 0,
+		"an action can close its own overlay without leaving a locked button"
+	)
 	overlay.close()
 	assert(not overlay.visible, "close hides the overlay")
 	overlay.free()

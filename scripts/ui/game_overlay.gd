@@ -43,5 +43,7 @@ func _add_action(text: String, action: Callable) -> void:
 
 
 func _clear_actions() -> void:
-	for child in get_node("Center/Card/Content/Actions").get_children():
-		child.free()
+	var actions := get_node("Center/Card/Content/Actions")
+	for child in actions.get_children():
+		actions.remove_child(child)
+		child.queue_free()
