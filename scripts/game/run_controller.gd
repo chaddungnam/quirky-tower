@@ -1,5 +1,7 @@
 extends Control
 
+signal home_requested
+
 const GameCatalog = preload("res://scripts/core/run/game_catalog.gd")
 const RunState = preload("res://scripts/core/run/run_state.gd")
 const RunEngine = preload("res://scripts/core/run/run_engine.gd")
@@ -136,6 +138,7 @@ func _spawn_challenge() -> void:
 
 func _clear_challenge() -> void:
 	if is_instance_valid(_current_challenge):
+		_current_challenge.name = "_RetiredChallenge"
 		_current_challenge.queue_free()
 	_current_challenge = null
 
@@ -158,4 +161,7 @@ func _show_run_end() -> void:
 	_phase = "end"
 	var title := "TOWER COMPLETE" if _state.status == "complete" else "GAME OVER"
 	var body := "SCORE %d" % _state.score
-	get_node("GameOverlay").show_message(title, body, "PLAY AGAIN", restart_run)
+	get_node("GameOverlay").show_actions(title, body, [
+		{"label": "PLAY AGAIN", "action": restart_run},
+		{"label": "HOME", "action": func() -> void: home_requested.emit()},
+	])

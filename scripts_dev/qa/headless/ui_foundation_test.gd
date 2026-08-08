@@ -21,14 +21,36 @@ func _init() -> void:
 	overlay.show_message("READY", "Tap", "GO", func(): pass)
 	assert(overlay.visible, "message opens the overlay")
 	assert(overlay.get_node("Center/Card/Content/Title").text == "READY", "title updates")
-	assert(overlay.get_node("Center/Card/Content/Actions").get_child_count() == 1, "one action is shown")
-	overlay.show_choices("QUIRK", [{"id": "wide_window", "label": "Wide Window"}], func(_id): pass)
-	assert(overlay.get_node("Center/Card/Content/Actions").get_child_count() == 1, "choices replace old actions")
+	assert(
+		overlay.get_node("Center/Card/Content/ActionScroll/Actions").get_child_count() == 1,
+		"one action is shown"
+	)
+	overlay.show_choices(
+		"QUIRK",
+		[
+			{"id": "safe", "label": "Sicherer Weg mit besonders langem übersetztem Namen"},
+			{"id": "risk", "label": "Überraschend riskanter Weg für mutige Kandidaten"},
+		],
+		func(_id): pass
+	)
+	var action_scroll = overlay.get_node("Center/Card/Content/ActionScroll")
+	var actions = action_scroll.get_node("Actions")
+	assert(action_scroll is ScrollContainer, "choices use a vertical scroll container")
+	assert(actions is VBoxContainer, "choices are always stacked vertically")
+	assert(actions.get_child_count() == 2, "choices replace old actions")
+	for child in actions.get_children():
+		var button := child as Button
+		assert(button != null, "every choice is a button")
+		assert(button.custom_minimum_size.y >= 96.0, "choice meets the mobile touch target")
+		assert(
+			button.autowrap_mode == TextServer.AUTOWRAP_WORD_SMART,
+			"long translated choices wrap instead of clipping"
+		)
 	overlay.show_message("FAIL", "HEARTS 2", "CONTINUE", func(): overlay.close())
-	var action_button: Button = overlay.get_node("Center/Card/Content/Actions").get_child(0)
+	var action_button: Button = actions.get_child(0)
 	action_button.pressed.emit()
 	assert(
-		overlay.get_node("Center/Card/Content/Actions").get_child_count() == 0,
+		actions.get_child_count() == 0,
 		"an action can close its own overlay without leaving a locked button"
 	)
 	overlay.close()

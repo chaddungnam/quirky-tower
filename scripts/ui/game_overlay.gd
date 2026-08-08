@@ -9,21 +9,33 @@ func _ready() -> void:
 
 
 func show_message(title: String, body: String, action_text: String, action: Callable) -> void:
-	_clear_actions()
-	get_node("Center/Card/Content/Title").text = title
-	get_node("Center/Card/Content/Body").text = body
-	_add_action(action_text, action)
-	show()
+	show_actions(title, body, [{"label": action_text, "action": action}])
 
 
 func show_choices(title: String, options: Array, action: Callable) -> void:
-	_clear_actions()
-	get_node("Center/Card/Content/Title").text = title
-	get_node("Center/Card/Content/Body").text = "하나를 선택하세요"
+	var actions: Array = []
 	for option in options:
 		var option_id := str(option.get("id", ""))
-		var label := str(option.get("label", option_id.replace("_", " ").capitalize()))
-		_add_action(label, action.bind(option_id))
+		actions.append({
+			"id": option_id,
+			"label": str(option.get("label", option_id.replace("_", " ").capitalize())),
+			"action": action.bind(option_id),
+		})
+	show_actions(title, "하나를 선택하세요", actions)
+
+
+func show_actions(title: String, body: String, options: Array) -> void:
+	_clear_actions()
+	get_node("Center/Card/Content/Title").text = title
+	get_node("Center/Card/Content/Body").text = body
+	for option in options:
+		_add_action(
+			str(option.get("label", "")),
+			option.get("action", Callable()),
+			str(option.get("id", ""))
+		)
+	var action_scroll := get_node("Center/Card/Content/ActionScroll") as ScrollContainer
+	action_scroll.custom_minimum_size.y = minf(600.0, options.size() * 110.0)
 	show()
 
 
@@ -32,18 +44,21 @@ func close() -> void:
 	_clear_actions()
 
 
-func _add_action(text: String, action: Callable) -> void:
+func _add_action(text: String, action: Callable, option_id := "") -> void:
 	var button := Button.new()
 	button.text = text
-	button.custom_minimum_size.y = Tokens.TOUCH_HEIGHT
-	get_node("Center/Card/Content/Actions").add_child(button)
-	button.add_theme_stylebox_override("normal", Tokens.panel_style(button, Tokens.CORAL))
-	button.add_theme_color_override("font_color", Tokens.color(button, Tokens.CREAM))
-	button.pressed.connect(func() -> void: action.call())
+	button.set_meta("option_id", option_id)
+	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	get_node("Center/Card/Content/ActionScroll/Actions").add_child(button)
+	Tokens.style_button(button, Tokens.CORAL)
+	button.pressed.connect(func() -> void:
+		if action.is_valid():
+			action.call()
+	)
 
 
 func _clear_actions() -> void:
-	var actions := get_node("Center/Card/Content/Actions")
+	var actions := get_node("Center/Card/Content/ActionScroll/Actions")
 	for child in actions.get_children():
 		actions.remove_child(child)
 		child.queue_free()

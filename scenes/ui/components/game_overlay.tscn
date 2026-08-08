@@ -55,6 +55,12 @@ text = "Body"
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="Actions" type="VBoxContainer" parent="Center/Card/Content"]
+[node name="ActionScroll" type="ScrollContainer" parent="Center/Card/Content"]
 layout_mode = 2
+size_flags_horizontal = 3
+horizontal_scroll_mode = 0
+
+[node name="Actions" type="VBoxContainer" parent="Center/Card/Content/ActionScroll"]
+layout_mode = 2
+size_flags_horizontal = 3
 theme_override_constants/separation = 14
