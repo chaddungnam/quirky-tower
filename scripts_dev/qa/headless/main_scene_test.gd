@@ -11,8 +11,8 @@ func _init() -> void:
 		errors.append("viewport height must be 1280")
 	if int(ProjectSettings.get_setting("display/window/size/window_width_override", 0)) != 1080:
 		errors.append("desktop play width must be 1080")
-	if int(ProjectSettings.get_setting("display/window/size/window_height_override", 0)) != 1920:
-		errors.append("desktop play height must be 1920")
+	if int(ProjectSettings.get_setting("display/window/size/window_height_override", 0)) != 2400:
+		errors.append("desktop play height must be 2400")
 	if not errors.is_empty():
 		for error in errors:
 			push_error(error)
