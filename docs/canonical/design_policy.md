@@ -1,5 +1,7 @@
 # 디자인 정책
 
+QA 작업은 [`house_duck_test_case_standard.md`](house_duck_test_case_standard.md)를 함께 읽고 화면 변경에는 Visual 파생 케이스를 적용한다.
+
 UI는 다음 세 층으로만 공통화한다.
 
 1. `AppTheme.tres`: 폰트와 Godot 컨트롤 기본 스타일

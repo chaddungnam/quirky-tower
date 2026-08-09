@@ -54,8 +54,19 @@ func _run() -> void:
 	german_button.pressed.emit()
 	assert(app.get_node("SettingsScreen/Content/Title").text == "EINSTELLUNGEN", "German applies live")
 
-	app.get_node("SettingsScreen/Content/Rows/BackButton").pressed.emit()
-	assert(app.get_node("HomeScreen").visible, "back returns to home")
+	app.get_node("SettingsScreen/Content/Rows/LanguageButton").pressed.emit()
+	assert(overlay.visible, "language popup can be re-entered")
+	var cancel_event := InputEventAction.new()
+	cancel_event.action = "ui_cancel"
+	cancel_event.pressed = true
+	app.call("_input", cancel_event)
+	await process_frame
+	assert(not overlay.visible, "back closes only the top language popup")
+	assert(app.get_node("SettingsScreen").visible, "settings stays open after popup back")
+	app.call("_input", cancel_event)
+	await process_frame
+	assert(app.get_node("HomeScreen").visible, "back from settings returns home")
+
 	app.get_node("HomeScreen/Content/PlayButton").pressed.emit()
 	assert(app.get_node("RunScreen").visible, "play opens the existing run")
 	assert(

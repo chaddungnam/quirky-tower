@@ -46,9 +46,15 @@ func _init() -> void:
 			button.autowrap_mode == TextServer.AUTOWRAP_WORD_SMART,
 			"long translated choices wrap instead of clipping"
 		)
-	overlay.show_message("FAIL", "HEARTS 2", "CONTINUE", func(): overlay.close())
+	var action_calls := [0]
+	overlay.show_message("FAIL", "HEARTS 2", "CONTINUE", func() -> void:
+		action_calls[0] += 1
+		overlay.close()
+	)
 	var action_button: Button = actions.get_child(0)
 	action_button.pressed.emit()
+	action_button.pressed.emit()
+	assert(action_calls[0] == 1, "an overlay action resolves only once under repeated input")
 	assert(
 		actions.get_child_count() == 0,
 		"an action can close its own overlay without leaving a locked button"

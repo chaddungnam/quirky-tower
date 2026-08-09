@@ -3,6 +3,7 @@ extends Control
 const Tokens = preload("res://scripts/ui/design_tokens.gd")
 
 var _enter_tween: Tween
+var _action_taken := false
 
 
 func _ready() -> void:
@@ -31,6 +32,7 @@ func show_choices(title: String, options: Array, action: Callable) -> void:
 
 
 func show_actions(title: String, body: String, options: Array) -> void:
+	_action_taken = false
 	_clear_actions()
 	get_node("Center/Card/Content/Title").text = title
 	var body_label := get_node("Center/Card/Content/Body") as Label
@@ -67,6 +69,11 @@ func _add_action(text: String, action: Callable, option_id := "") -> void:
 	button.offset_transform_enabled = true
 	button.offset_transform_visual_only = true
 	button.pressed.connect(func() -> void:
+		if _action_taken:
+			return
+		_action_taken = true
+		for sibling in button.get_parent().get_children():
+			(sibling as Button).disabled = true
 		if action.is_valid():
 			action.call()
 	)

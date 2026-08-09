@@ -8,6 +8,7 @@
 - [아키텍처](architecture.md)
 - [디자인 정책](design_policy.md)
 - [QA](qa.md)
+- [House Duck 테스트 케이스 공통 기준](house_duck_test_case_standard.md)
 - [Quirky Ball 동일 도구 적용 프롬프트](../handoffs/quirky-ball-free-godot-docs-prompt.md)
 - [최소 플레이 루프 설계](../superpowers/specs/2026-08-08-minimal-playable-loop-design.md)
 - [통합 층 도전 설계](../superpowers/specs/2026-08-08-integrated-tower-trial-design.md)

@@ -21,6 +21,19 @@ func restart_run() -> void:
 	get_node("RunScreen").restart_run()
 
 
+func _input(event: InputEvent) -> void:
+	if not event.is_action_pressed("ui_cancel"):
+		return
+	var overlay := get_node("ChoiceOverlay") as Control
+	if overlay.visible:
+		overlay.close()
+		get_viewport().set_input_as_handled()
+		return
+	if get_node("SettingsScreen").visible:
+		show_home()
+		get_viewport().set_input_as_handled()
+
+
 func show_home() -> void:
 	_show_only(get_node("HomeScreen"))
 
