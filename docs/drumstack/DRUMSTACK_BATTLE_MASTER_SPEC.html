@@ -45,17 +45,17 @@
   <header class="hero" data-searchable data-status="locked" data-source="user-direction,argent-twilight-video-audit" data-decision="DS-PROD-001,DS-GAME-001">
     <div class="shell hero-grid">
       <div>
-        <div class="eyebrow">HOUSE DUCK · DRUMSTACK BATTLE · 3V3 BIRD TACTICS · MASTER SPEC v0.9 · 2026-08-11</div>
+        <div class="eyebrow">HOUSE DUCK · DRUMSTACK BATTLE · 3V3 BIRD TACTICS · MASTER SPEC v0.9.1 · 2026-08-11</div>
         <h1>움직이고,<br>스킬 쓰고,<br>판을 뒤집는다</h1>
         <p class="lead">도시 타일 전장에서 오리·닭·비둘기 3마리를 지휘한다. 각 조류는 자기 차례에 이동한 뒤 한 가지 스킬을 사용한다. 다음 행동 순서, 사거리, 위험 타일, 예상 결과를 전부 보고 판단하는 3대3 2.5D 전술 대전이다.</p>
         <div class="hero-quote"><strong>제품 약속:</strong> 중학생은 첫 턴에 “파란 칸으로 움직이고, 빛나는 버튼을 눌러 적을 맞힌다”를 별도 설명 없이 이해한다. 숙련자는 순서, 장애물, 밀치기, 회복, 상태효과를 조합해 불리한 판도 뒤집는다.</div>
         <div class="status-row">
-          <span class="badge locked">제품 방향 합의</span><span class="badge locked">AT식 개별 유닛 턴</span><span class="badge locked">3v3</span><span class="badge locked">가로 20:9 권장</span><span class="badge locked">무가챠·무장비</span><span class="badge proposed">HTML 명세 승인 대기</span><span class="badge proposed">수치 플레이테스트 전</span><span class="badge deferred">Supabase 후속</span>
+          <span class="badge locked">제품·HTML 방향 승인</span><span class="badge locked">AT식 개별 유닛 턴</span><span class="badge locked">3v3</span><span class="badge locked">가로 20:9 권장</span><span class="badge locked">무가챠·무장비</span><span class="badge proposed">Gate 0 실행 전</span><span class="badge proposed">수치 플레이테스트 전</span><span class="badge deferred">Supabase 후속</span>
         </div>
-        <div class="trace"><b>문서 경계:</b> 이 파일은 구현 전 정본 후보이며, 코드·Godot 화면·실기기·재미를 증명하지 않는다. 승인 뒤 <code>DS-*</code> 항목을 구현·테스트·스크린샷과 대조한다.</div>
+        <div class="trace"><b>문서 경계:</b> 제품·아트 방향은 승인됐고 구현 계획 작성이 허용됐다. 이 파일은 코드·Godot 화면·실기기·재미를 증명하지 않으며, 실제 착수 전 Gate 0 계약과 새 저장소 전환을 통과해야 한다.</div>
       </div>
       <div class="landscape" role="img" aria-label="가로 20대9 드럼스택 배틀 전투 HUD 개념도">
-        <div class="hud-top"><span>ROUND 2 · SCORE 4:3 · 04:18</span><div class="timeline"><span class="token chicken">C</span><span class="token enemy">E</span><span class="token pigeon">P</span><span class="token duck">D</span></div></div>
+        <div class="hud-top"><span>ACTION 7/24 · SCORE 4:3 · 04:18</span><div class="timeline"><span class="token chicken">C</span><span class="token enemy">E</span><span class="token pigeon">P</span><span class="token duck">D</span></div></div>
         <span class="objective"></span>
         <span class="piece p1 duck">D</span><span class="piece p2 chicken">C</span><span class="piece p3 pigeon">P</span>
         <span class="piece e1 enemy">G</span><span class="piece e2 enemy">R</span><span class="piece e3 enemy">S</span>
@@ -74,24 +74,24 @@
 
   <main>
     <section id="document-status" data-searchable data-status="locked proposed" data-source="user-direction,house-duck-rules" data-decision="DS-DOC-001" data-feature="DS-TC-SPEC-001">
-      <div class="shell"><div class="section-head"><div><div class="index">00 · DOCUMENT STATUS</div><h2>이 문서를 어떻게 읽고 승인하는가</h2></div></div>
-        <p class="intro">최신 사용자 지시가 구 Quirky Tower 명세보다 우선한다. 이 HTML은 드럼스택 배틀의 새 제품 정본 후보이며, 승인 전에는 기존 게임 코드를 삭제하거나 이름을 바꾸지 않는다.</p>
+      <div class="shell"><div class="section-head"><div><div class="index">00 · DOCUMENT STATUS</div><h2>이 문서를 어떻게 읽고 실행하는가</h2></div></div>
+        <p class="intro">최신 사용자 지시가 구 Quirky Tower 명세보다 우선한다. 제품·HTML 방향은 승인됐지만 기존 게임 삭제, 저장소 전환, SDK 연결은 Gate 0의 안전 검사를 통과한 뒤에만 실행한다.</p>
         <div class="status-strip"><span class="locked">LOCKED · 사용자 확정</span><span class="proposed">PROPOSED · 추천 수치</span><span class="playtest">NEEDS PLAYTEST</span><span class="deferred">DEFERRED · 후속</span><span class="cut">CUT · 만들지 않음</span></div>
         <div class="grid three">
-          <article class="card keep"><div class="kicker">SOURCE OF TRUTH</div><h3>우선순위</h3><ol><li>House Duck 공통 규칙</li><li>사용자의 최신 명시 지시</li><li>본 HTML의 LOCKED 결정</li><li>승인 뒤 생성할 구현 계획</li><li>코드·테스트·화면 증거</li></ol></article>
+          <article class="card keep"><div class="kicker">SOURCE OF TRUTH</div><h3>우선순위</h3><ol><li>House Duck 공통 규칙</li><li>사용자의 최신 명시 지시</li><li>본 HTML의 LOCKED 결정</li><li>승인된 실행 보충 계약·구현 계획</li><li>코드·테스트·화면 증거</li></ol></article>
           <article class="card info"><div class="kicker">EVIDENCE</div><h3>PASS를 섞지 않는다</h3><p><code>STATIC</code>, <code>HEADLESS</code>, <code>RUNTIME</code>, <code>VISUAL</code>, <code>DEVICE</code>, <code>HUMAN</code>을 분리한다. 문서 완성은 플레이 완성을 뜻하지 않는다.</p></article>
           <article class="card cut-card"><div class="kicker">NO SILENT DRIFT</div><h3>바뀌면 기록한다</h3><p>최신 지시로 5스킬 카드·공용 3액션·세로 고정·메인 스토리·가챠·장비를 제외했다. 다시 넣으려면 결정 ID를 명시적으로 대체한다.</p></article>
         </div>
         <details open><summary>이번 버전에서 잠근 핵심 13개</summary><div class="body"><ol><li>작업명: 한국어 <b>드럼스택 배틀</b>, 글로벌 <b>Drumstack Battle</b>.</li><li>3대3 조류 전술 대전. 시작 조류는 오리·닭·비둘기.</li><li>AT처럼 개별 유닛 행동 순서를 보여준다.</li><li>자기 차례에는 이동 0~1회 → 스킬/방어 1회 → 턴 종료.</li><li>가로 20:9를 기본 방향으로 한다.</li><li>스토리는 메인 진입을 막지 않는 서브 모드다.</li><li>가챠와 장비 시스템을 만들지 않는다.</li><li>영웅은 총 10명, 3명 지급, 2명 진행 해금, 5명 격주 공개.</li><li>마을 허브를 둔다.</li><li>무료 재화는 알, 프리미엄 재화는 보석.</li><li>보석은 미션·광고·구매로 얻는다.</li><li>스태미나는 PvE 보상 루프에 적용하고 핵심 대전은 막지 않는다.</li><li>일반 13+이며 아동 대상/Kids/Family 앱으로 만들지 않는다.</li></ol></div></details>
-        <details><summary>사용자 결정 기록 · 전체 HTML 승인은 아직 대기</summary><div class="body"><table><thead><tr><th>날짜</th><th>대화에서 합의한 방향</th><th>대체한 구안</th><th>상태</th></tr></thead><tbody>
+        <details><summary>사용자 결정 기록 · 제품·명세 방향 승인</summary><div class="body"><table><thead><tr><th>날짜</th><th>대화에서 합의한 방향</th><th>대체한 구안</th><th>상태</th></tr></thead><tbody>
           <tr><td>2026-08-11</td><td>3v3 조류 타일 전술, 오리·닭·비둘기 starter</td><td>Quirky Tower 3막 flock 게임</td><td>LOCKED</td></tr>
           <tr><td>2026-08-11</td><td>AT식 개별 유닛 턴, 이동 뒤 스킬, 가로 허용</td><td>공용 3액션·하단 5카드·세로 고정</td><td>LOCKED</td></tr>
           <tr><td>2026-08-11</td><td>무가챠·무장비, 10영웅, 3지급·2진행·5격주</td><td>300영웅·장비·소환 중심 성장</td><td>LOCKED</td></tr>
           <tr><td>2026-08-11</td><td>마을, 서브 스토리, 알·보석·모이, 실제 비동기 대전 후속</td><td>스토리 강제 진입·실시간 PvP</td><td>LOCKED</td></tr>
           <tr><td>2026-08-11</td><td>일반 13+, 중학생도 이해 가능한 직관성</td><td>아동 대상/Kids/Family 제품</td><td>LOCKED</td></tr>
-          <tr><td>현재</td><td>본 HTML의 세부 수치·게이트·BM·기술 계약</td><td>-</td><td>USER APPROVAL PENDING</td></tr>
-        </tbody></table><p class="subtle">LOCKED는 위 개별 제품 방향의 합의를 뜻한다. 본 HTML 전체를 승인했다는 뜻은 아니다.</p></div></details>
-        <div class="callout danger-callout"><strong>구현 금지:</strong> 이 문서 승인 전에는 기존 리부트 코드를 삭제하거나, 폴더·저장소·앱 ID를 드럼스택으로 바꾸거나, Supabase·광고 SDK·결제를 연결하지 않는다.</div>
+          <tr><td>2026-08-11</td><td>본 HTML 기반 개발 준비 점검과 구현 계획 작성</td><td>추가 승인 대기</td><td>APPROVED</td></tr>
+        </tbody></table><p class="subtle">LOCKED는 제품·구조 방향이다. PROPOSED 수치, 실제 재미, 성능과 BM 효과는 각 Gate 증거 전까지 확정값이 아니다.</p></div></details>
+        <div class="callout danger-callout"><strong>Gate 0 차단:</strong> 계획과 계약 문서 작성은 허용된다. 기존 리부트 삭제, 저장소·앱 ID 전환, Supabase·광고 SDK·결제 연결은 dirty worktree 보존·tag·새 저장소·release 차단 검사 전에는 실행하지 않는다.</div>
       </div>
     </section>
 
@@ -460,7 +460,7 @@ final_damage = max(1, round(post_defense × incoming))</code></pre><p>모든 퍼
         <details open><summary>서버 도입 순서</summary><div class="body"><ol><li><b>Local:</b> battle state, seed, command ledger, bot, 결과를 한 기기에서 재현.</li><li><b>Supabase P1:</b> 계정, 프로필, 편성 snapshot, 단일 시즌 랭킹, match/command 원장.</li><li><b>시즌 비동기:</b> server seed/state 수신 → 현재 유닛의 command 1개 제출 → 서버 검증·새 state 저장 → 상대 알림.</li><li><b>재접속:</b> 마지막 승인 turn_index부터 재생하고 같은 command_id 재전송은 기존 결과를 반환한다.</li><li><b>친구 초대:</b> 같은 실제 턴 교환을 사용하되 랭킹 보상 없음.</li><li><b>즉시 방어전·협동·길드:</b> 실제 턴 교환과 원장이 안정된 뒤.</li></ol></div></details>
         <details open><summary>비동기 command·시간 권위 · Gate F 계약</summary><div class="body"><pre><code>{
   match_id, rule_version, turn_index, command_id,
-  client_sequence, actor_id, move_tile, skill_id, target_tile,
+  client_sequence, actor_id, move_path, skill_id, target_tile,
   state_hash_before
 }</code></pre><ul><li><b>원자성:</b> 이동과 스킬/방어를 command 1개로 제출한다. 서버 승인 전 클라이언트 화면은 preview일 뿐이다.</li><li><b>순서:</b> 서버는 해당 match의 정확한 rule_version, 예상 turn_index, 현재 actor_id, state_hash_before가 모두 맞을 때만 수락한다.</li><li><b>중복:</b> command_id는 match 안에서 unique다. 같은 ID 재전송은 새 행동을 만들지 않고 저장된 동일 응답을 반환한다. client_sequence는 진단용이며 권위가 아니다.</li><li><b>시간:</b> 비동기 아레나에는 로컬 15초/7분 제한을 적용하지 않는다. 각 플레이어의 24시간 chess-clock bank를 서버 시각으로 자기 활성 턴에만 차감하고 0이면 <code>TIMEOUT_LOSS</code>로 종료한다.</li><li><b>서버 규칙:</b> Supabase Edge Function의 순수 TypeScript BattleRules가 랭크 권위다. Godot GDScript BattleRules는 로컬/preview mirror이며 서버 응답을 덮어쓰지 않는다.</li><li><b>드리프트 방지:</b> Gate F 전에 동일 JSON state/command/result golden vector 1,000개 이상을 GDScript와 TypeScript 양쪽에 실행해 state/event hash 불일치 0을 증명한다. match는 시작 rule_version에 고정한다.</li></ul></div></details>
         <details><summary>랭킹 무결성 경계</summary><div class="body"><ul><li>서버가 허용한 seed, map, roster snapshot, rule_version을 기록한다.</li><li>서버는 이산 규칙을 재생해 승인 state hash와 reward를 저장한다.</li><li>Godot 3D 물리·애니메이션 좌표는 랭킹 판정에 포함하지 않는다.</li><li>결과·reward도 match_id+rule_version idempotency key로 한 번만 반영한다.</li><li>오프라인 봇전과 서버 랭크 결과를 같은 증거로 간주하지 않는다.</li></ul></div></details>
@@ -477,7 +477,7 @@ final_damage = max(1, round(post_defense × incoming))</code></pre><p>모든 퍼
         </div>
         <details open><summary>영웅 1종 필수 산출물</summary><div class="body"><table><thead><tr><th>종류</th><th>규격/상태</th><th>필수</th><th>Gate</th></tr></thead><tbody>
           <tr><td>3D 모델</td><td>중간밀도 cel, LOD 0/1, 단일 skeleton</td><td>예</td><td>D</td></tr>
-          <tr><td>리깅</td><td>root/body_root/spine/neck_01/neck_02/head/beak/wing.LR/leg.LR/toe/tail</td><td>예</td><td>D</td></tr>
+          <tr><td>리깅</td><td>root/body_root/spine_01/chest/neck_01/neck_02/head/bill_lower/wing_*_shoulder/leg_*_thigh/foot/toe/tail_root</td><td>예</td><td>D</td></tr>
           <tr><td>애니메이션</td><td>idle, move, hit, KO, basic, active, signature, celebrate 8상태군; start/loop/stop·guard subclip 허용</td><td>8상태군</td><td>D</td></tr>
           <tr><td>표정</td><td>neutral, focus, assertive, hit, uneasy, victory</td><td>6개</td><td>D</td></tr>
           <tr><td>2D 전신</td><td>400×800 alpha, 동일 6표정 crop 파생</td><td>6장</td><td>D</td></tr>
@@ -525,27 +525,29 @@ final_damage = max(1, round(post_defense × incoming))</code></pre><p>모든 퍼
   modes/               # tutorial, bot_skirmish, arena
   localization/        # Godot CSV
 
-scripts/drumstack/core/
+scripts/core/battle/
   battle_state.gd      # seed, order, score, units, status, ledger
   battle_rules.gd      # validate/apply의 유일 권위
   grid_rules.gd        # path, range, LOS, push
   bot_policy.gd        # legal plan 평가
 
-scripts/drumstack/game/
+scripts/game/battle/
   battle_controller.gd # input → command → core → view
   battle_board_3d.gd   # logical tile ↔ world transform
   battle_view.gd       # event ledger → animation/VFX
 
-scenes/drumstack/
-  app/main.tscn
-  battle/battle_screen.tscn
-  battle/battle_board_3d.tscn
-  battle/actors/bird_actor.tscn
-  ui/village.tscn
-  ui/mode_select.tscn
-  ui/team_confirm.tscn
-  ui/result.tscn
-  ui/settings.tscn</code></pre></div></details>
+scenes/app/main.tscn
+scenes/outgame/village_shell.tscn
+scenes/drumstack/battle/
+  battle_screen.tscn
+  battle_board_3d.tscn
+  actors/bird_actor.tscn
+  arenas/arena_service_rooftop_01.tscn
+scenes/drumstack/ui/
+  mode_select.tscn
+  team_confirm.tscn
+  result.tscn
+  settings.tscn</code></pre></div></details>
         <details open><summary>도메인 경계</summary><div class="body"><table><thead><tr><th>구성요소</th><th>책임</th><th>하면 안 되는 일</th></tr></thead><tbody>
           <tr><td>BattleState</td><td>직렬화 가능한 현재 사실</td><td>Node 참조, Vector3, Tween 저장</td></tr>
           <tr><td>BattleRules</td><td>command 검증·적용, event 생성</td><td>UI, 오디오, await</td></tr>
@@ -554,8 +556,9 @@ scenes/drumstack/
           <tr><td>Controller</td><td>입력 상태, command 전달, 전환</td><td>피해 계산 중복</td></tr>
           <tr><td>View</td><td>event를 화면·소리로 표현</td><td>결과 판정, 보상 지급</td></tr>
         </tbody></table></div></details>
-        <details><summary>플러그인·기술 선택</summary><div class="body"><ul><li><b>유지:</b> community Godot Asset Library의 <code>godot_mcp</code> v0.7.2 pin. 개발 때만 켠다.</li><li><b>Release:</b> plugin 비활성, MCP autoload 없음, <code>addons/godot_mcp/**</code> export 제외, PCK 검사.</li><li><b>Native:</b> <code>AStarGrid2D</code>, <code>Camera3D</code>, <code>GridMap</code> 또는 수제 tile visuals, <code>AnimationTree</code>, Godot audio bus.</li><li><b>지금 제외:</b> behavior tree, state-chart plugin, Dialogic, Phantom Camera, FMOD/Wwise, GUT/GdUnit, Supabase SDK.</li><li><b>도입 시점:</b> Supabase·AdMob·Billing·StoreKit은 Gate A~C와 외부 재미 테스트 통과 뒤.</li></ul></div></details>
-        <div class="callout"><strong>Ponytail 기준:</strong> Gate A 로컬 core command는 <code>{kind, actor_id, move_tile, skill_id, target_tile}</code> Dictionary면 충분하다. Gate F에서 이 payload를 서버 envelope에 넣는다. ECS·ability framework·factory interface는 두 번째 실제 소비자가 생기기 전 만들지 않는다.</div>
+        <details open><summary>Gate A 실행 보충 계약</summary><div class="body"><p><a href="../superpowers/specs/2026-08-11-drumstack-core-implementation-contract.md"><b>Core Implementation Contract</b></a>가 JSON-safe BattleState/Command/Event, 명시적 <code>move_path</code>, clock·cooldown, 11×9 fixture, LOS·hazard, starter target shape, bot·10k fixture를 잠근다. 본 HTML과 충돌하면 최신 사용자 결정 다음으로 보충 계약의 구체 실행값을 따른다.</p></div></details>
+        <details><summary>플러그인·기술 선택</summary><div class="body"><ul><li><b>현재 legacy:</b> upstream community addon <code>godot_mcp</code> v0.7.2. 현재 Quirky Tower에서 임의 업그레이드하지 않는다.</li><li><b>새 repo 후보:</b> 공식 Godot Asset Library 배포본 v0.8.0을 격리 검증 후 pin한다. upstream v0.8.1은 v0.8.0과 runtime이 같은 문서 릴리스이므로 필수 업그레이드가 아니다. 실패하면 검증된 v0.7.2로 복귀한다.</li><li><b>Release:</b> plugin 비활성, MCP autoload 없음, <code>addons/godot_mcp/**</code> export 제외, PCK 검사.</li><li><b>Native:</b> <code>AStarGrid2D</code>, <code>Camera3D</code>, <code>GridMap</code> 또는 수제 tile visuals, <code>AnimationTree</code>, Godot audio bus.</li><li><b>지금 제외:</b> behavior tree, state-chart plugin, Dialogic, Phantom Camera, FMOD/Wwise, GUT/GdUnit, Supabase SDK.</li><li><b>도입 시점:</b> Supabase·AdMob·Billing·StoreKit은 Gate A~C와 외부 재미 테스트 통과 뒤.</li></ul></div></details>
+        <div class="callout"><strong>Ponytail 기준:</strong> Gate A local command는 JSON-safe Dictionary 하나면 충분하다. 이동은 검증할 ordered <code>move_path</code>를 포함해 동률 경로와 이동 중 소품 접촉을 재현한다. Gate F에서 같은 payload를 서버 envelope에 넣으며 ECS·ability framework·factory interface는 두 번째 실제 소비자가 생기기 전 만들지 않는다.</div>
       </div>
     </section>
 
@@ -563,13 +566,14 @@ scenes/drumstack/
       <div class="shell"><div class="section-head"><div><div class="index">18 · QUIRKY TOWER LEGACY MAP</div><h2>살릴 기반, 이름을 바꿀 셸, 버릴 게임</h2></div></div>
         <p class="intro">현재 <code>main</code>의 사용자 미커밋 파일과 Godot 생성물이 있으므로 지금 이동·삭제하지 않는다. 새 이름·폴더·저장소 전환은 본 명세 승인과 tag 뒤에 한다.</p>
         <table><thead><tr><th>판정</th><th>대상</th><th>처리</th></tr></thead><tbody>
-          <tr><td>KEEP</td><td><code>.editorconfig</code>, <code>.gitattributes</code>, <code>.gitignore</code>, fonts+license, <code>addons/godot_mcp/**</code>, affiliation data, <code>qa_output/.gitkeep</code></td><td>그대로 재사용, export 규칙 유지</td></tr>
-          <tr><td>KEEP DOC RULES</td><td><code>docs/canonical/README.md</code>, <code>design_policy.md</code>, <code>qa.md</code>, shared <code>house_duck_test_case_standard.md</code></td><td>새 repo 경로에 복사하고 Drumstack 우선순위만 갱신</td></tr>
-          <tr><td>RETARGET</td><td><code>project.godot</code>, icon, app main, splash, settings, DesignTokens/AppTheme</td><td>이름·가로 20:9·새 팔레트·새 흐름으로 수정</td></tr>
-          <tr><td>REUSE PATTERN</td><td>세로 popup, 중복 입력 잠금, locale fallback, 프로세스 종료 QA</td><td>타워 문구·마스코트 제거 후 공통 구조만 사용</td></tr>
+          <tr><td>RESTORE ONLY</td><td><code>.editorconfig</code>, <code>.gitattributes</code>, fonts+license, 승인된 <code>docs/drumstack/**</code>와 이 구현 계약·계획</td><td><code>quirky-tower-gate-a-final</code> tag에서 exact restore</td></tr>
+          <tr><td>COPY SHARED</td><td>House Duck development / asset-art / test-case standards</td><td><code>shared/standards</code>에서 byte-for-byte 복사하고 세 SHA-256 고정</td></tr>
+          <tr><td>CREATE NEW</td><td><code>.gitignore</code>, <code>project.godot</code>, icon, canonical docs, QA keep/ignore, app shell, theme/tokens</td><td>Drumstack 가로 20:9·Mobile renderer·새 흐름으로 처음부터 생성</td></tr>
+          <tr><td>MCP SEPARATE</td><td><code>addons/godot_mcp/**</code></td><td>구 addon은 복사하지 않음. 새 repo에서 Asset Library v0.8.0을 격리 검증하며, 실패가 기록된 경우에만 tag의 v0.7.2를 fallback restore</td></tr>
+          <tr><td>REUSE RULE</td><td>세로 popup, 중복 입력 잠금, locale fallback, exact PID 프로세스 종료</td><td>파일 복사가 아니라 새 구현의 검수 규칙으로만 적용</td></tr>
           <tr><td>ARCHIVE DOCS</td><td><code>docs/reboot/**</code>, old canonical gameplay/product/story/economy/work state</td><td>기존 repo의 <code>quirky-tower-gate-a-final</code> tag로 보존; 새 repo에는 필요한 회고 링크만 기록</td></tr>
           <tr><td>DO NOT COPY</td><td><code>scenes/game/reboot/**</code>, <code>scripts/core/reboot/**</code>, <code>scripts/game/reboot/**</code>, <code>scenes/game/run_screen.tscn</code>, <code>scripts/game/run_controller.gd</code>, <code>scenes/ui/components/run_hud.tscn</code>, <code>scripts/ui/run_hud.gd</code>, <code>scripts_dev/qa/headless/flock_*.gd</code>, <code>scripts_dev/qa/run_gate_a_visual.sh</code>, <code>scripts_dev/qa/runtime/capture_gate_a.gd</code>, <code>qa_output/reboot_gate_a/**</code></td><td>기존 repo/tag에는 보존하고 신규 repo에는 복사하지 않음; 삭제 명령 없음</td></tr>
-          <tr><td>NEW</td><td><code>data/drumstack/**</code>, <code>scripts/core/battle/**</code>, <code>scripts/game/battle/**</code>, <code>scenes/battle/**</code></td><td>새 규칙과 P0 화면만 생성</td></tr>
+          <tr><td>NEW</td><td><code>data/drumstack/**</code>, <code>scripts/core/battle/**</code>, <code>scripts/game/battle/**</code>, <code>scenes/app/**</code>, <code>scenes/outgame/**</code>, <code>scenes/drumstack/**</code></td><td>새 규칙과 P0 화면만 생성</td></tr>
         </tbody></table>
         <details open><summary>이름·폴더·저장소 전환 순서</summary><div class="body"><ol><li>본 HTML 승인.</li><li>현재 사용자 변경을 별도 안전 commit으로 정리.</li><li>기존 <code>quirky_tower</code> repo에 <code>quirky-tower-gate-a-final</code> tag 생성.</li><li>GitHub에 신규 <code>drumstack-battle</code> repo와 로컬 <code>drumstack_battle</code> 폴더 생성. 기존 repo rename은 하지 않는다.</li><li>KEEP/RETARGET 파일만 새 repo로 복사하고 첫 commit에 원본 tag를 provenance로 기록한다. ZIP·수동 전달은 쓰지 않는다.</li><li>패키지 ID·앱 ID·save namespace 초안 작성. 실제 Store record는 후속.</li><li>구 runtime은 기존 repo에 그대로 남기며, 새 repo에는 DO NOT COPY 목록을 가져오지 않는다.</li><li>Godot 재import 후 main scene과 P0 public flow 확인.</li></ol></div></details>
       </div>
@@ -596,7 +600,7 @@ scenes/drumstack/
           <tr><td>JSON/CSV</td><td>100KB</td><td>250KB</td><td>hero/map/domain별 파일</td></tr>
           <tr><td>HTML master</td><td>140KB</td><td>220KB</td><td>정본 index+chapter HTML+shared CSS/JS로 분리</td></tr>
           <tr><td>Test</td><td>500줄</td><td>800줄</td><td>도메인별 focused runner</td></tr>
-        </tbody></table><p><span class="badge playtest">SIZE WARNING REACHED</span> 현재 v0.9는 요구 추적표를 포함해 약 152KB이며 220KB 실패선 아래다. 사용자가 이 스냅샷을 승인하면 동결하고, 다음 대형 명세 수정 전 product/battle/content/UI/tech/QA chapter로 분할해 master에는 ID registry만 남긴다. 이번 요청은 단일 초상세 HTML이므로 지금은 파일을 늘려 재구성하지 않는다.</p></div></details>
+        </tbody></table><p><span class="badge playtest">SIZE WARNING REACHED</span> 승인된 v0.9 계열 master는 약 153KB이며 220KB 실패선 아래다. 이 파일에는 이후 큰 실행 계약을 더 넣지 않는다. 전투 core, 3D asset, 구현 계획과 준비도는 companion 문서로 분리하고 master에는 링크와 ID registry만 유지한다.</p></div></details>
         <details open><summary>엔진·프로세스 종료 규칙</summary><div class="body"><ul><li>실행 전 baseline PID·포트 기록.</li><li>agent가 시작한 Godot/서버 PID와 cwd를 기록.</li><li>정상 quit → bounded wait → 정확한 PID/children TERM → 필요 시 exact KILL.</li><li>광범위 <code>pkill Godot</code> 금지. Quirky Ball/다른 프로젝트 프로세스 보존.</li><li>MCP 포트 9200~9215와 프로젝트 포트를 종료 후 확인.</li><li>Godot 생성 <code>.uid/.import</code>는 추적 여부를 확인하고 무단 일괄 삭제하지 않는다.</li><li>테스트하지 않을 때 Editor·debug server를 남기지 않는다.</li></ul></div></details>
       </div>
     </section>
@@ -605,7 +609,7 @@ scenes/drumstack/
       <div class="shell"><div class="section-head"><div><div class="index">20 · DEVELOPMENT SKILLS &amp; PLUGINS</div><h2>무료 로컬 문서와 필요한 순간의 엔진 연결만 쓴다</h2></div></div>
         <p class="intro">Context7 계정·quota에 의존하지 않는다. Godot 4.7 로컬 문서와 현재 저장소 검색을 먼저 쓰고, Godot MCP는 Editor·씬·런타임 확인이 필요한 순간에만 켠다.</p>
         <table><thead><tr><th>순서</th><th>스킬/도구</th><th>사용 시점</th><th>산출물/중단 조건</th></tr></thead><tbody>
-          <tr><td>1</td><td><code>brainstorming</code> / <code>spec</code></td><td>제품·규칙 결정</td><td>본 HTML 승인</td></tr>
+          <tr><td>1</td><td><code>brainstorming</code> / <code>spec</code></td><td>제품·규칙 결정</td><td>승인된 HTML과 실행 보충 계약</td></tr>
           <tr><td>2</td><td><code>plan-ceo-review</code> / <code>plan-eng-review</code></td><td>범위·기술 위험 검토</td><td>P0와 cut 확정</td></tr>
           <tr><td>3</td><td><code>writing-plans</code></td><td>구현 전</td><td>파일·테스트·Gate별 실행 계획</td></tr>
           <tr><td>4</td><td><code>using-git-worktrees</code></td><td>dirty main 보호</td><td>독립 <code>codex/*</code> branch</td></tr>
@@ -617,7 +621,7 @@ scenes/drumstack/
           <tr><td>10</td><td><code>design-review</code> / 화면 QA</td><td>최종 코드의 before/after</td><td>P0/P1 visual finding 0</td></tr>
           <tr><td>11</td><td><code>verification-before-completion</code></td><td>완료 주장 전</td><td>명세→구현→증거 재대조</td></tr>
         </tbody></table>
-        <details><summary>Godot MCP 정확한 경계</summary><div class="body"><ul><li>현재 pin은 upstream community addon <code>regiellis/godot-mcp-go v0.7.2</code>. Godot 팀 공식 제작 플러그인이라고 부르지 않는다.</li><li>현재 repo 내용은 upstream v0.7.2와 줄바꿈 외 semantic diff 0이라는 기존 감사 결과를 유지한다.</li><li>CLI <code>--typed=false</code>를 우선해 context와 메모리 사용을 줄인다.</li><li>MCP/Editor는 로컬 화면·ClassDB·scene/runtime 확인에만 사용하고 문서·순수 코드 분석 때 띄우지 않는다.</li><li>모든 release preset에서 addon 제외와 autoload 부재를 검사한다.</li></ul></div></details>
+        <details><summary>Godot MCP 정확한 경계</summary><div class="body"><ul><li>현재 legacy pin은 upstream community addon <code>regiellis/godot-mcp-go v0.7.2</code>. Godot 팀 공식 제작 플러그인이라고 부르지 않는다.</li><li>새 저장소에서는 <a href="https://godotengine.org/asset-library/asset/5367">Godot Asset Library v0.8.0</a>을 출처·commit·SHA·MIT license와 함께 격리 검증한다. latest를 이유로 현재 repo를 자동 변경하지 않는다.</li><li>CLI <code>--typed=false</code>를 우선해 context와 메모리 사용을 줄인다.</li><li>MCP/Editor는 로컬 화면·ClassDB·scene/runtime 확인에만 사용하고 문서·순수 코드 분석 때 띄우지 않는다.</li><li>모든 release preset에서 addon 제외와 autoload 부재를 검사한다.</li></ul></div></details>
       </div>
     </section>
 
@@ -667,20 +671,20 @@ scenes/drumstack/
       <div class="shell"><div class="section-head"><div><div class="index">23 · ROADMAP &amp; STOP GATES</div><h2>한 달은 캐시카우 출시가 아니라 검증 가능한 프로토타입</h2></div></div>
         <p class="intro">드럼스택은 기존 타워보다 규모가 크다. 한 달 안에는 3 starter·1맵·봇·한 경기·결과까지 검증하고, 10영웅·마을·BM·서버는 Gate 뒤에 순서대로 붙인다.</p>
         <table><thead><tr><th>Gate</th><th>범위</th><th>완료 조건</th><th>실패 시</th></tr></thead><tbody>
-          <tr><td>0 · Spec</td><td>본 HTML, 제품/수치/cut/증거</td><td>사용자 승인+추적표 모순 0</td><td>구현 시작 금지</td></tr>
+          <tr><td>0 · Contract</td><td>승인 HTML, core/asset 실행 계약, 새 repo·standards·QA/export guard</td><td>정적 검사+dirty 보존+MCP release 차단</td><td>runtime·Duck A1 제작 시작 금지</td></tr>
           <tr><td>A · Pure Core</td><td>3starter, 11×9, turn/range/damage/status/score, Easy bot</td><td>focused tests+10k sim</td><td>3D/UI 만들지 않고 규칙 수정</td></tr>
           <tr><td>B · Greybox Match</td><td>재생→마을→봇전→결과→재대결</td><td>public input 완주, runtime/visual P1 0</td><td>outgame·BM 중단</td></tr>
           <tr><td>C · Human Fun</td><td>외부 5인</td><td>30초 행동 4/5, 재대결 3/5, 7/10</td><td>아트 대신 턴·목표·연출 수정</td></tr>
-          <tr><td>D · Vertical Art/Audio</td><td>3starter cel3D, map, VFX, core audio</td><td>최종 코드 2400×1080+listen Gate</td><td>7영웅 선제작 금지</td></tr>
+          <tr><td>D · Roster Art/Audio</td><td>승인된 Duck 기준으로 닭·비둘기 cel3D, core audio 확장</td><td>최종 코드 2400×1080+listen Gate</td><td>후속 7영웅 선제작 금지</td></tr>
           <tr><td>E · Outgame</td><td>마을, 스토리 1장, 진행2영웅, 경제 placeholder</td><td>fresh save 전체 흐름+save migration</td><td>상점·스케줄 축소</td></tr>
           <tr><td>F · Backend/BM/Device</td><td>Supabase, arena, ads, purchase, Android/iOS</td><td>staging+store sandbox+실기기</td><td>출시 주장 금지</td></tr>
         </tbody></table>
         <details open><summary>첫 4주 실행 후보</summary><div class="body"><table><thead><tr><th>주</th><th>Cloud 중심</th><th>Local 최소 검증</th><th>산출물</th></tr></thead><tbody>
-          <tr><td>Week 1</td><td>BattleState/Rules/Grid/Bot TDD, 10k sim</td><td>Godot parse 1회</td><td>Gate A core</td></tr>
-          <tr><td>Week 2</td><td>Controller, data, app shell, tests</td><td>Greybox map·입력·카메라</td><td>한 경기 시작~결과</td></tr>
-          <tr><td>Week 3</td><td>HUD/전환/리셋/visual runner</td><td>2400×1080 before/after, 외부 5인</td><td>Gate B/C 판정</td></tr>
-          <tr><td>Week 4</td><td>실패 수정, 문서 reconciliation</td><td>Android 1대+iPhone 1대 최소 확인</td><td>프로토타입 승인/폐기 결정</td></tr>
-        </tbody></table><p class="subtle">Gate C 사람 가독성·재대결 검증 전에는 최종 아트·오디오 Gate D로 넘어가지 않는다. 10영웅 최종 리깅, 스토리 다장, 상점 SDK, Supabase, 길드, 협동 보스는 각각의 후속 Gate 전 만들지 않는다.</p></div></details>
+          <tr><td>Week 1</td><td>새 repo·schema·첫 턴 rules RED와 A0 manifest 준비</td><td>덕 대장 회색 turntable+전장 blockout owner review</td><td>Gate 0+A0</td></tr>
+          <tr><td>Week 2</td><td>첫 턴 core TDD와 asset import 검사</td><td>Duck A1/A2: 3D·rig·6표정·필수 clips·cel material·2D 파생</td><td>asset source/import truth kit</td></tr>
+          <tr><td>Week 3</td><td>public first-turn controller와 visual runner</td><td>Duck A3/A4: AT형 전장·타일 UI·3스킬·피격·KO·VFX, 2400×1080</td><td>asset+첫 턴 owner 판정</td></tr>
+          <tr><td>Week 4</td><td>3v3 Pure Core/Easy bot·10k와 한 경기 shell</td><td>외부 5인, 필요할 때만 Android/iPhone 최소 확인</td><td>Gate A~C 승인/수정 결정</td></tr>
+        </tbody></table><p class="subtle">사용자가 선택한 asset-first는 Duck Guard 1명+전장·UI·VFX 1세트의 A0~A4와 owner review까지다. 2D는 승인 GLB에서 파생한다. 이 기준본과 첫 턴 core는 병렬 제작하지만, Duck 승인을 받기 전 닭·비둘기 final 제작과 Gate D roster 확장을 시작하지 않는다. 나머지 7영웅, 스토리 다장, 상점 SDK, Supabase, 길드, 협동 보스는 각각의 후속 Gate 전 만들지 않는다.</p></div></details>
       </div>
     </section>
 
@@ -714,7 +718,7 @@ scenes/drumstack/
       <div class="shell"><div class="section-head"><div><div class="index">26 · REQUIREMENT TRACEABILITY</div><h2>명세 → 구현 → 테스트 → 화면</h2></div></div>
         <p class="intro">아래는 구현 전 계약이다. 현재는 HTML 섹션만 완료되었고 코드·테스트·스크린샷은 미착수다. 따라서 게임 기능 전체를 완료라고 판단하지 않는다.</p>
         <table><thead><tr><th>범위·우선</th><th>요구 결정 ID</th><th>시험 ID·합격선</th><th>구현 경계</th><th>화면·기기 증거</th><th>현재</th></tr></thead><tbody>
-          <tr><td><a href="#document-status">00 문서 · P0</a></td><td><span id="DS-DOC-001">DS-DOC-001</span> · 방향 합의와 HTML 승인 상태 분리</td><td><b>DS-TC-SPEC-001</b>: 선언된 결정·시험 ID 100%가 이 표에 있고 중복 DOM ID 0</td><td>master HTML metadata/registry</td><td>STATIC만; 게임 화면 해당 없음</td><td>HTML 승인 대기</td></tr>
+          <tr><td><a href="#document-status">00 문서 · P0</a></td><td><span id="DS-DOC-001">DS-DOC-001</span> · 제품·HTML 승인과 Gate 0 실행 상태 분리</td><td><b>DS-TC-SPEC-001</b>: 선언된 결정·시험 ID 100%가 이 표에 있고 중복 DOM ID 0</td><td>master+readiness+core/asset companion</td><td>STATIC만; 게임 화면 해당 없음</td><td>방향 승인 / Gate 0 실행 전</td></tr>
           <tr><td><a href="#executive">01 제품 · P0</a></td><td><span id="DS-PROD-001">DS-PROD-001</span>, <span id="DS-PROD-002">DS-PROD-002</span>, <span id="DS-POLICY-001">DS-POLICY-001</span> · 3v3 약속/재대결/13+</td><td><b>DS-TC-ENTRY-001</b>: 신규 5명 중 4명이 60초 안에 첫 command 완료<br><b>DS-TC-MATCH-001</b>: 5명 중 4명이 목표·턴·재대결 이유 설명<br><b>DS-TC-POLICY-001</b>: 스토어 target 13+, Kids/Family off</td><td>product copy, onboarding, store metadata</td><td>HUMAN 5인+Play/App Store console</td><td>방향 합의 / 구현·콘솔 차단</td></tr>
           <tr><td><a href="#reference">02 참고 · P0</a></td><td><span id="DS-REF-001">DS-REF-001</span>, <span id="DS-REF-002">DS-REF-002</span> · AT 근거와 복제 금지선</td><td><b>DS-TC-REF-001</b>: 0:00~23:21 타임라인과 타일·카메라·VFX KEEP/CHANGE/CUT 출처 누락 0</td><td>reference audit/change boundary</td><td>STATIC; 영상에 없는 UI를 근거로 주장 0</td><td>문서 완료</td></tr>
           <tr><td><a href="#battle-rules">03 전투 · P0</a></td><td><span id="DS-GAME-001">DS-GAME-001</span>, <span id="DS-GAME-002">DS-GAME-002</span>, <span id="DS-GAME-003">DS-GAME-003</span>, <span id="DS-GAME-004">DS-GAME-004</span> · 이동→스킬/방어·게이지·승패</td><td><b>DS-TC-TURN-001</b>: 동일 seed/command의 actor·gauge·ledger hash 일치<br><b>DS-TC-RANGE-001</b>: 모든 starter 스킬의 min/max/shape/target legality와 preview/apply 불일치 0<br><b>DS-TC-VICTORY-001</b>: 15초·7분·24행동·전멸·점수·tie·항복·동시KO 기대값 일치</td><td>battle_state/rules/controller</td><td>HEADLESS+현재/다음 큐·결과 2400×1080</td><td>수치 playtest 전 / 구현 차단</td></tr>
@@ -729,10 +733,10 @@ scenes/drumstack/
           <tr><td><a href="#progression">12 성장 · P1</a></td><td><span id="DS-PROG-001">DS-PROG-001</span>, <span id="DS-PROG-002">DS-PROG-002</span> · Lv1~10/+8%/해금</td><td><b>DS-TC-PROG-001</b>: HP/ATK/DEF 상한 각각 +8%, SPD/MOV 변화 0<br><b>DS-TC-ECON-001</b>: 3지급·2미션·5직접 해금 경로 단절 0</td><td>profile progression+unlock ledger</td><td>HEADLESS economy; profile UI Gate E</td><td>수치 playtest 전</td></tr>
           <tr><td><a href="#economy-bm">13 BM · P1</a></td><td><span id="DS-BM-001">DS-BM-001</span>, <span id="DS-BM-002">DS-BM-002</span>, <span id="DS-BM-003">DS-BM-003</span>, <span id="DS-BM-004">DS-BM-004</span> · 알/보석/모이/광고·구매</td><td><b>DS-TC-BM-001</b>: earn/spend 환율 역전 0<br><b>DS-TC-AD-001</b>: reward/forced/remove-ad 계약 일치<br><b>DS-TC-PURCHASE-001</b>: pending/cancel/refund/restore/idempotency 전부 통과<br><b>DS-TC-STAMINA-001</b>: 60/108/120 경계·PvP 차감 0</td><td>economy ledger+store services</td><td>HEADLESS 후 store sandbox/DEVICE 별도</td><td>명세 수치 후보 / SDK 차단</td></tr>
           <tr><td><a href="#ranking-social">14 랭킹 · P1</a></td><td><span id="DS-RANK-001">DS-RANK-001</span>, <span id="DS-SOCIAL-001">DS-SOCIAL-001</span>, <span id="DS-SERVER-001">DS-SERVER-001</span> · 단일 랭킹/소속/실제 비동기</td><td><b>DS-TC-RANK-001</b>: result/reward 중복 0, 성장차 4%p 초과 match 0<br><b>DS-TC-AFFIL-001</b>: 국가·유머소속 단일 code/filter 일치<br><b>DS-TC-ASYNC-001</b>: conflict/retry/reconnect/24h timeout과 1,000 golden vector drift 0</td><td>Supabase Edge Function+match/command ledger</td><td>STAGING+push/reconnect DEVICE; 봇 증거 대체 불가</td><td>Gate F까지 차단</td></tr>
-          <tr><td><a href="#art">15 아트 · P1</a></td><td><span id="DS-ART-001">DS-ART-001</span>, <span id="DS-ART-002">DS-ART-002</span>, <span id="DS-ART-003">DS-ART-003</span> · cel3D 조류/도시/표정/VFX/파생 asset</td><td><b>DS-TC-ART-001</b>: 종·역할·6표정 blind 판독 5/5<br><b>DS-TC-RIG-001</b>: 6 facial pose+필수 동작 clipping/foot slide P1 0; steady move-loop 머리 pitch·roll ±5°·눈 높이 drift 10% 이내; move-loop당 catch-up 1회·0.06~0.10초; 피격 release 뒤 0.18~0.24초 안에 re-lock<br><b>DS-TC-ASSET-001</b>: hero_id/source hash/2D·3D·표정 파생 누락 0</td><td>3D master+face/body rig+VFX+asset manifest</td><td>Gate D gallery/action-camera in-game before-after; final art 전 claim 금지</td><td>방향 합의 / Gate D 차단</td></tr>
+          <tr><td><a href="#art">15 아트 · P1</a></td><td><span id="DS-ART-001">DS-ART-001</span>, <span id="DS-ART-002">DS-ART-002</span>, <span id="DS-ART-003">DS-ART-003</span> · cel3D 조류/도시/표정/VFX/파생 asset</td><td><b>DS-TC-ART-001</b>: 종·역할·6표정 blind 판독 5/5<br><b>DS-TC-RIG-001</b>: 6 facial pose+필수 동작 clipping/foot slide P1 0; steady move-loop 머리 pitch·roll ±5°·눈 높이 drift 10% 이내; move-loop당 catch-up 1회·0.06~0.10초; 피격 release 뒤 0.18~0.24초 안에 re-lock<br><b>DS-TC-ASSET-001</b>: hero_id/source hash/2D·3D·표정 파생 누락 0</td><td>3D master+face/body rig+VFX+asset manifest</td><td>Duck A0~A4 blockout→Godot 비교; roster Gate D 전 확대 금지</td><td>방향 합의 / Duck 제작 전</td></tr>
           <tr><td><a href="#audio">16 오디오 · P1</a></td><td><span id="DS-AUDIO-001">DS-AUDIO-001</span>, <span id="DS-AUDIO-002">DS-AUDIO-002</span> · 행동 인과/조류 테마</td><td><b>DS-TC-AUDIO-001</b>: turn/skill/contact/status/KO event 누락 0<br><b>DS-TC-LISTEN-001</b>: 화면 없이 5/5가 내·상대 턴과 hit 식별<br><b>DS-TC-HAPTIC-001</b>: reduced/disable과 platform mapping 일치</td><td>event map+native buses+haptic map</td><td>Gate D listen test; speaker/headphone/DEVICE 분리</td><td>Gate D 차단</td></tr>
           <tr><td><a href="#architecture">17 기술 · P0</a></td><td><span id="DS-TECH-001">DS-TECH-001</span>, <span id="DS-TECH-002">DS-TECH-002</span>, <span id="DS-TECH-003">DS-TECH-003</span> · pure rules/view 분리/reset/export</td><td><b>DS-TC-CORE-001</b>: same input state/event hash 일치<br><b>DS-TC-RESET-001</b>: same/new node restart 100회 누수 0<br><b>DS-TC-EXPORT-001</b>: MCP plugin/autoload/PCK 포함 0</td><td>BattleState/Rules/Grid/Bot/Controller/View</td><td>HEADLESS+Godot import; release preset 검사</td><td>설계 완료 / 구현 차단</td></tr>
-          <tr><td><a href="#legacy">18 이전 · P0</a></td><td><span id="DS-MIGRATE-001">DS-MIGRATE-001</span>, <span id="DS-MIGRATE-002">DS-MIGRATE-002</span> · old repo 보존/new repo 전환</td><td><b>DS-TC-MIGRATE-001</b>: tag 존재, KEEP exact, legacy runtime 유입 0, dirty loss 0</td><td>quirky_tower tag→new drumstack-battle repo</td><td>Git evidence; Godot import는 새 repo 이후</td><td>HTML 승인 전 차단</td></tr>
+          <tr><td><a href="#legacy">18 이전 · P0</a></td><td><span id="DS-MIGRATE-001">DS-MIGRATE-001</span>, <span id="DS-MIGRATE-002">DS-MIGRATE-002</span> · old repo 보존/new repo 전환</td><td><b>DS-TC-MIGRATE-001</b>: tag 존재, KEEP exact, legacy runtime 유입 0, dirty loss 0</td><td>quirky_tower tag→new drumstack-battle repo</td><td>Git evidence; Godot import는 새 repo 이후</td><td>Gate 0 실행 전 차단</td></tr>
           <tr><td><a href="#ops">19 운영 · P0</a></td><td><span id="DS-OPS-001">DS-OPS-001</span>, <span id="DS-DOC-002">DS-DOC-002</span> · Cloud/Local·PID·파일상한</td><td><b>DS-TC-PERF-001</b>: target device frame/memory budget 통과<br><b>DS-TC-PROCESS-001</b>: agent-owned PID/listener 잔존 0, 타 프로젝트 영향 0<br><b>DS-TC-DOCSIZE-001</b>: 140KB warning/220KB fail fixture 일치</td><td>QA scripts+project checks+workflow docs</td><td>STATIC/HEADLESS/LOCAL/DEVICE 구분</td><td>공통규칙 반영 / 자동화 후속</td></tr>
           <tr><td><a href="#skills-plugins">20 도구 · P0</a></td><td><span id="DS-WORKFLOW-001">DS-WORKFLOW-001</span>, <span id="DS-PLUGIN-001">DS-PLUGIN-001</span> · 최소 skill/plugin 흐름</td><td><b>DS-TC-EXPORT-001</b>: release export에서 godot_mcp plugin/autoload/files 0</td><td>기존 MCP 1개 dev-only; native Godot 우선</td><td>STATIC+export PCK scan</td><td>도구 결정 완료 / export 차단</td></tr>
           <tr><td><a href="#qa">21 QA · P0</a></td><td><span id="DS-QA-001">DS-QA-001</span>, <span id="DS-QA-002">DS-QA-002</span>, <span id="DS-QA-003">DS-QA-003</span> · 자동/화면/사람/기기 증거 분리</td><td><b>DS-TC-CORE-001</b>: core 회귀 전체 PASS<br><b>DS-TC-VISUAL-001</b>: 요구 상태 exact-size P0/P1 0<br><b>DS-TC-HUMAN-001</b>: 첫 행동 4/5·턴 인지 5/5·재대결 관찰<br><b>DS-TC-DEVICE-001</b>: Android/iOS input/perf/audio 별도 PASS</td><td>House Duck test case+feature map</td><td>증거 종류를 서로 대체하지 않음</td><td>계약 완료 / 실행 차단</td></tr>
@@ -777,13 +781,13 @@ scenes/drumstack/
           <li><a href="https://www.euipo.europa.eu/uk/trade-marks/before-applying/availability">EUIPO availability guidance</a>와 <a href="https://www.wipo.int/en/web/global-brand-database">WIPO Global Brand Database</a> · 정식 유사표장 검토는 미완.</li>
         </ul></div></details>
         <details open><summary>명시적 CUT / DEFERRED</summary><div class="body grid two"><div><h4>CUT</h4><ul><li>Quirky Tower 3막 flock gameplay</li><li>공용 3액션 턴</li><li>하단 5카드 loadout</li><li>세로 고정</li><li>메인 스토리 강제 진행</li><li>가챠·희귀도·중복</li><li>장비·룬·아티팩트</li><li>300영웅</li><li>긴 필살기·강제 컷신</li></ul></div><div><h4>DEFERRED</h4><ul><li>Supabase와 실제 랭킹·턴 교환</li><li>즉시 AI 방어전</li><li>협동 보스</li><li>길드·채팅</li><li>10영웅 최종 아트 일괄 제작</li><li>battle pass</li><li>실시간 PvP</li><li>추가 상태·속성 상성</li><li>13×11 이상 맵</li></ul></div></div></details>
-        <details><summary>남은 승인 포인트</summary><div class="body"><ol><li><b>연속 Turn Gauge:</b> Gate A 기본으로 진행. 5인 중 2명 이상 순서를 이해 못하면 round queue fallback.</li><li><b>Spotlight:</b> 중앙 점수 목표를 Gate C 변형 모드로 시험할지 결정.</li><li><b>가벼운 +8% 성장:</b> 단일 랭킹 유지와 전략성을 함께 만족하는지 시뮬레이션·사람 Gate 필요.</li><li><b>Drumstack 이름:</b> art lock 전 유사표장과 한국어·영어 각 5인 인지 테스트.</li><li><b>모이 패배 차감:</b> 스토리 패배 시 절반 환급 후보.</li></ol></div></details>
-        <div class="callout success-callout"><strong>다음 문서:</strong> 사용자가 이 HTML을 승인하면 <code>writing-plans</code>로 Gate A의 정확한 파일·RED/GREEN 테스트·삭제 금지선·스크린샷 상태를 실행 계획으로 분리한다. 승인 전에는 구현하지 않는다.</div>
+        <details><summary>남은 플레이테스트·후속 승인 포인트</summary><div class="body"><ol><li><b>연속 Turn Gauge:</b> Gate A 기본으로 진행. 5인 중 2명 이상 순서를 이해 못하면 round queue fallback.</li><li><b>Spotlight:</b> 중앙 점수 목표를 Gate C 변형 모드로 시험할지 결정.</li><li><b>가벼운 +8% 성장:</b> 단일 랭킹 유지와 전략성을 함께 만족하는지 시뮬레이션·사람 Gate 필요.</li><li><b>Drumstack 이름:</b> art lock 전 유사표장과 한국어·영어 각 5인 인지 테스트.</li><li><b>모이 패배 차감:</b> 스토리 패배 시 절반 환급 후보.</li></ol></div></details>
+        <div class="callout success-callout"><strong>실행 문서:</strong> <a href="DRUMSTACK_DEVELOPMENT_READINESS_SPEC.html">개발 준비도 보드</a>, <a href="../superpowers/specs/2026-08-11-drumstack-core-implementation-contract.md">Gate A core 계약</a>, <a href="../superpowers/specs/2026-08-11-drumstack-3d-asset-vertical-slice-design.md">3D asset 계약</a>, <a href="../superpowers/plans/2026-08-11-drumstack-gate-0-first-turn.md">Gate 0→첫 턴 실행 계획</a>을 함께 따른다. 실제 완료 판정은 구현·테스트·최종 화면이 생긴 뒤에만 갱신한다.</div>
       </div>
     </section>
   </main>
 
-  <footer><div class="shell"><p><strong>Drumstack Battle Master Product &amp; Game Specification v0.9</strong></p><p>작성일 2026-08-11 · Europe/Berlin · HTML 자체는 구현·기기·재미 증거가 아니다.</p><p class="subtle">Search는 한국어·English·DS 결정/테스트 ID를 찾는다. 인쇄 시 모든 details가 펼쳐진다.</p></div></footer>
+  <footer><div class="shell"><p><strong>Drumstack Battle Master Product &amp; Game Specification v0.9.1</strong></p><p>작성일 2026-08-11 · Europe/Berlin · 제품·HTML 방향 승인 · HTML 자체는 구현·기기·재미 증거가 아니다.</p><p class="subtle">Search는 한국어·English·DS 결정/테스트 ID를 찾는다. 인쇄 시 모든 details가 펼쳐진다.</p></div></footer>
 
   <script>
     (()=>{

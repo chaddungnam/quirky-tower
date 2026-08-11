@@ -52,6 +52,17 @@
 - 시각 비대칭은 볏, 눈 간격, 스카프 매듭, 꼬리깃, 포즈에만 의도적으로 둔다.
 - 리그, 웨이트, 접지, pivot, contact marker와 타일 좌표는 정확해야 한다.
 
+#### Project K 최신 cel3D 결과에서 가져올 품질 기준
+
+사용자가 2026-08-11 제공한 Project K `cel3d-rebuild` 이미지는 선호 방향과 모델링 보드의 시각 하한이다. Project K의 runtime-ready/승인 GLB 증거로 간주하지 않고 제품 파일로 복사하지 않으며, 아래 원리만 Duck Guard의 실제 source→GLB→Godot 결과에 적용한다.
+
+- 정면·측면·후면에서 같은 큰 질량과 비율이 유지되고, 한 시점에서만 그럴듯한 생성형 실루엣을 금지한다.
+- 몸통·다리·방패를 3~5개의 읽히는 덩어리로 나누고, 작은 장식보다 관절과 기능 pivot을 먼저 보인다.
+- base color와 한 단계 그림자 위주로 면을 정리한다. 모든 edge에 같은 선·광택·재질 noise를 넣지 않는다.
+- walk, turn, attack는 결과 pose만 두지 않고 발·무게중심·방패·머리의 이동 arc를 contact sheet에 함께 표시한다.
+- Duck Guard 납품 보드는 `front / 3-4 front / side / back / move arc / basic contact` 6칸을 같은 camera·scale·light로 렌더한다.
+- Project K의 군용 올리브 팔레트, 탱크·굴착기·헬기 형상, 기계 관절 비율은 가져오지 않는다. 조류의 둥근 몸통, 물갈퀴, 부리, 오리 궁둥이와 셀 애니 표정을 유지한다.
+
 ### DS-MAP-001 · AT식 기능 중심 3D 전장
 
 - 평상시 바닥 격자는 은은하게 유지하고 현재 행동을 선택할 때 필요한 타일만 강하게 표시한다.
@@ -74,10 +85,25 @@ flowchart LR
   H --> J[다음 캐릭터·맵 확장]
 ```
 
-- 축은 `+Y up`, `-Z forward`, `+X right`, 1 Godot unit=1m로 고정한다.
+- Godot runtime 축은 `+Y up`, `-Z forward`, `+X right`, 1 Godot unit=1m로 고정한다.
 - GLB에 camera와 light를 포함하지 않는다. 프로젝트 scene이 카메라·광원을 소유한다.
 - imported GLB를 직접 편집하지 않고 wrapper TSCN에서 external material, AnimationTree, sockets와 VFX를 연결한다.
 - 전투 규칙과 이동 결과는 BattleRules와 논리 타일이 소유한다. 애니메이션 callback과 mesh collider는 권위가 아니다.
+
+### Blender 4.5 LTS → GLB 2.0 → Godot 4.7 납품 계약
+
+| 단계 | 고정값 |
+|---|---|
+| DCC | Blender `4.5 LTS`, Meter/Unit Scale `1.0`, source는 `+Z up/-Y forward/+X right` |
+| Collection | 최상위 `EXPORT`; 하위 `GEO_LOD0`, `GEO_LOD1`, 선택 `GEO_LOD2`, `RIG`, `SOCKETS`만 export |
+| Character object | root object와 Armature는 `hero_duck_guard`; mesh는 `hero_duck_guard_lod0/1/2`; 임시 object는 `_work_` prefix로 `EXPORT` 밖에 둔다 |
+| Environment object | root는 `arena_service_rooftop_01`; module은 `{group}_{function}_{2-digit}` 예: `blocker_high_hvac_01`; collision은 같은 basename에 `_col_move` 또는 `_col_los` suffix |
+| Transform | character origin은 양발 접지 중앙, environment origin은 보드 중심; export object rotation `0,0,0`, scale `1,1,1`; Armature 음수 scale과 skin 이후 rest pose/apply transform 금지 |
+| Export | 선택 collection만 Binary `.glb`; modifiers·UV·tangent·skin·morph 포함, camera/light 제외, Draco 제외, animation 30fps sample, NLA strip 이름을 exact clip ID로 export |
+| Runtime 검사 | imported root에서 `+Y up/-Z forward/+X right`, 높이 1.42m 후보, root scale `1,1,1`; 불일치 시 wrapper 보정이 아니라 export 실패 |
+| Godot import | Godot 4.7 scene import, animation/morph/skin 유지, embedded material은 wrapper에서 external profile로 remap; loop와 event track은 아래 계약으로 검증 |
+
+캐릭터와 환경은 각각 `resources/drumstack/contracts/glb_character_import_v1.json`, `glb_environment_import_v1.json`의 값으로 import 검사를 자동화한다. Godot가 생성한 `.godot/imported/**`와 `.import` 캐시는 source가 아니며 manifest에 넣지 않는다.
 
 ## 4. 덕 대장 3D 규격
 
@@ -114,6 +140,10 @@ flowchart LR
 - 깃털 한 올, 실사 roughness noise, 전면 rim light, 균일 specular와 생성 texture를 사용하지 않는다.
 - 깃털 큰 면은 쉬게 두고 눈·부리·발·방패 접점에만 edge와 value contrast를 집중한다.
 
+`assets/drumstack/materials/shaders/cel_character_mobile.gdshader`와 `assets/drumstack/materials/character_cel_mobile.tres`가 캐릭터 재질 정본이다. texture는 `assets/drumstack/characters/hero_duck_guard/textures/hero_duck_guard_albedo.png`와 `hero_duck_guard_mask.png`다. albedo는 RGBA8 sRGB, mask는 linear로 R=shadow threshold, G=제한 specular, B=emission, A=선택 outline group을 저장한다. 기본 normal/ORM은 만들지 않으며 두 texture 모두 1024, mipmap on, mobile VRAM compression, anisotropic 4x 이하로 import한다. 환경은 같은 channel 의미의 `assets/drumstack/materials/shaders/cel_environment_mobile.gdshader`를 쓰며 `assets/drumstack/environments/arena_service_rooftop_01/textures/arena_service_rooftop_01_atlas_0_albedo.png`와 `_mask.png`, 필요 시 `atlas_1_albedo.png`와 `_mask.png` 2048 세트를 사용한다.
+
+기준 render profile은 Godot Mobile renderer, 1600×720 logical viewport와 2400×1080 QA capture, 2x MSAA, shadow atlas 2048, glow·motion blur·SSAO·dynamic GI off다. `resources/drumstack/profiles/world_mobile_mid.tres`가 WorldEnvironment/DirectionalLight 값, `resources/drumstack/profiles/camera_battle_20x9.tres`가 orthographic `yaw 45°/pitch -52°/roll 0°/size 13.5`를 소유한다. wrapper나 스킬 scene이 이 값을 복제하지 않는다.
+
 ## 5. 조류 rig와 표정
 
 ```text
@@ -125,15 +155,24 @@ root
    │                                      ├─ eye_l
    │                                      └─ eye_r
    ├─ tail_root → tail_fan_l / tail_fan_r
-   ├─ wing_l_shoulder → upper → forearm → wrist → primary
-   ├─ wing_r_shoulder → upper → forearm → wrist → primary
-   ├─ leg_l_thigh → shin → ankle → foot → toe
-   └─ leg_r_thigh → shin → ankle → foot → toe
+   ├─ wing_l_shoulder → wing_l_upper → wing_l_forearm → wing_l_wrist → wing_l_primary
+   ├─ wing_r_shoulder → wing_r_upper → wing_r_forearm → wing_r_wrist → wing_r_primary
+   ├─ leg_l_thigh → leg_l_shin → leg_l_ankle → foot_l → toe_l
+   └─ leg_r_thigh → leg_r_shin → leg_r_ankle → foot_r → toe_r
 ```
 
-필수 socket은 `back`, `shield`, `bill_fx`, `chest_fx`, `wing_l/r_fx`, `foot_l/r_fx`, `ground_fx`, `target_center`다.
+필수 socket은 아래 exact 규칙의 `socket_*` 10개다.
 
 마스터 명세의 `hips` 용어는 조류형 `body_root`로 통일한다. `shield_root` 아래에는 좌·중·우 3개 rigid panel과 각각의 pivot을 두고, 등 socket에 붙인 채 접힘→전개 transform만 bake한다.
+
+### Skeleton·face·socket exact 규칙
+
+- 이 subsection의 exact ID가 에셋 제작 실행 정본이다. 상위 HTML의 `beak`, `wing.LR`, `hips` 표기는 설명용 shorthand이며 별도 bone 이름으로 만들지 않는다.
+- bone과 socket의 좌우 suffix는 `_l`, `_r`만 사용한다. `.L/.R`, `LR`, `beak`, `hips`는 금지하고 `bill_lower`, `body_root`로 통일한다.
+- rest pose는 정면 `-Z`, 양발 전체 접지, 날개는 몸에서 25° 이내, 꼬리·방패 닫힘이다. 중심 bone의 local `+Y`는 자식 방향, `+Z`는 전방을 향하고 좌우 bone은 음수 scale 없이 같은 roll 규칙으로 mirror한다.
+- 얼굴 v1은 bone 방식만 사용한다. `lid_upper_l/r`, `lid_lower_l/r`, `eye_l/r`, `bill_lower`, `crest_01/02`를 사용하고 blendshape는 만들지 않는다.
+- socket은 non-deform `Node3D`로 wrapper에 생성하며 exact 이름은 `socket_back`, `socket_shield`, `socket_bill_fx`, `socket_chest_fx`, `socket_wing_l_fx`, `socket_wing_r_fx`, `socket_foot_l_fx`, `socket_foot_r_fx`, `socket_ground_fx`, `socket_target_center`다. 모든 socket scale은 1이며 `socket_ground_fx`는 양발 중앙의 Y=0에 둔다.
+- `shield_root`, `shield_panel_l/c/r`은 rigid accessory bone이다. panel mesh는 deform하지 않고 각 panel pivot의 local rotation만 animation한다.
 
 ### 머리·시선 안정화 계약
 
@@ -152,13 +191,13 @@ root
 | 클립 | 목표 길이 | 필수 읽기 |
 |---|---:|---|
 | `idle_combat` | 2.40s loop | 느린 호흡, 좌우 체중 이동, 꼬리깃 1회, 머리 안정·불규칙 시선 |
-| `move_start/loop/stop` | 0.10/0.36/0.10s | 뒤뚱거림, 궁둥이·꼬리 반동, 물갈퀴 접지, 머리 hold→catch-up |
-| `turn_45/90/180` | 0.10/0.16/0.24s | 시선·머리 2~4 frame 선행 후 넓은 발과 몸통이 따라 회전 |
+| `move_start`, `move_loop`, `move_stop` | 0.10/0.36/0.10s | 뒤뚱거림, 궁둥이·꼬리 반동, 물갈퀴 접지, 머리 hold→catch-up |
+| `turn_45`, `turn_90`, `turn_180` | 0.10/0.16/0.24s | 시선·머리 2~4 frame 선행 후 넓은 발과 몸통이 따라 회전 |
 | `basic_beak_shield` | 0.88s | 준비 → 부리 contact → self shield → 복귀 |
 | `active_quack_challenge` | 1.05s | 흡기 → 부채꼴 음파 → 상태 표시 → 복귀 |
 | `signature_duck_formation` | 2.25s | 등 방패 전개 → 지면 contact → 아군 보호 → 복귀 |
-| `guard_enter/loop/hit/exit` | 0.20/1.20/0.22/0.16s | 방패 앞세움과 압축 반동 |
-| `hit_light/heavy/push` | 0.40/0.64/0.72s | 방향성 충격에서 머리 lock 해제→재고정, 궁둥이·꼬리 후행, 결과 타일 접지 |
+| `guard_enter`, `guard_loop`, `guard_hit`, `guard_exit` | 0.20/1.20/0.22/0.16s | 방패 앞세움과 압축 반동 |
+| `hit_light`, `hit_heavy`, `hit_push` | 0.40/0.64/0.72s | 방향성 충격에서 머리 lock 해제→재고정, 궁둥이·꼬리 후행, 결과 타일 접지 |
 | `ko` | 1.20s | 방패에 기대 앉듯 다운, 마지막 pose hold |
 | `victory` | 1.80s | 날개 경례, 짧은 꽥, 방패를 가볍게 두드림 |
 
@@ -167,9 +206,19 @@ root
 - animation marker는 VFX·SFX·카메라용이다. 피해·보호막·상태 계산에 사용하지 않는다.
 - 일반 행동은 카메라 복귀까지 1.2초 이하, 대표기는 2.5초 이하로 끝낸다.
 
+모든 clip은 30fps이며 이동은 root motion 없는 in-place다. loop는 `idle_combat`, `move_loop`, `guard_loop`만 true다. exact marker ID는 `mk_prepare`, `mk_vfx_floor`, `mk_sfx_swing`, `mk_contact`, `mk_vfx_contact`, `mk_sfx_contact`, `mk_result`, `mk_camera_peak`, `mk_recover`다. Blender pose marker와 `resources/drumstack/characters/hero_duck_guard_animation_events.json`의 frame이 일치해야 하며 wrapper는 이 JSON으로 AnimationPlayer event track을 만든다. `mk_contact`는 연출 신호일 뿐 BattleRules 판정 시각을 바꾸지 않는다.
+
 ## 7. AT식 전장과 카메라
 
-전장 ID는 `arena.service_rooftop_01`, 크기는 11×9다. 바닥은 평평한 전술면이며 도시 깊이는 보드 바깥 3D 배경으로만 표현한다.
+전장 ID는 `arena.service_rooftop_01`, 정체성은 **네온 골목 상부의 옥상 설비장**으로 잠근다. 아래 골목의 간판 빛과 배관·옥상 출입구가 보이되 플레이 보드는 옥상의 평평한 11×9 전술면이며 도시 깊이는 보드 바깥 3D 배경으로만 표현한다.
+
+### 1.25m modular grid 계약
+
+- tile은 1.25m 정사각형이다. 보드 중심이 world `(0,0,0)`이며 tile `(x,y)` 중심은 `((x-5)*1.25, 0, (y-4)*1.25)`다. `(0,0)`은 화면상 북서, `x`는 동쪽, `y`는 남쪽으로 증가한다.
+- 1칸 module과 소품 pivot은 접지면 중앙, 다칸 module pivot은 가장 작은 `(x,y)` tile 중앙이다. mesh는 grid에서 0.01m 이상 임의 offset하지 않는다.
+- render mesh collision을 사용하지 않는다. 이동 차단은 `_col_move` 단순 box, 시야 차단은 `_col_los` 단순 box로 분리한다. 높은 설비벽만 LOS 높이 1.8m로 차단하고 낮은 상자는 LOS를 통과시킨다.
+- 전술면+기능 소품은 45k tris/8 materials/60 draw calls 이하, 보드 밖 배경은 80k tris/4 materials 이하를 후보 상한으로 둔다. static prop은 atlas와 MultiMesh를 우선하고 tile overlay를 이 예산에 합산하지 않는다.
+- source collection은 `FLOOR`, `BLOCKER_HIGH`, `BLOCKER_LOW`, `PROP_INTERACTIVE`, `BACKDROP`, `COLLISION_MOVE`, `COLLISION_LOS`다. 기능 소품 object ID는 `prop_barrel_01`, `prop_snack_vendor_01`, `prop_drain_hatch_01` 형식을 쓴다.
 
 ### 기능 소품
 
@@ -216,6 +265,8 @@ root
 - 색각 없이 outline과 문양만으로 모든 상태를 구분해야 한다.
 - preview와 resolve가 같은 범위·대상·수치를 보여야 한다.
 
+tile 표시 정본은 `scenes/drumstack/battle/tiles/tile_overlay.tscn`과 `assets/drumstack/vfx/tiles/tile_overlay.gdshader`다. plane은 1.20m, pivot 중앙, 바닥 위 Y=0.012m, depth test on, shadow off, cull disabled다. render priority는 점유 2, 범위 3, 대상 4로 고정하고 색·opacity·outline·hatch는 shader parameter만 바꾼다. idle 보드 전체 overlay는 1 draw call, 행동 subset은 MultiMesh 4 draw calls 이하를 목표로 한다.
+
 ## 9. 전투 HUD
 
 2400×1080 가로 화면을 기준으로 한다.
@@ -233,6 +284,11 @@ root
 - UI text는 이미지에 굽지 않고 localization과 실제 font로 렌더한다.
 - 행동 버튼 4개의 위치는 상태와 cooldown에 따라 움직이지 않는다.
 - 행동 제한시간은 상단 우측에 고정하고, `CONFIRM`에서는 예상 결과 옆에 `실행/취소`를 세로로 쌓는다. 두 버튼은 각 96px 이상 touch height를 확보한다.
+- 동반 HTML의 축소 CSS 도형 수치는 배치 설명용이며 구현 치수가 아니다. 실행/취소의 96 logical px와 본 문서의 resource 계약이 항상 우선한다.
+
+UI source는 `art_source/drumstack/ui/battle_house_duck_v1/`의 `frame_battle.svg`, `icon_action_basic.svg`, `icon_action_active.svg`, `icon_action_signature.svg`, `icon_action_guard.svg`, `icon_tile_move.svg`, `icon_tile_attack.svg`, `icon_tile_danger.svg`와 `panel_battle_32.9.png`, `panel_speech_24.9.png`, `button_action_24.9.png`다. runtime은 같은 basename으로 `assets/drumstack/ui/battle_house_duck_v1/`에 두고 `themes/drumstack/battle_house_duck_v1.tres`가 font size, color, margin, focus, disabled 상태를 소유한다. SVG/9-patch에 text를 굽지 않는다.
+
+말풍선 prefab은 `scenes/drumstack/ui/battle/bird_speech_bubble.tscn`이다. 입력은 `hero_id`, `expression_id`, `localization_key`, `anchor_socket`, `priority`이며 기본 anchor는 `socket_target_center`, 초상은 derivative manifest의 128px profile을 쓴다. 기본은 발화자 반대쪽 위, 겹치면 좌→우→위 중앙 순으로 이동하고 어느 위치도 HP·범위·예상 결과·실행 버튼을 피하지 못하면 초상 없는 상단 toast로 fallback한다.
 
 ## 10. VFX storyboard
 
@@ -275,21 +331,36 @@ root
 - HP, 얼굴과 타일을 0.25초 이상 가리지 않는다.
 - full-screen blur, motion blur, dynamic light, 백색 과노출과 긴 camera rotation을 사용하지 않는다.
 
+VFX scene은 `scenes/drumstack/vfx/hero_duck_guard/vfx_basic_beak_shield.tscn`, `vfx_active_quack_challenge.tscn`, `vfx_signature_duck_formation.tscn`, `vfx_hit.tscn`이다. 바닥 telegraph는 tile overlay shader, contact/result는 `GPUParticles3D`와 최소 mesh를 사용한다. 일반기 particle 160/texture 512/material 3/draw call 12 이하, 대표기 420/texture 1024/material 5/peak draw call 35 이하이며 transparent overdraw가 화면의 35%를 0.25초 넘게 덮으면 실패한다. spawn은 위 marker ID와 socket exact 이름만 사용한다.
+
 ## 11. 파일·manifest
 
 ```text
-art_source/drumstack/characters/hero_duck_guard/
-assets/drumstack/characters/hero_duck_guard/
-assets/drumstack/environments/arena_service_rooftop_01/
+art_source/drumstack/characters/hero_duck_guard/hero_duck_guard.blend
+art_source/drumstack/environments/arena_service_rooftop_01/arena_service_rooftop_01.blend
+art_source/drumstack/ui/battle_house_duck_v1/
+audio_source/drumstack/hero_duck_guard/
+assets/drumstack/characters/hero_duck_guard/hero_duck_guard.glb
+assets/drumstack/environments/arena_service_rooftop_01/arena_service_rooftop_01.glb
 assets/drumstack/ui/battle_house_duck_v1/
-assets/drumstack/vfx/hero_duck_guard/
+assets/drumstack/audio/hero_duck_guard/
 scenes/drumstack/battle/actors/hero_duck_guard.tscn
+scenes/drumstack/battle/arenas/arena_service_rooftop_01.tscn
+resources/drumstack/asset_manifest.schema.json
 resources/drumstack/asset_manifest.json
 ```
 
 파일은 `snake_case`, 논리 ID는 `hero.duck_guard`와 `arena.service_rooftop_01`을 사용한다. `final`, `new`, 임시 버전 suffix를 런타임 경로에 넣지 않고 Git commit과 manifest hash로 버전을 추적한다.
 
-manifest에는 `art_family`, source·runtime path, rig/material profile, source SHA-256, animation marker, derivative render profile과 hash가 필요하다. release manifest에 `candidate`, 누락 경로와 임시 fallback이 있으면 실패한다.
+manifest `manifest_version=1` 항목은 `asset_id`, `asset_type`, `art_family`, `source{path,sha256,creator,tool,tool_version,origin,license}`, `runtime[{path,sha256}]`, `rig_profile`, `material_profile`, `render_profile`, `dependencies[]`, `animation_markers[]`, `derivative_of`, `derivatives[{profile,path,sha256}]`, `approved_gates[]`, `status`, `git_commit`을 필수로 가진다. 직접 제작은 `origin=authored_house_duck`, `license=house_duck_proprietary`로 기록한다. 외부 reference는 제품 asset entry가 아니며 manifest와 같은 폴더의 `reference_log.json`에 URL·권리자·열람 목적·`reference_only=true`만 남긴다. release manifest에 `candidate`, 누락/hash 불일치/임시 fallback/미상 license가 있으면 schema validation 실패다.
+
+### 2D derivative·말풍선 초상 profile
+
+`resources/drumstack/profiles/derivative_hero_v1.json`은 승인 GLB와 `resources/drumstack/profiles/world_portrait_v1.tres`만 입력으로 받는다. 3/4 front yaw 25°/pitch -6° orthographic, key/fill/rim 65/25/10, transparent RGBA8 sRGB PNG, premultiply off, UI/text 없음으로 고정한다. 출력은 `hero_duck_guard_full_{expression}_400x800.png`, `hero_duck_guard_profile_{expression}_256.png`, `hero_duck_guard_profile_{expression}_128.png`, `hero_duck_guard_queue_neutral_96.png`, `hero_duck_guard_shop_neutral_900x1200.png`이며 얼굴 중심과 발밑 safe crop 좌표도 profile에 기록한다. Gate D에서는 full/profile/queue만, shop은 Gate E에서 생성한다.
+
+### Audio hook profile
+
+source는 48kHz/24-bit mono WAV, runtime은 48kHz mono Ogg이며 bus는 `SFX/UI`, `SFX/Combat`, `Voice`만 사용한다. exact event ID는 `sfx.ui.turn.mine`, `sfx.ui.turn.enemy`, `sfx.ui.tile.valid`, `sfx.ui.tile.invalid`, `sfx.hero.duck_guard.basic.swing`, `sfx.hero.duck_guard.basic.contact`, `sfx.hero.duck_guard.active.cast`, `sfx.hero.duck_guard.signature.deploy`, `sfx.hero.duck_guard.hit`, `voice.hero.duck_guard.select`, `voice.hero.duck_guard.attack`, `voice.hero.duck_guard.hit`, `voice.hero.duck_guard.ko`, `voice.hero.duck_guard.victory`다. 파일명은 event ID의 점을 underscore로 바꿔 source `.wav`, runtime `.ogg`를 붙인다. 예: `sfx_hero_duck_guard_basic_contact.wav` → `sfx_hero_duck_guard_basic_contact.ogg`. `mk_sfx_swing`과 `mk_sfx_contact`만 animation에 직접 연결하며 나머지는 event ledger가 `resources/drumstack/audio/audio_event_map.json`을 통해 재생한다. 동일 event polyphony는 UI 2, Combat 4, Voice 1이고 contact가 swing/voice보다 우선한다.
 
 ## 12. 시각·기기 승인 게이트
 

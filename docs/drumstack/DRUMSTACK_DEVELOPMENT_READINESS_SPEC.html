@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Drumstack Battle · Development Readiness</title>
+  <style>
+    @font-face{font-family:DoHyeon;src:url("../../assets/fonts/DoHyeon-Regular.ttf") format("truetype");font-display:swap}
+    :root{--night:#0b1115;--panel:#121c22;--panel2:#19272d;--ink:#f6efd8;--muted:#9dafb3;--line:#405158;--cyan:#47ded5;--amber:#ffc247;--coral:#ff6c5f;--green:#69de8b;--blue:#66a9ff;--max:1280px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;color:var(--ink);background:var(--night);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif}a{color:var(--cyan)}code{padding:.1em .35em;color:var(--amber);background:#080d10}h1,h2,h3{font-family:DoHyeon,system-ui,sans-serif;font-weight:400;line-height:1.08}h1{max-width:880px;margin:14px 0 18px;font-size:clamp(48px,8vw,112px)}h2{margin:0 0 20px;font-size:clamp(34px,5vw,64px)}h3{margin:0 0 8px;font-size:24px}.shell{width:min(var(--max),calc(100% - 32px));margin:auto}.eyebrow{color:var(--cyan);font:700 13px/1.2 ui-monospace,monospace;letter-spacing:.14em}.hero{padding:54px 0 38px;border-bottom:1px solid var(--line)}.hero-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(330px,.65fr);gap:22px;align-items:end}.lead{max-width:800px;color:#cfdbd9;font-size:clamp(18px,2vw,25px)}.verdict{padding:20px;border:2px solid var(--amber);background:var(--panel)}.verdict strong{display:block;color:var(--amber);font:42px/1 DoHyeon}.verdict p{margin:10px 0 0}.badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.badge{display:inline-flex;align-items:center;min-height:32px;padding:4px 10px;border:1px solid currentColor;font:700 12px/1.2 ui-monospace,monospace;text-transform:uppercase}.ready{color:var(--green)}.locked{color:var(--cyan)}.blocked{color:var(--coral)}.pending{color:var(--amber)}.deferred{color:var(--muted)}nav{position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line);background:rgba(11,17,21,.96)}nav .shell{display:flex;gap:16px;overflow:auto;padding:12px 0}nav a{flex:0 0 auto;color:var(--muted);font-weight:800;text-decoration:none}nav a:hover,nav a:focus-visible{color:var(--ink)}section{padding:64px 0;border-bottom:1px solid #26363c}.intro{max-width:880px;color:#c6d2d1;font-size:19px}.grid{display:grid;gap:12px}.four{grid-template-columns:repeat(4,1fr)}.three{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:repeat(2,1fr)}.card{min-width:0;padding:18px;border:1px solid var(--line);background:var(--panel)}.card[data-state="ready"]{border-top:5px solid var(--green)}.card[data-state="locked"]{border-top:5px solid var(--cyan)}.card[data-state="blocked"]{border-top:5px solid var(--coral)}.card[data-state="pending"]{border-top:5px solid var(--amber)}.state{margin-bottom:18px;font:800 12px/1 ui-monospace,monospace;letter-spacing:.1em}.card ul{margin:8px 0 0;padding-left:20px}.card li+li{margin-top:5px}.track{display:grid;grid-template-columns:1fr 60px 1fr;gap:14px;align-items:stretch;margin-top:24px}.lane{border:1px solid var(--line);background:var(--panel)}.lane-head{padding:13px 16px;color:var(--night);font:24px/1 DoHyeon}.lane.asset .lane-head{background:var(--amber)}.lane.core .lane-head{background:var(--cyan)}.step{display:grid;grid-template-columns:52px 1fr;gap:12px;padding:14px 16px;border-top:1px solid var(--line)}.step b{display:grid;place-items:center;width:44px;height:44px;border:1px solid currentColor;font:20px/1 ui-monospace,monospace}.merge{display:grid;place-items:center;color:var(--ink);font:44px/1 DoHyeon}.merge small{font:12px/1.2 ui-monospace,monospace;writing-mode:vertical-rl}.callout{margin-top:18px;padding:18px;border-left:6px solid var(--cyan);background:var(--panel2)}.callout.stop{border-color:var(--coral)}table{width:100%;margin-top:20px;border-collapse:collapse;background:var(--panel)}th,td{padding:12px;border:1px solid var(--line);text-align:left;vertical-align:top}th{color:var(--cyan);font:700 12px/1.2 ui-monospace,monospace;text-transform:uppercase}.tool-list{display:grid;grid-template-columns:150px 1fr 120px;gap:0;margin-top:18px;border:1px solid var(--line)}.tool-list>*{padding:12px;border-bottom:1px solid var(--line)}.tool-list>*:nth-last-child(-n+3){border-bottom:0}.tool-list .name{color:var(--ink);font-weight:800}.tool-list .why{color:#c7d2d1}.tool-list .when{text-align:right;font:700 12px/1.4 ui-monospace,monospace}.evidence{display:flex;gap:7px;flex-wrap:wrap}.evidence span{padding:5px 8px;border:1px solid var(--line);font:700 11px/1.2 ui-monospace,monospace}.flow{display:flex;align-items:stretch;gap:6px;overflow:auto;margin-top:20px}.flow-step{min-width:150px;flex:1;padding:14px;border:1px solid var(--line);background:var(--panel)}.flow-step b{display:block;margin-bottom:6px;color:var(--amber)}.arrow{display:grid;place-items:center;color:var(--cyan);font-size:28px}details{margin-top:12px;border:1px solid var(--line);background:var(--panel)}summary{cursor:pointer;padding:15px;font-weight:800}.body{padding:0 16px 16px;color:#c8d4d3}.body p:last-child{margin-bottom:0}.truth{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:18px}.truth>div{min-height:108px;padding:12px;border:1px solid var(--line);background:var(--panel)}.truth b{display:block;color:var(--cyan);font:17px/1.2 DoHyeon}.footer{padding:36px 0;color:var(--muted)}
+    @media(max-width:900px){.hero-grid,.four,.three,.two{grid-template-columns:1fr 1fr}.track{grid-template-columns:1fr}.merge{min-height:64px}.merge small{writing-mode:horizontal-tb}.truth{grid-template-columns:1fr 1fr}.tool-list{grid-template-columns:120px 1fr}.tool-list .when{grid-column:2;text-align:left;padding-top:0}}
+    @media(max-width:560px){.hero{padding-top:34px}.hero-grid,.four,.three,.two,.truth{grid-template-columns:1fr}.shell{width:min(var(--max),calc(100% - 22px))}section{padding:44px 0}.tool-list{grid-template-columns:1fr}.tool-list .when{grid-column:auto}.flow{display:grid;grid-template-columns:1fr}.arrow{transform:rotate(90deg)}table{display:block;max-width:100%;overflow-x:auto}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+    @media print{nav{display:none}body{color:#111;background:#fff}.hero,section{border-color:#999}.card,.lane,.flow-step,table,details,.truth>div,.verdict{color:#111;background:#fff}.lead,.intro,.body,.tool-list .why{color:#333}}
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="shell hero-grid">
+      <div>
+        <div class="eyebrow">HOUSE DUCK · DRUMSTACK BATTLE · GATE 0 READINESS · 2026-08-11</div>
+        <h1>기획은 승인.<br>개발 환경은 아직.</h1>
+        <p class="lead">제품 방향은 더 설명할 단계가 아니다. 지금 필요한 것은 새 저장소, 결정적 전투 계약, Duck Guard 3D 기준본, 그리고 한 턴을 실제 화면으로 증명하는 일이다.</p>
+        <div class="badges"><span class="badge ready">Direction ready</span><span class="badge locked">Contracts locked</span><span class="badge blocked">Runtime absent</span><span class="badge pending">Gate 0 next</span></div>
+      </div>
+      <aside class="verdict" aria-label="개발 준비 최종 판정"><strong>부분 준비</strong><p>이 문서 세트로 <b>Gate 0와 첫 턴 구현을 시작할 계약</b>은 갖췄다. 하지만 현재 재생 버튼은 여전히 Quirky Tower를 열며, Drumstack 모델·전장·전투 코드는 0개다.</p></aside>
+    </div>
+  </header>
+
+  <nav aria-label="문서 목차"><div class="shell"><a href="#status">준비도</a><a href="#route">개발 경로</a><a href="#contracts">계약</a><a href="#tools">도구</a><a href="#docs">문서·QA</a><a href="#done">완료 기준</a></div></nav>
+
+  <main>
+    <section id="status"><div class="shell">
+      <h2>지금 정확히 어디까지 됐나</h2>
+      <div class="grid four">
+        <article class="card" data-state="ready"><div class="state ready">READY</div><h3>제품 방향</h3><ul><li>3v3 조류 타일 전술</li><li>개별 Turn Gauge</li><li>가로 20:9</li><li>무가챠·무장비</li><li>13+ 일반 이용자</li></ul></article>
+        <article class="card" data-state="locked"><div class="state locked">LOCKED IN DOCS</div><h3>구현 계약</h3><ul><li>state/command/event</li><li>path·LOS·clock</li><li>Blender→GLB→Godot</li><li>rig·material·VFX hook</li><li>QA·증거 경계</li></ul></article>
+        <article class="card" data-state="blocked"><div class="state blocked">NOT BUILT</div><h3>실제 게임</h3><ul><li>Drumstack 새 repo 없음</li><li>전투 core 없음</li><li>Duck Guard GLB 없음</li><li>11×9 전장 없음</li><li>한 턴 runtime 없음</li></ul></article>
+        <article class="card" data-state="pending"><div class="state pending">NEXT GATE</div><h3>첫 증명</h3><ul><li>오리 8방향 모델·리그</li><li>6표정·머리 hold→catch-up</li><li>3스킬·피격·KO·VFX</li><li>AT형 전장·타일 UI</li><li>재생→부리방패 첫 턴</li></ul></article>
+      </div>
+      <div class="callout stop"><b>완료라고 부르지 않는 것:</b> HTML·headless PASS만으로 AT 같은 전투 감각, 3D 품질, 재미, Android/iPhone 성능을 증명하지 않는다.</div>
+    </div></section>
+
+    <section id="route"><div class="shell">
+      <h2>에셋 먼저, 규칙도 같이 잠근다</h2>
+      <p class="intro">최종 영웅 10개를 먼저 만들지 않는다. Duck Guard와 한 전장만 A0~A4 기준본으로 완성하고, 같은 시간에 화면과 무관한 전투 규칙을 headless로 검증한다. 두 갈래는 첫 턴에서 합친다.</p>
+      <div class="track">
+        <div class="lane asset"><div class="lane-head">ASSET TRUTH KIT</div><div class="step"><b>A0</b><span><strong>실루엣 승인</strong><br>Project K식 정·측·후면 질량, 오리·탱커 판독</span></div><div class="step"><b>A1</b><span><strong>3D source</strong><br>rig·6표정·필수 clips·cel material·GLB</span></div><div class="step"><b>A2</b><span><strong>Godot import</strong><br>socket·marker·camera·derivative 누락 0</span></div><div class="step"><b>A3</b><span><strong>전장·UI</strong><br>AT형 타일 상태·말풍선·선택 인과</span></div><div class="step"><b>A4</b><span><strong>동작·VFX</strong><br>이동·3스킬·피격·KO·머리 안정화</span></div></div>
+        <div class="merge"><span>+</span><small>FIRST TURN</small></div>
+        <div class="lane core"><div class="lane-head">DETERMINISTIC CORE</div><div class="step"><b>C0</b><span><strong>JSON 계약</strong><br>BattleState·Command·Event·hash</span></div><div class="step"><b>C1</b><span><strong>규칙 RED/GREEN</strong><br>경로·범위·피해·상태·시간</span></div><div class="step"><b>C2</b><span><strong>Easy bot</strong><br>동일 legal generator와 seeded 선택</span></div></div>
+      </div>
+      <div class="flow" aria-label="Gate 진행 순서"><div class="flow-step"><b>Gate 0</b>새 repo·standards·export guard</div><span class="arrow">›</span><div class="flow-step"><b>Duck A0–A4</b>3D·rig·표정·동작·VFX 승인</div><span class="arrow">›</span><div class="flow-step"><b>첫 턴</b>이동→preview→공격→피격</div><span class="arrow">›</span><div class="flow-step"><b>한 경기</b>3v3 봇전→결과→재대결</div><span class="arrow">›</span><div class="flow-step"><b>확장</b>5인 Gate 뒤 닭·비둘기·서버/BM</div></div>
+    </div></section>
+
+    <section id="contracts"><div class="shell">
+      <h2>작업자마다 달라지지 않는 계약</h2>
+      <div class="grid two">
+        <article class="card" data-state="locked"><div class="state locked">CORE</div><h3>규칙의 유일 권위</h3><ul><li>정수·JSON-safe state만 hash</li><li>이동은 ordered <code>move_path</code> 전체를 검증</li><li>wall clock은 authority 입력, core가 OS 시간을 읽지 않음</li><li>preview와 apply가 같은 함수 사용</li><li>물리·애니메이션은 결과를 바꾸지 않음</li></ul><p><a href="../superpowers/specs/2026-08-11-drumstack-core-implementation-contract.md">Core contract 열기</a></p></article>
+        <article class="card" data-state="locked"><div class="state locked">ASSET</div><h3>3D 하나가 원본</h3><ul><li>Blender 4.5 LTS source</li><li>Project K처럼 정·측·후면 질량과 관절축 일치</li><li>GLB 2.0 + Godot wrapper</li><li>exact bone·clip·marker·socket</li><li>mobile cel material·camera profile</li><li>2D 프로필은 승인 GLB에서 파생</li></ul><p><a href="../superpowers/specs/2026-08-11-drumstack-3d-asset-vertical-slice-design.md">Asset contract 열기</a></p></article>
+      </div>
+      <div class="truth" aria-label="첫 턴 truth kit 구성"><div><b>1 · SOURCE</b><span>duck_guard.blend<br>arena.blend</span></div><div><b>2 · RUNTIME</b><span>GLB·TSCN<br>materials</span></div><div><b>3 · RULES</b><span>state·command<br>event ledger</span></div><div><b>4 · VIEW</b><span>camera·tile<br>VFX·HUD</span></div><div><b>5 · EVIDENCE</b><span>RED/GREEN<br>2400×1080</span></div></div>
+      <details open><summary>이번에 일부러 만들지 않는 것</summary><div class="body"><p>닭·비둘기 final, 나머지 7영웅, 두 번째 전장, 완성 마을, 상점·프로필 테두리, Supabase, 광고·결제, 협동 보스, 길드, final music. 첫 턴과 5인 Gate가 통과할 때만 다음 묶음을 연다.</p></div></details>
+    </div></section>
+
+    <section id="tools"><div class="shell">
+      <h2>도구는 더 깔지 않는다</h2>
+      <p class="intro">Godot 4.7 native 기능과 이미 설치된 skills로 충분하다. 플러그인은 개발용 MCP 하나만 격리 검증한다.</p>
+      <div class="tool-list" role="table" aria-label="개발 도구 선택">
+        <div class="name">Ponytail</div><div class="why">기존 구조·stdlib·Godot native 순으로 해결. 한 소비자용 framework 금지.</div><div class="when ready">ALWAYS</div>
+        <div class="name">Superpowers</div><div class="why">writing-plans → worktree → TDD → review → verification. 별도 설치 불필요.</div><div class="when ready">MUST</div>
+        <div class="name">godot-local-docs</div><div class="why">4.7 API와 개념의 무료 1차 근거. Context7 quota 불필요.</div><div class="when ready">MUST</div>
+        <div class="name">godot_mcp</div><div class="why">씬·ClassDB·입력·runtime 확인 때만 Local에서 켜고 exact PID를 종료.</div><div class="when pending">LOCAL ONLY</div>
+        <div class="name">Godot native</div><div class="why">AStarGrid2D, Camera3D, AnimationTree, audio bus. 외부 camera/BT/audio plugin 없음.</div><div class="when ready">MUST</div>
+        <div class="name">SDK</div><div class="why">Supabase·AdMob·Billing·StoreKit은 재미 Gate 뒤. 지금 연결하면 검증을 흐린다.</div><div class="when deferred">GATE F</div>
+      </div>
+      <div class="callout"><b>MCP pin:</b> 현재 legacy v0.7.2는 그대로 둔다. 새 repo에서 공식 Godot Asset Library v0.8.0을 4.7 import/runtime/export로 검증하고, 실패하면 v0.7.2로 돌아간다. release에는 plugin·autoload·addon 파일이 모두 0이어야 한다.</div>
+    </div></section>
+
+    <section id="docs"><div class="shell">
+      <h2>큰 문서와 QA가 다시 무너지지 않게</h2>
+      <div class="grid three">
+        <article class="card" data-state="ready"><div class="state ready">CANONICAL</div><h3>짧은 현재 상태</h3><p><code>work_state.md</code>는 현재/다음/차단만. 완료 기록은 history로 옮긴다. 결정은 append-only register, 요구 연결은 feature map 한 곳.</p></article>
+        <article class="card" data-state="locked"><div class="state locked">STATIC</div><h3>엔진 없이 검사</h3><p>링크·ID·JSON·CSV·manifest·파일 크기·shared standard hash·MCP provenance·export 제외를 Cloud에서 검사한다.</p></article>
+        <article class="card" data-state="pending"><div class="state pending">LOCAL</div><h3>필요한 순간만 실행</h3><p>Godot import, 실제 입력, 카메라·VFX·오디오, 2400×1080 캡처, Android/iPhone만 Local. 종료 뒤 agent-owned PID/listener 0.</p></article>
+      </div>
+      <table><thead><tr><th>파일</th><th>경고</th><th>실패</th><th>처리</th></tr></thead><tbody><tr><td>GDScript</td><td>400줄</td><td>700줄</td><td>도메인 책임으로 분리</td></tr><tr><td>Markdown</td><td>500줄 또는 80KB</td><td>900줄 또는 160KB</td><td>현재와 history 분리</td></tr><tr><td>JSON/CSV</td><td>100KB</td><td>250KB</td><td>hero/map/domain별</td></tr><tr><td>HTML master</td><td>140KB</td><td>220KB</td><td>승인본 동결, companion 링크</td></tr><tr><td>Test</td><td>500줄</td><td>800줄</td><td>focused runner</td></tr></tbody></table>
+      <div class="evidence" aria-label="증거 종류"><span>STATIC</span><span>HEADLESS</span><span>RUNTIME</span><span>VISUAL</span><span>LISTEN</span><span>HUMAN</span><span>DEVICE</span><span>BACKEND</span></div>
+      <details><summary>House Duck TC 필수 필드</summary><div class="body"><p>TC ID · 분류 · 우선순위 · 사전조건 · 액션 · 기대결과 · 플랫폼 · 자동화 · 결과 · 증거 · 이슈. Headless PASS는 화면·재미·기기 PASS로 승격하지 않는다.</p></div></details>
+    </div></section>
+
+    <section id="done"><div class="shell">
+      <h2>다음 완료 보고는 이것만 보면 된다</h2>
+      <table><thead><tr><th>항목</th><th>현재</th><th>첫 완료 증거</th></tr></thead><tbody>
+        <tr><td>제품·명세 방향</td><td><span class="badge ready">완료</span></td><td>master+companion 정적 일치</td></tr>
+        <tr><td>Gate 0 저장소·규칙</td><td><span class="badge blocked">미실행</span></td><td>새 repo, standards hash, export guard, RED/GREEN</td></tr>
+        <tr><td>Duck Guard asset truth kit</td><td><span class="badge blocked">미제작</span></td><td>A0→A4 비교, GLB·rig·6표정·3스킬·피격·VFX·2D 파생·owner review</td></tr>
+        <tr><td>첫 턴</td><td><span class="badge blocked">미구현</span></td><td>public input 영상+인과 2400×1080 상태</td></tr>
+        <tr><td>한 경기·재미</td><td><span class="badge deferred">후속</span></td><td>3v3 완주+외부 5인 Gate</td></tr>
+        <tr><td>기기·서버·BM</td><td><span class="badge deferred">후속</span></td><td>Android/iPhone, staging, store sandbox</td></tr>
+      </tbody></table>
+      <div class="callout"><b>바로 이어갈 문서:</b> <a href="../superpowers/plans/2026-08-11-drumstack-gate-0-first-turn.md">Gate 0 → 첫 턴 구현 계획</a>. 이 계획이 끝나기 전에는 “게임 개발 준비 완료”나 “플레이 가능”이라고 보고하지 않는다.</div>
+    </div></section>
+  </main>
+
+  <footer class="footer"><div class="shell"><b>Drumstack Battle Development Readiness v1.0</b><br>신규 승인 보드라 비포 캡처 없음. 이 HTML은 계획 증거이며 Godot·실기기·재미 증거가 아니다.</div></footer>
+</body>
+</html>
