@@ -469,7 +469,7 @@ final_damage = max(1, round(post_defense × incoming))</code></pre><p>모든 퍼
 
     <section id="art" data-searchable data-status="locked proposed deferred" data-source="user-art-direction,project-k-art-direction" data-decision="DS-ART-001,DS-ART-002,DS-ART-003" data-feature="DS-TC-ART-001,DS-TC-RIG-001,DS-TC-ASSET-001">
       <div class="shell"><div class="section-head"><div><div class="index">15 · ART, RIG &amp; ASSET PIPELINE</div><h2>셀 애니 조류와 도시 네온, 실루엣은 한눈에</h2></div></div>
-        <p class="intro">최신 Project K의 중간밀도 cel 3D 방향과 ZZZ에서 느껴지는 도시 리듬·굵은 실루엣을 높은 수준의 영감으로만 사용한다. 캐릭터·팔레트·그래픽 모티브·UI 배치를 복사하지 않는다.</p>
+        <p class="intro">제품 기본값은 실제 DCC·GLB 기반 cel 3D다. 생성 이미지는 모델시트·텍스처·맵·UI 원본과 승인 기준에서 제외한다. AT의 전술 가독성과 ZZZ에서 느껴지는 도시 리듬·굵은 실루엣은 높은 수준의 원리로만 참고하며 캐릭터·팔레트·그래픽 모티브·UI 배치를 복사하지 않는다.</p>
         <div class="grid three">
           <article class="card keep"><div class="kicker">CHARACTER</div><h3>둥글고 유기적인 조류</h3><ul><li>오리 부리·닭 볏·비둘기 가슴 등 종 판독</li><li>네모 몸통 금지</li><li>2~3개 큰 질량으로 단순화</li><li>역할 소품은 하나만</li><li>팀색은 의상 띠/발판에, 깃털 원색 보존</li></ul></article>
           <article class="card info"><div class="kicker">WORLD</div><h3>커닝시티식 골목 구조</h3><ul><li>옥상·간판·맨홀·자판기·배럴</li><li>청록/호박/코랄 도시 팔레트</li><li>전술 타일보다 배경 대비 낮게</li><li>기능 장애물은 실루엣과 아이콘 반복</li><li>직접 IP 건물·로고 복제 금지</li></ul></article>
@@ -477,8 +477,8 @@ final_damage = max(1, round(post_defense × incoming))</code></pre><p>모든 퍼
         </div>
         <details open><summary>영웅 1종 필수 산출물</summary><div class="body"><table><thead><tr><th>종류</th><th>규격/상태</th><th>필수</th><th>Gate</th></tr></thead><tbody>
           <tr><td>3D 모델</td><td>중간밀도 cel, LOD 0/1, 단일 skeleton</td><td>예</td><td>D</td></tr>
-          <tr><td>리깅</td><td>root/hips/spine/head/beak/wing.LR/leg.LR/toe/tail</td><td>예</td><td>D</td></tr>
-          <tr><td>애니메이션</td><td>idle, move, hit, KO, basic, active, signature, celebrate</td><td>8개</td><td>D</td></tr>
+          <tr><td>리깅</td><td>root/body_root/spine/head/beak/wing.LR/leg.LR/toe/tail</td><td>예</td><td>D</td></tr>
+          <tr><td>애니메이션</td><td>idle, move, hit, KO, basic, active, signature, celebrate 8상태군; start/loop/stop·guard subclip 허용</td><td>8상태군</td><td>D</td></tr>
           <tr><td>표정</td><td>neutral, focus, assertive, hit, uneasy, victory</td><td>6개</td><td>D</td></tr>
           <tr><td>2D 전신</td><td>400×800 alpha, 동일 6표정 crop 파생</td><td>6장</td><td>D</td></tr>
           <tr><td>프로필</td><td>256×256/128×128 crop</td><td>2규격</td><td>D</td></tr>
@@ -486,7 +486,7 @@ final_damage = max(1, round(post_defense × incoming))</code></pre><p>모든 퍼
           <tr><td>상점 카드</td><td>900×1200 source에서 crop</td><td>1장</td><td>E</td></tr>
           <tr><td>테두리 미리보기</td><td>프로필+frame 조합</td><td>1상태</td><td>E</td></tr>
         </tbody></table></div></details>
-        <details open><summary>리깅·애니메이션·표정 가독성 계약</summary><div class="body"><ul><li>부리·날개·발이 종과 스킬을 읽히게 해야 하며 사람형 팔 동작을 그대로 씌우지 않는다.</li><li>이동은 보폭보다 몸통 bob·날개 균형으로 종 차이를 만든다.</li><li>얼굴 rig는 눈꺼풀/눈 크기·시선, 부리 열림, 머리 기울기, 볏·목깃 보조 움직임을 제공한다. 종마다 없는 부위를 억지 사람 얼굴처럼 만들지 않는다.</li><li>neutral→focus→assertive, hit→uneasy, victory의 6 pose가 3D·프로필·말풍선 초상에서 같은 감정으로 읽혀야 한다.</li><li>공격 준비 silhouette 0.12~0.25초, contact 2 render frame 이상, recovery 0.18~0.45초.</li><li>대표기 중에도 출발 타일·대상·도착 타일이 최소 한 프레임 보인다.</li><li>스킬 VFX는 바닥 telegraph, 행동 본체, contact/수치의 세 layer로 분리하고 타일·얼굴·HP를 0.25초 넘게 가리지 않는다.</li><li>프로토타입 greybox가 재미 Gate를 통과하기 전 10영웅 최종 모델을 선제작하지 않는다.</li></ul></div></details>
+        <details open><summary>리깅·애니메이션·표정 가독성 계약</summary><div class="body"><ul><li>부리·날개·발이 종과 스킬을 읽히게 해야 하며 사람형 팔 동작을 그대로 씌우지 않는다.</li><li>이동은 보폭보다 몸통 bob·날개 균형으로 종 차이를 만든다.</li><li>얼굴 rig는 눈꺼풀/눈 크기·시선, 부리 열림, 머리 기울기, 볏·목깃 보조 움직임을 제공한다. 종마다 없는 부위를 억지 사람 얼굴처럼 만들지 않는다.</li><li>덕 대장 방패는 <code>shield_root</code> 아래 좌·중·우 3개 rigid panel과 개별 pivot으로 구성하고 접힘→전개 transform만 bake한다.</li><li>neutral→focus→assertive, hit→uneasy, victory의 6 pose가 3D·프로필·말풍선 초상에서 같은 감정으로 읽혀야 한다.</li><li>공격 준비 silhouette 0.12~0.25초, contact 2 render frame 이상, recovery 0.18~0.45초.</li><li>대표기 중에도 출발 타일·대상·도착 타일이 최소 한 프레임 보인다.</li><li>스킬 VFX는 바닥 telegraph, 행동 본체, contact/수치의 세 layer로 분리하고 타일·얼굴·HP를 0.25초 넘게 가리지 않는다.</li><li>프로토타입 greybox가 재미 Gate를 통과하기 전 10영웅 최종 모델을 선제작하지 않는다.</li></ul></div></details>
         <details open><summary>전투 말풍선·조류 반응 규칙</summary><div class="body"><table><thead><tr><th>계기</th><th>표정/말풍선</th><th>빈도</th><th>금지</th></tr></thead><tbody>
           <tr><td>첫 선택</td><td>focus+역할 한마디</td><td>경기당 영웅 1회</td><td>튜토리얼 장문</td></tr>
           <tr><td>대표기</td><td>assertive+고유 한마디</td><td>첫 사용 필수, 이후 50%</td><td>행동 지연</td></tr>
@@ -494,6 +494,7 @@ final_damage = max(1, round(post_defense × incoming))</code></pre><p>모든 퍼
           <tr><td>아군 회복/보호</td><td>neutral/victory+감사 반응</td><td>경기당 2회 상한</td><td>결과 수치 가림</td></tr>
           <tr><td>승리/패배</td><td>victory 또는 uneasy</td><td>결과 화면 1회</td><td>CTA 가림</td></tr>
         </tbody></table><ul><li>전투 말풍선은 한국어 18자·최대 2줄·1.2~2초이며 한 팀당 동시에 1개만 보인다. 번역은 문자 수가 아니라 실제 2줄 fit으로 검사한다.</li><li>말풍선 tail은 발화 조류를 가리키고 HP·상태·범위·대상·실행 버튼과 겹치면 반대쪽 anchor로 이동한다.</li><li>preview 타이머를 멈추거나 입력을 막지 않는다. 설정에서 전투 대사 ‘전체/중요만/끄기’를 제공한다.</li><li>대사는 각 조류의 성격을 보여주되 전술 결과 설명을 대신하지 않는다. 피해·힐·상태는 UI와 VFX만으로도 이해되어야 한다.</li></ul></div></details>
+        <div class="callout"><strong>3D 에셋 서브명세:</strong> <a href="DRUMSTACK_3D_ASSET_VERTICAL_SLICE_SPEC.html">덕 대장·AT형 전장·타일 UI·VFX 시각판</a>과 <a href="../superpowers/specs/2026-08-11-drumstack-3d-asset-vertical-slice-design.md">정본 설계</a>를 함께 본다. House Duck 공통 정본은 <code>shared/standards/house_duck_asset_art_standard.md</code>이며, 공유 폴더가 Git으로 추적되기 전에는 서브명세가 실행용 fallback을 소유한다. 실제 3D turntable과 Godot 화면 전에는 다음 캐릭터를 대량 제작하지 않는다.</div>
         <div class="callout danger-callout"><strong>저작권·브랜드 경계:</strong> “ZZZ 느낌”은 셀셰이딩, 도시 에너지, 그래픽 리듬의 추상적 기준이다. ZZZ/AT/메이플의 캐릭터, 로고, 폰트, UI 프레임, 맵, 스킬 VFX, 음원을 복제하지 않는다.</div>
       </div>
     </section>
@@ -612,7 +613,7 @@ scenes/drumstack/
           <tr><td>6</td><td><code>ponytail</code></td><td>항상</td><td>native·기존 구조·최소 diff</td></tr>
           <tr><td>7</td><td><code>godot-local-docs</code></td><td>4.7 API/개념</td><td>공식 로컬 근거</td></tr>
           <tr><td>8</td><td><code>godot-mcp</code></td><td>Local 씬/입력/런타임 QA</td><td>작업 때만 실행, 종료 검증</td></tr>
-          <tr><td>9</td><td><code>imagegen</code></td><td>Gate D 아트 방향 승인 뒤</td><td>후보 원화, 최종 3D master 아님</td></tr>
+          <tr><td>9</td><td><code>imagegen</code></td><td>제품 에셋에는 사용하지 않음</td><td>탐색 기록만 가능; 모델시트·텍스처·맵·UI·승인 근거 금지</td></tr>
           <tr><td>10</td><td><code>design-review</code> / 화면 QA</td><td>최종 코드의 before/after</td><td>P0/P1 visual finding 0</td></tr>
           <tr><td>11</td><td><code>verification-before-completion</code></td><td>완료 주장 전</td><td>명세→구현→증거 재대조</td></tr>
         </tbody></table>
