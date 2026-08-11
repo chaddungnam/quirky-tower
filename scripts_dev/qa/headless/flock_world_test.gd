@@ -47,7 +47,9 @@ func _run() -> void:
 	world.set_physics_process(false)
 	var completed_routes: Array = []
 	world.act_completed.connect(
-		func(_act_id: String, result: Dictionary) -> void: completed_routes.append(result.route)
+		func(act_id: String, result: Dictionary) -> void:
+			if act_id == "entry":
+				completed_routes.append(result.route)
 	)
 	var rescue_area := world.get_node("Encounter/Rescue") as Area3D
 	rescue_area.global_position = leader.global_position
@@ -85,6 +87,119 @@ func _run() -> void:
 		var face := bird.get_node("FaceSurface") as Sprite3D
 		assert(face.texture.get_size() == Vector2(16, 16), "bird faces use a 16x16 surface")
 		assert(face.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST, "bird faces keep nearest filtering")
+
+	var chain_points := {
+		"antenna_a": Vector3(0.0, 0.56, 1.35),
+		"relay_b": Vector3(-2.2, 0.56, -1.0),
+		"vent_c": Vector3(2.2, 0.56, -3.0),
+	}
+	var chain_ids: Array[String] = ["antenna_a", "relay_b", "vent_c"]
+	var chain_completions: Array[Dictionary] = []
+	var chain_collapse_stages: Array[String] = []
+	var chain_rewards: Array[int] = []
+	world.act_completed.connect(
+		func(act_id: String, result: Dictionary) -> void:
+			if act_id == "chain":
+				chain_completions.append(result)
+	)
+	world.collapse_stage.connect(func(stage: String) -> void: chain_collapse_stages.append(stage))
+	world.reward_released.connect(func(value: int) -> void: chain_rewards.append(value))
+	world.start_act("chain")
+	var first_chain_screen := camera.unproject_position(chain_points.antenna_a)
+	world.set_drag_target(first_chain_screen)
+	world.set_drag_target(first_chain_screen)
+	assert(
+		world.get("_chain_target_ids") == ["antenna_a"],
+		"chain selection preserves one stable ID and ignores a repeated target"
+	)
+	var ledger_before_broken := state.event_ledger.duplicate(true)
+	world.release_swipe(first_chain_screen, Vector2.ZERO)
+	assert(world.get("_chain_status") == "broken", "fewer than two chain targets reports broken")
+	assert(
+		world.get("_chain_target_ids") == ["antenna_a"],
+		"a broken release keeps its selected path for correction"
+	)
+	assert(state.event_ledger == ledger_before_broken, "a broken release consumes no discrete ledger event")
+	assert(world.has_node("Effects/ChainPath"), "the world owns one chain path surface")
+	var chain_path := world.get_node("Effects/ChainPath") as MeshInstance3D
+	var chain_mesh := chain_path.mesh as ImmediateMesh
+	assert(chain_mesh.get_surface_count() == 1, "the broken chain path remains visibly marked")
+	var broken_vertices: PackedVector3Array = chain_mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+	assert(broken_vertices.size() >= 2, "the broken chain path renders a visible segment")
+	var broken_material := chain_mesh.surface_get_material(0) as StandardMaterial3D
+	assert(broken_material.albedo_color == Color(1.0, 0.16, 0.2), "the broken chain path turns high-contrast red")
+
+	world.set_drag_target(camera.unproject_position(chain_points.relay_b))
+	world.set_drag_target(camera.unproject_position(chain_points.antenna_a))
+	world.set_drag_target(camera.unproject_position(chain_points.vent_c))
+	assert(
+		world.get("_chain_target_ids") == chain_ids,
+		"chain target IDs stay ordered while duplicates are ignored"
+	)
+	assert(world.has_node("Effects/AttackOrb"), "the world owns one attack orb")
+	var attack_orb := world.get_node("Effects/AttackOrb") as Area3D
+	assert(attack_orb.get_child_count() == 2, "the attack orb has one visual and one collider")
+	var orb_collision := attack_orb.get_node("Collision") as CollisionShape3D
+	assert(orb_collision.shape != null, "the attack orb carries a real collision shape")
+	var real_overlap_ids: Array[String] = []
+	attack_orb.body_entered.connect(
+		func(body: Node3D) -> void:
+			if body.has_meta("target_id"):
+				real_overlap_ids.append(str(body.get_meta("target_id")))
+	)
+	var goose_before_chain := goose.global_position
+	var ledger_before_chain := state.event_ledger.size()
+	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
+	assert(world.get("_chain_status") == "released", "two or more unique targets release one chain raid")
+	for _frame in range(240):
+		await physics_frame
+		if not chain_completions.is_empty():
+			break
+	assert(chain_completions.size() == 1, "one valid chain release completes the act once")
+	assert(chain_completions[0] == {"status": "released", "target_ids": chain_ids}, "chain completion reports stable IDs")
+	assert(real_overlap_ids == chain_ids, "one real physics overlap strikes each unique target in order")
+	assert(
+		chain_collapse_stages == ["contact", "crack", "pieces", "collapse", "reward"],
+		"the authored structural target finishes its collapse before chain completion"
+	)
+	assert(chain_rewards == [1], "the chain collapse releases its authored reward once")
+	assert(goose.global_position.distance_to(goose_before_chain) > 0.1, "the visible companion trails the released chain")
+	var chain_events: Array = state.event_ledger.slice(ledger_before_chain)
+	assert(chain_events.size() == 4, "valid chain records one target list and one event per strike")
+	assert(
+		chain_events[0] == {"kind": "chain_targets", "payload": {"target_ids": chain_ids}},
+		"the chain ledger stores the ordered stable target IDs once"
+	)
+	for index in range(chain_ids.size()):
+		assert(
+			chain_events[index + 1] == {"kind": "chain_strike", "payload": {"target_id": chain_ids[index]}},
+			"each chain strike ledger entry stores one ID only"
+		)
+	assert(chain_mesh.get_surface_count() == 0, "a valid chain release clears its path surface")
+	assert(world.get("_chain_target_ids").is_empty(), "a valid chain release consumes its selected IDs")
+	var ledger_after_chain := state.event_ledger.duplicate(true)
+	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
+	await physics_frame
+	assert(state.event_ledger == ledger_after_chain, "a consumed chain cannot record duplicate strikes or rewards")
+	assert(chain_completions.size() == 1, "a consumed chain cannot complete twice")
+
+	world.start_act("chain")
+	world.set_drag_target(camera.unproject_position(chain_points.antenna_a))
+	world.set_drag_target(camera.unproject_position(chain_points.relay_b))
+	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
+	var canceled_after_last_overlap := false
+	for _frame in range(240):
+		await physics_frame
+		if world.get("_chain_struck_targets").has("relay_b"):
+			canceled_after_last_overlap = true
+			world.cancel_gesture()
+			break
+	assert(canceled_after_last_overlap, "the cancel regression reaches the last target through real overlap")
+	for _frame in range(30):
+		await physics_frame
+	assert(chain_completions.size() == 1, "cancel on the last target prevents a late chain completion")
+	assert(chain_mesh.get_surface_count() == 0, "chain cancellation clears the path surface")
+	assert(world.get("_chain_target_ids").is_empty(), "chain cancellation clears selected IDs")
 
 	var weak_point := world.get_node("Encounter/BrawlWeakPoint") as RigidBody3D
 	var dash_collision := world.get_node("Actors/Leader/DashHitbox/Collision") as CollisionShape3D

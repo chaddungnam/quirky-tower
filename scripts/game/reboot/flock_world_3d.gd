@@ -19,6 +19,10 @@ const DASH_SPEED := 16.0
 const DASH_DURATION := 0.24
 const DASH_IMPULSE := 7.0
 const BRAWL_TARGET_ID := "antenna_a"
+const CHAIN_TARGET_IDS: Array[String] = [BRAWL_TARGET_ID, "relay_b", "vent_c"]
+const CHAIN_PICK_RADIUS := 96.0
+const CHAIN_TRAIL_DELAY := 0.06
+const CHAIN_PATH_Y := FLOOR_Y + 0.04
 
 var _run_state: FlockRunState
 var _act_id := ""
@@ -39,6 +43,18 @@ var _detached_pieces: Array[RigidBody3D] = []
 var _collapsed_targets: Dictionary = {}
 var _reward_claimed := false
 var _collapse_tween: Tween
+var _chain_targets: Dictionary = {}
+var _chain_target_ids: Array[String] = []
+var _chain_struck_targets: Dictionary = {}
+var _chain_status := ""
+var _chain_expected_target_id := ""
+var _chain_attack_active := false
+var _chain_attack_consumed := false
+var _chain_release_generation := 0
+var _chain_path_mesh: ImmediateMesh
+var _chain_path_material: StandardMaterial3D
+var _attack_orb: Area3D
+var _attack_orb_collision: CollisionShape3D
 
 @onready var _camera: Camera3D = $Camera
 @onready var _actors: Node3D = $Actors
@@ -52,6 +68,7 @@ func _ready() -> void:
 	_actors.add_child(_leader)
 	_make_dash_hitbox()
 	_make_brawl_encounter()
+	_make_chain_raid()
 
 	var goose := _make_bird_actor("goose")
 	goose.visible = false
@@ -80,8 +97,17 @@ func start_act(act_id: String) -> void:
 	if act_id == "brawl":
 		_reset_brawl_encounter()
 		collapse_stage.emit("warning")
+	elif act_id == "chain":
+		_chain_target_ids.clear()
+		_chain_struck_targets.clear()
+		_chain_status = ""
+		_chain_attack_consumed = false
+		_draw_chain_path(false)
 
 func set_drag_target(screen_position: Vector2) -> void:
+	if _act_id == "chain":
+		_select_chain_target(screen_position)
+		return
 	if _act_id == "brawl":
 		if not _has_swipe_candidate:
 			_swipe_start = screen_position
@@ -106,6 +132,9 @@ func set_drag_target(screen_position: Vector2) -> void:
 	_has_drag_target = true
 
 func release_swipe(screen_position: Vector2, velocity: Vector2) -> void:
+	if _act_id == "chain":
+		_release_chain()
+		return
 	if (
 		_act_id != "brawl"
 		or not _has_swipe_candidate
@@ -122,6 +151,18 @@ func release_swipe(screen_position: Vector2, velocity: Vector2) -> void:
 	set_physics_process(true)
 
 func cancel_gesture() -> void:
+	_chain_release_generation += 1
+	_chain_attack_active = false
+	_chain_expected_target_id = ""
+	_chain_target_ids.clear()
+	_chain_struck_targets.clear()
+	_chain_status = ""
+	if _attack_orb_collision != null:
+		_attack_orb_collision.set_deferred("disabled", true)
+	if _attack_orb != null:
+		_attack_orb.visible = false
+	if _chain_path_mesh != null:
+		_chain_path_mesh.clear_surfaces()
 	_has_drag_target = false
 	_has_swipe_candidate = false
 	_dash_active = false
@@ -255,6 +296,138 @@ func _sync_companions() -> void:
 				bird.global_position = _leader.global_position + FOLLOW_OFFSETS[slot.get_index()]
 				break
 
+func _select_chain_target(screen_position: Vector2) -> void:
+	if _chain_attack_active or _chain_attack_consumed:
+		return
+	var selected_id := ""
+	var selected_distance := CHAIN_PICK_RADIUS
+	for target_id in CHAIN_TARGET_IDS:
+		var target := _chain_targets.get(target_id) as Node3D
+		if target == null or _camera.is_position_behind(target.global_position):
+			continue
+		var target_distance := _camera.unproject_position(target.global_position).distance_to(screen_position)
+		if target_distance <= selected_distance:
+			selected_id = target_id
+			selected_distance = target_distance
+	if selected_id.is_empty() or _chain_target_ids.has(selected_id):
+		return
+	_chain_target_ids.append(selected_id)
+	_chain_status = "drawing"
+	_draw_chain_path(false)
+
+func _release_chain() -> void:
+	if _chain_attack_active or _chain_attack_consumed:
+		return
+	if _chain_target_ids.size() < 2:
+		_chain_status = "broken"
+		_draw_chain_path(true)
+		return
+	_chain_attack_consumed = true
+	_chain_attack_active = true
+	_chain_status = "released"
+	_chain_struck_targets.clear()
+	var released_ids: Array[String] = _chain_target_ids.duplicate()
+	_chain_target_ids.clear()
+	_draw_chain_path(false)
+	if _run_state != null:
+		_run_state.record_event("chain_targets", {"target_ids": released_ids})
+	_chain_release_generation += 1
+	_execute_chain(released_ids, _chain_release_generation)
+
+func _execute_chain(target_ids: Array[String], generation: int) -> void:
+	_attack_orb.visible = true
+	_attack_orb.global_position = Vector3(0.0, -20.0, 0.0)
+	_attack_orb_collision.set_deferred("disabled", false)
+	await get_tree().physics_frame
+	for index in range(target_ids.size()):
+		if generation != _chain_release_generation:
+			return
+		var target_id := target_ids[index]
+		var target := _chain_targets.get(target_id) as Node3D
+		if target == null:
+			continue
+		_chain_expected_target_id = target_id
+		_attack_orb.global_position = target.global_position
+		for _frame in range(4):
+			await get_tree().physics_frame
+			if generation != _chain_release_generation:
+				return
+			if _chain_struck_targets.has(target_id):
+				break
+		if not _chain_struck_targets.has(target_id):
+			continue
+		await get_tree().create_timer(CHAIN_TRAIL_DELAY).timeout
+		if generation != _chain_release_generation:
+			return
+		_trail_chain_companion(index, target.global_position)
+		_attack_orb.global_position = Vector3(0.0, -20.0, 0.0)
+		await get_tree().physics_frame
+		if generation != _chain_release_generation:
+			return
+	if generation != _chain_release_generation:
+		return
+	if _collapse_tween != null and _collapse_tween.is_valid() and _collapse_tween.is_running():
+		await _collapse_tween.finished
+		if generation != _chain_release_generation:
+			return
+	_chain_expected_target_id = ""
+	_chain_attack_active = false
+	_attack_orb.visible = false
+	_attack_orb_collision.set_deferred("disabled", true)
+	act_completed.emit("chain", {"status": "released", "target_ids": target_ids})
+
+func _on_attack_orb_body_entered(body: Node3D) -> void:
+	if not _chain_attack_active or not body.has_meta("target_id"):
+		return
+	var target_id := str(body.get_meta("target_id"))
+	if target_id != _chain_expected_target_id or _chain_struck_targets.has(target_id):
+		return
+	_chain_struck_targets[target_id] = true
+	_flash_chain_target(body)
+	impact.emit("chain_strike", body.global_position)
+	if _run_state != null:
+		_run_state.record_event("chain_strike", {"target_id": target_id})
+	if target_id == BRAWL_TARGET_ID:
+		trigger_collapse(target_id, Vector3.FORWARD)
+
+func _trail_chain_companion(index: int, target_position: Vector3) -> void:
+	var visible_companions: Array[CharacterBody3D] = []
+	for slot in _companion_slots.get_children():
+		if slot.get_child_count() > 0 and slot.get_child(0).visible:
+			visible_companions.append(slot.get_child(0) as CharacterBody3D)
+	if visible_companions.is_empty():
+		return
+	var companion := visible_companions[index % visible_companions.size()]
+	companion.global_position = target_position + FOLLOW_OFFSETS[index % FOLLOW_OFFSETS.size()] * 0.35
+
+func _flash_chain_target(target: Node3D) -> void:
+	var visual := target.get_node_or_null("Visual") as MeshInstance3D
+	if visual == null:
+		return
+	var material := visual.mesh.material as StandardMaterial3D
+	var base_color: Color = target.get_meta("chain_color")
+	material.albedo_color = Color(1.0, 0.95, 0.5)
+	create_tween().tween_property(material, "albedo_color", base_color, 0.18)
+
+func _draw_chain_path(broken: bool) -> void:
+	if _chain_path_mesh == null:
+		return
+	_chain_path_mesh.clear_surfaces()
+	if _chain_target_ids.is_empty():
+		return
+	_chain_path_material.albedo_color = Color(1.0, 0.16, 0.2) if broken else Color(0.1, 1.0, 0.86)
+	_chain_path_mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP, _chain_path_material)
+	if _chain_target_ids.size() == 1:
+		var marker_target := _chain_targets[_chain_target_ids[0]] as Node3D
+		var marker_position := marker_target.global_position
+		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x - 0.24, CHAIN_PATH_Y, marker_position.z))
+		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x + 0.24, CHAIN_PATH_Y, marker_position.z))
+	else:
+		for target_id in _chain_target_ids:
+			var target := _chain_targets[target_id] as Node3D
+			_chain_path_mesh.surface_add_vertex(Vector3(target.global_position.x, CHAIN_PATH_Y, target.global_position.z))
+	_chain_path_mesh.surface_end()
+
 func _make_dash_hitbox() -> void:
 	var hitbox := Area3D.new()
 	hitbox.name = "DashHitbox"
@@ -306,8 +479,10 @@ func _make_brawl_encounter() -> void:
 	weak_mesh.rings = 4
 	weak_mesh.material = weak_material
 	var weak_visual := MeshInstance3D.new()
+	weak_visual.name = "Visual"
 	weak_visual.mesh = weak_mesh
 	_weak_point.add_child(weak_visual)
+	_weak_point.set_meta("chain_color", weak_material.albedo_color)
 
 	var pieces := Node3D.new()
 	pieces.name = "DetachedPieces"
@@ -332,6 +507,94 @@ func _make_brawl_encounter() -> void:
 		piece_visual.mesh = piece_mesh
 		piece.add_child(piece_visual)
 		_detached_pieces.append(piece)
+
+func _make_chain_raid() -> void:
+	_chain_targets[BRAWL_TARGET_ID] = _weak_point
+	_chain_targets["relay_b"] = _make_chain_weak_point(
+		"ChainRelayB",
+		"relay_b",
+		Vector3(-2.2, FLOOR_Y, -1.0),
+		Color(0.14, 0.88, 0.82)
+	)
+	_chain_targets["vent_c"] = _make_chain_weak_point(
+		"ChainVentC",
+		"vent_c",
+		Vector3(2.2, FLOOR_Y, -3.0),
+		Color(0.69, 0.42, 0.95)
+	)
+
+	_chain_path_mesh = ImmediateMesh.new()
+	_chain_path_material = StandardMaterial3D.new()
+	_chain_path_material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	_chain_path_material.no_depth_test = true
+	var chain_path := MeshInstance3D.new()
+	chain_path.name = "ChainPath"
+	chain_path.mesh = _chain_path_mesh
+	$Effects.add_child(chain_path)
+
+	_attack_orb = Area3D.new()
+	_attack_orb.name = "AttackOrb"
+	_attack_orb.visible = false
+	_attack_orb.collision_layer = 0
+	_attack_orb.collision_mask = 8
+	$Effects.add_child(_attack_orb)
+	var orb_material := StandardMaterial3D.new()
+	orb_material.albedo_color = Color(1.0, 0.95, 0.5)
+	orb_material.emission_enabled = true
+	orb_material.emission = orb_material.albedo_color
+	var orb_mesh := SphereMesh.new()
+	orb_mesh.radius = 0.34
+	orb_mesh.height = 0.68
+	orb_mesh.material = orb_material
+	var orb_visual := MeshInstance3D.new()
+	orb_visual.name = "Visual"
+	orb_visual.mesh = orb_mesh
+	_attack_orb.add_child(orb_visual)
+	var orb_shape := SphereShape3D.new()
+	orb_shape.radius = 0.38
+	_attack_orb_collision = CollisionShape3D.new()
+	_attack_orb_collision.name = "Collision"
+	_attack_orb_collision.shape = orb_shape
+	_attack_orb_collision.disabled = true
+	_attack_orb.add_child(_attack_orb_collision)
+	_attack_orb.body_entered.connect(_on_attack_orb_body_entered)
+
+func _make_chain_weak_point(
+	node_name: String,
+	target_id: String,
+	world_position: Vector3,
+	color: Color
+) -> RigidBody3D:
+	var target := RigidBody3D.new()
+	target.name = node_name
+	target.position = world_position
+	target.freeze = true
+	target.collision_layer = 8
+	target.collision_mask = 4
+	target.set_meta("target_id", target_id)
+	target.set_meta("chain_color", color)
+	$Encounter.add_child(target)
+	var shape := SphereShape3D.new()
+	shape.radius = 0.48
+	var collision := CollisionShape3D.new()
+	collision.name = "Collision"
+	collision.shape = shape
+	target.add_child(collision)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.emission_enabled = true
+	material.emission = color * 0.35
+	var mesh := SphereMesh.new()
+	mesh.radius = 0.48
+	mesh.height = 0.96
+	mesh.radial_segments = 8
+	mesh.rings = 4
+	mesh.material = material
+	var visual := MeshInstance3D.new()
+	visual.name = "Visual"
+	visual.mesh = mesh
+	target.add_child(visual)
+	return target
 
 func _reset_brawl_encounter() -> void:
 	if _collapse_tween != null and _collapse_tween.is_valid():
