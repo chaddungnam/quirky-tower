@@ -329,7 +329,7 @@ func _on_dash_body_entered(body: Node3D) -> void:
 	_dash_collision.set_deferred("disabled", true)
 	_leader.velocity = Vector3.ZERO
 	_weak_point.apply_central_impulse(_dash_direction * DASH_IMPULSE)
-	_contact_marker.global_position = _weak_point.global_position
+	_contact_marker.global_position = _weak_point.global_position + Vector3(0.0, 1.0, 0.45)
 	_contact_marker.visible = true
 	impact.emit("dash", _weak_point.global_position)
 	_show_rebound(_dash_direction, _feedback_generation)
@@ -340,8 +340,8 @@ func _show_rebound(direction: Vector3, generation: int) -> void:
 	if _act_id != "brawl" or generation != _feedback_generation:
 		return
 	_contact_marker.visible = false
-	_leader.global_position -= direction * 0.65
-	_rebound_marker.global_position = _leader.global_position
+	_leader.global_position -= direction * 1.4
+	_rebound_marker.global_position = _leader.global_position + Vector3(0.0, 1.0, 0.45)
 	_rebound_marker.visible = true
 	impact.emit("rebound", _leader.global_position)
 	await get_tree().create_timer(0.12).timeout
@@ -648,6 +648,7 @@ func _make_chain_raid() -> void:
 	orb_mesh.material = orb_material
 	var orb_visual := MeshInstance3D.new()
 	orb_visual.name = "Visual"
+	orb_visual.position = Vector3(0.0, 0.9, 0.35)
 	orb_visual.mesh = orb_mesh
 	_attack_orb.add_child(orb_visual)
 	var orb_shape := SphereShape3D.new()

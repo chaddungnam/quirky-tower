@@ -128,11 +128,15 @@ func _run() -> void:
 	var detached_pieces := world.get_node("Encounter/DetachedPieces") as Node3D
 	var contact_marker := world.get_node("Effects/ContactMarker") as Node3D
 	var rebound_marker := world.get_node("Effects/ReboundMarker") as Node3D
+	var contact_material := ((contact_marker.get_child(0) as MeshInstance3D).mesh.material as StandardMaterial3D)
+	var rebound_material := ((rebound_marker.get_child(0) as MeshInstance3D).mesh.material as StandardMaterial3D)
 	var crack_lines := world.get_node("Effects/CrackLines") as Node3D
 	var reward_burst := world.get_node("Effects/RewardBurst") as Node3D
 	var reward_label := reward_burst.get_node("Value") as Label3D
 	var break_marker := world.get_node("Effects/BreakMarker") as Node3D
 	var attack_orb := world.get_node("Effects/AttackOrb") as Area3D
+	var attack_orb_visual := attack_orb.get_node("Visual") as MeshInstance3D
+	var attack_orb_material := attack_orb_visual.mesh.material as StandardMaterial3D
 	var collapse_stages: Array[String] = []
 	var stage_records: Array[Dictionary] = []
 	var rewards: Array[int] = []
@@ -182,6 +186,7 @@ func _run() -> void:
 					"visible": contact_marker.visible,
 					"position": contact_marker.global_position,
 					"on_camera": _camera_contains(camera, contact_marker.global_position, viewport_size),
+					"color": contact_material.albedo_color,
 				})
 			elif kind == "rebound":
 				rebound_records.append({
@@ -190,6 +195,7 @@ func _run() -> void:
 					"visible": rebound_marker.visible,
 					"position": rebound_marker.global_position,
 					"on_camera": _camera_contains(camera, rebound_marker.global_position, viewport_size),
+					"color": rebound_material.albedo_color,
 				})
 	)
 	world.start_act("brawl")
@@ -248,16 +254,26 @@ func _run() -> void:
 	assert(dash_contacts.size() == 1, "the dash hitbox contacts one real rigid enemy")
 	assert(contact_records.size() == 1, "real collider contact exposes one contact beat")
 	assert(contact_records[0].visible and contact_records[0].on_camera, "the contact marker is visible on camera")
+	var contact_offset: Vector3 = contact_records[0].position - dash_contacts[0]
+	assert(contact_offset.y >= 0.6 and contact_offset.z >= 0.35, "the contact glyph clears the collider above and toward camera")
+	assert(contact_offset.length() < 1.2, "the contact glyph stays attached to the real collision surface")
 	assert(
-		(contact_records[0].position as Vector3).distance_to(dash_contacts[0]) < 0.05,
-		"the contact marker uses the real collision point"
+		camera.unproject_position(contact_records[0].position).distance_to(camera.unproject_position(dash_contacts[0])) >= 32.0,
+		"the contact glyph is visibly separated from the target on screen"
 	)
 	assert(rebound_records.size() == 1, "contact advances to one distinct rebound beat")
 	assert(rebound_records[0].visible and rebound_records[0].on_camera, "the rebound marker is visible on camera")
 	assert(rebound_records[0].frame > contact_records[0].frame, "rebound advances to a later render frame")
+	assert(contact_records[0].color != rebound_records[0].color, "contact and rebound use distinct high-contrast materials")
+	var rebound_marker_offset: Vector3 = rebound_records[0].position - rebound_records[0].leader_position
+	assert(rebound_marker_offset.y >= 0.6 and rebound_marker_offset.z >= 0.35, "the rebound glyph clears the leader silhouette")
 	assert(
-		(rebound_records[0].leader_position as Vector3).distance_to(contact_records[0].leader_position) > 0.25,
+		(rebound_records[0].leader_position as Vector3).distance_to(contact_records[0].leader_position) > 1.1,
 		"rebound visibly separates the leader from contact"
+	)
+	assert(
+		camera.unproject_position(rebound_records[0].position).distance_to(camera.unproject_position(contact_records[0].position)) >= 48.0,
+		"contact and rebound markers occupy unmistakably distinct screen positions"
 	)
 	assert(weak_impulse_seen, "contact applies forward impulse to the rigid enemy")
 	assert(
@@ -458,10 +474,14 @@ func _run() -> void:
 	world.impact.connect(
 		func(kind: String, world_point: Vector3) -> void:
 			if kind == "chain_strike" and chain_capture.active:
+				var visual_position := attack_orb_visual.global_position
 				chain_strike_visuals.append({
-					"visible": attack_orb.visible,
-					"at_overlap": attack_orb.global_position.distance_to(world_point) < 0.05,
-					"on_camera": _camera_contains(camera, attack_orb.global_position, viewport_size),
+					"visible": attack_orb.visible and attack_orb_visual.visible,
+					"root_at_overlap": attack_orb.global_position.distance_to(world_point) < 0.05,
+					"visual_offset": visual_position - world_point,
+					"screen_gap": camera.unproject_position(visual_position).distance_to(camera.unproject_position(world_point)),
+					"on_camera": _camera_contains(camera, visual_position, viewport_size),
+					"emissive": attack_orb_material.emission_enabled,
 				})
 	)
 	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
@@ -484,7 +504,9 @@ func _run() -> void:
 	assert(chain_flash_ids == chain_ids, "every real chain strike exposes the authored flash")
 	assert(chain_strike_visuals.size() == chain_ids.size(), "every overlap exposes one visible strike beat")
 	for strike in chain_strike_visuals:
-		assert(strike.visible and strike.at_overlap and strike.on_camera, "AttackOrb is visible at each camera-safe real overlap")
+		assert(strike.visible and strike.root_at_overlap and strike.on_camera, "AttackOrb collider stays at each real overlap while its visual remains visible")
+		assert(strike.visual_offset.y >= 0.55 and strike.visual_offset.z >= 0.3, "AttackOrb visual clears the struck sphere toward camera")
+		assert(strike.screen_gap >= 28.0 and strike.emissive, "each strike exposes a separated emissive marker on screen")
 	for target_id in chain_ids:
 		var target := chain_targets[target_id] as RigidBody3D
 		assert(target.global_position.y < 0.3 and target.freeze, "every struck target visibly lowers and freezes")
