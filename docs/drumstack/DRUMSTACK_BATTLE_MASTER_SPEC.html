@@ -1,0 +1,814 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <meta name="description" content="드럼스택 배틀의 제품, 전투, UI, 영웅, 경제, 아트, 오디오, 기술, QA를 통합한 초상세 마스터 명세">
+  <title>Drumstack Battle · Master Product &amp; Game Specification · 2026-08-11</title>
+  <style>
+    @font-face{font-family:"DoHyeon";src:url("../../assets/fonts/DoHyeon-Regular.ttf") format("truetype");font-display:swap}
+    :root{
+      --bg:#071019;--deep:#03070c;--surface:#111f2b;--surface2:#172b39;--surface3:#203847;
+      --ink:#f5f0df;--muted:#a9bac4;--line:#35505e;--egg:#ffd35a;--gem:#57dfd3;
+      --coral:#ff6c62;--sky:#6fb8ff;--lime:#9ee36f;--violet:#b69aff;--danger:#ff5577;
+      --locked:#9ee36f;--proposed:#ffd35a;--deferred:#9aaab3;--cut:#ff5577;--playtest:#b69aff;
+      --max:1320px;--radius:14px;--shadow:0 18px 52px rgba(0,0,0,.32)
+    }
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:128px}body{margin:0;color:var(--ink);background:radial-gradient(circle at 6% 0,rgba(87,223,211,.14),transparent 31rem),radial-gradient(circle at 94% 4%,rgba(255,108,98,.12),transparent 30rem),linear-gradient(180deg,var(--bg),var(--deep));font:15px/1.67 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    a{color:var(--egg);overflow-wrap:anywhere}button,input,select{font:inherit}button{color:inherit}strong{color:#fff}code,kbd{padding:2px 6px;color:#ffe68f;background:#020609;border:1px solid #2a424e;border-radius:5px;overflow-wrap:anywhere}pre{overflow:auto;padding:17px;background:#020609;border:1px solid var(--line);border-radius:10px}pre code{padding:0;border:0;overflow-wrap:normal}
+    h1,h2,h3,h4,summary{font-family:"DoHyeon",system-ui,sans-serif;font-weight:400;line-height:1.14}h1{margin:10px 0 18px;font-size:clamp(45px,7.6vw,88px);letter-spacing:-.02em}h2{margin:0;font-size:clamp(31px,4vw,48px)}h3{margin:0 0 11px;font-size:25px}h4{margin:18px 0 8px;font-size:19px}p{margin:0 0 13px}ul,ol{margin:10px 0 0;padding-left:22px}li+li{margin-top:6px}
+    table{display:block;width:100%;max-width:100%;margin-top:13px;overflow-x:auto;border-collapse:collapse}th,td{min-width:130px;padding:11px 12px;text-align:left;vertical-align:top;border:1px solid var(--line)}th{color:var(--egg);background:#152b38}td{background:rgba(17,31,43,.72)}
+    .shell{width:min(var(--max),calc(100% - 32px));margin:0 auto}.hero{padding:66px 0 46px;border-bottom:1px solid var(--line)}.hero-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(440px,.85fr);gap:38px;align-items:center}.hero-grid>*,.grid>*,.section-head>*{min-width:0}
+    .eyebrow{color:var(--gem);font-size:12px;font-weight:850;letter-spacing:.14em}.lead{max-width:860px;color:#d2e0e6;font-size:clamp(17px,2vw,22px)}.hero-quote{margin-top:20px;padding:16px 18px;background:rgba(3,7,12,.78);border-left:4px solid var(--egg)}
+    .status-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}.badge{display:inline-flex;align-items:center;min-height:30px;padding:5px 10px;border:1px solid var(--line);border-radius:999px;background:rgba(3,7,12,.8);font-size:12px;font-weight:760}.locked{color:#d7ffc9;border-color:var(--locked)}.proposed{color:#fff0af;border-color:var(--proposed)}.deferred{color:var(--muted);border-color:var(--deferred)}.cut{color:#ffc4d0;border-color:var(--cut)}.playtest{color:#e7ddff;border-color:var(--playtest)}.evidence{color:#c3d2d9;border-style:dashed}
+    .landscape{position:relative;width:100%;aspect-ratio:20/9;overflow:hidden;border:7px solid #314e5d;border-radius:28px;background:linear-gradient(180deg,rgba(7,16,25,.1),rgba(7,16,25,.88)),linear-gradient(135deg,#1b4b5a,#2e273f 58%,#3d232e);box-shadow:var(--shadow)}.landscape:before{content:"";position:absolute;inset:14% 7% 23%;border:1px solid rgba(255,255,255,.13);transform:perspective(500px) rotateX(56deg);background:repeating-linear-gradient(90deg,rgba(87,223,211,.23) 0 2px,transparent 2px 10%),repeating-linear-gradient(0deg,rgba(87,223,211,.18) 0 2px,transparent 2px 14%)}
+    .hud-top{position:absolute;inset:4% 4% auto;display:flex;justify-content:space-between;gap:8px;font-size:11px}.timeline{display:flex;gap:4px}.token{display:grid;place-items:center;width:27px;height:27px;border:2px solid #091018;border-radius:50%;color:#071019;font:14px/1 "DoHyeon"}.duck{background:var(--egg)}.chicken{background:var(--coral)}.pigeon{background:var(--sky)}.enemy{background:#d97c98}.piece{position:absolute;display:grid;place-items:center;width:39px;height:49px;border:3px solid #071019;border-radius:52% 52% 45% 45%;color:#071019;font:17px/1 "DoHyeon";box-shadow:0 0 0 2px rgba(255,255,255,.22)}.p1{left:25%;top:44%}.p2{left:34%;top:59%}.p3{left:42%;top:40%}.e1{right:27%;top:35%}.e2{right:34%;top:57%}.e3{right:18%;top:58%}.skillbar{position:absolute;right:4%;bottom:5%;display:flex;gap:7px}.skill{display:grid;place-items:center;width:50px;height:50px;border:2px solid var(--egg);border-radius:11px;background:#162835;font:18px/1 "DoHyeon"}.portrait{position:absolute;left:4%;bottom:5%;display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--gem);background:rgba(3,7,12,.85);font-size:11px}.portrait .token{width:35px;height:35px}.objective{position:absolute;left:46%;top:42%;width:58px;height:58px;border:3px solid var(--egg);transform:rotate(45deg);box-shadow:0 0 22px rgba(255,211,90,.72)}
+    .toolbar-wrap{position:sticky;top:0;z-index:30;background:rgba(3,7,12,.96);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}.toolbar{display:grid;grid-template-columns:minmax(220px,1fr) auto auto auto auto;gap:8px;padding:9px 0;align-items:center}.search,.filter,.tool{min-height:42px;padding:8px 12px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px}.tool{cursor:pointer}.tool:hover,.tool:focus-visible,.search:focus-visible,.filter:focus-visible{outline:2px solid var(--egg);outline-offset:2px}.search-count{min-width:70px;color:var(--muted);font-size:12px;text-align:right}
+    .toc{position:sticky;top:61px;z-index:25;background:rgba(7,16,25,.95);border-bottom:1px solid var(--line)}.toc .shell{display:flex;gap:4px;padding:7px 0;overflow-x:auto}.toc a{flex:0 0 auto;padding:7px 10px;color:var(--muted);text-decoration:none;font-size:12px;border-radius:6px}.toc a:hover,.toc a.active{color:#071019;background:var(--egg)}
+    main section{padding:66px 0;border-bottom:1px solid rgba(53,80,94,.62)}.section-head{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:15px;align-items:end;margin-bottom:21px}.index{color:var(--gem);font-size:12px;font-weight:850;letter-spacing:.13em}.intro{max-width:930px;color:#c4d4db;font-size:17px}.anchor{min-width:42px;min-height:42px;background:var(--surface);border:1px solid var(--line);border-radius:8px;cursor:pointer}
+    .grid{display:grid;gap:15px}.two{grid-template-columns:repeat(2,minmax(0,1fr))}.three{grid-template-columns:repeat(3,minmax(0,1fr))}.four{grid-template-columns:repeat(4,minmax(0,1fr))}.card{padding:19px;background:linear-gradient(145deg,rgba(23,43,57,.96),rgba(10,23,33,.98));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.card.keep{border-top:4px solid var(--lime)}.card.change{border-top:4px solid var(--egg)}.card.cut-card{border-top:4px solid var(--danger)}.card.info{border-top:4px solid var(--sky)}.card.play{border-top:4px solid var(--violet)}.kicker{margin-bottom:7px;color:var(--gem);font-size:12px;font-weight:850;letter-spacing:.08em}.number{margin-bottom:9px;color:var(--egg);font:38px/1 "DoHyeon"}.subtle{color:var(--muted);font-size:12px}.callout{margin-top:17px;padding:16px 18px;background:rgba(17,31,43,.74);border-left:4px solid var(--egg)}.danger-callout{border-left-color:var(--danger)}.success-callout{border-left-color:var(--lime)}
+    .flow{display:flex;gap:7px;padding:7px 0 16px;overflow-x:auto}.flow-step{flex:1 0 165px;min-width:165px;padding:14px;background:var(--surface);border:1px solid var(--line);border-radius:9px}.flow-step b{display:block;margin-bottom:5px;color:var(--egg)}.arrow{align-self:center;color:var(--gem);font-size:24px}.status-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:16px 0}.status-strip span{padding:9px;text-align:center;background:#0b1922;border:1px solid var(--line);font-size:11px}
+    details{margin-top:15px;background:rgba(7,16,25,.55);border:1px solid var(--line);border-radius:10px}details>summary{padding:15px 17px;cursor:pointer;color:#fff;font-size:20px}details>.body{padding:0 17px 17px}.metric{display:grid;grid-template-columns:145px 1fr;gap:12px;padding:9px 0;border-top:1px solid rgba(53,80,94,.62)}.metric b{color:var(--gem)}
+    .wire-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.screen{min-height:260px;padding:14px;background:#0a151e;border:5px solid #314e5d;border-radius:18px}.screen-title{display:flex;justify-content:space-between;color:var(--egg);font:18px/1 "DoHyeon"}.screen-main{display:grid;place-items:center;min-height:140px;margin:10px 0;background:linear-gradient(145deg,#183443,#26263c);border:1px solid var(--line);text-align:center}.screen-actions{display:grid;gap:7px}.screen-action{min-height:42px;padding:9px;background:#18303e;border:1px solid var(--line);border-left:4px solid var(--gem)}
+    .hero-roster{display:grid;grid-template-columns:repeat(5,minmax(160px,1fr));gap:10px;overflow-x:auto}.hero-card{min-width:160px;padding:15px;background:var(--surface);border:1px solid var(--line);border-top:4px solid var(--role,var(--egg));border-radius:11px}.hero-card .silhouette{display:grid;place-items:center;width:74px;height:88px;margin:0 auto 11px;background:var(--role,var(--egg));color:#071019;border-radius:52% 52% 44% 44%;font:35px/1 "DoHyeon"}.statline{display:grid;grid-template-columns:45px 1fr;gap:6px;font-size:12px}.statbar{align-self:center;height:6px;background:#071019;border-radius:6px;overflow:hidden}.statbar i{display:block;height:100%;width:var(--v);background:var(--role,var(--egg))}.tank{--role:#75c7ff}.damage{--role:#ff756c}.support{--role:#9ee36f}.control{--role:#b69aff}.bruiser{--role:#ffd35a}
+    .source-list li{margin-top:8px}.trace{margin-top:12px;color:var(--muted);font-size:12px}.trace b{color:var(--gem)}.search-hidden,.status-hidden{display:none!important}.no-script{padding:12px;color:#071019;background:var(--egg)}footer{padding:45px 0 70px;color:var(--muted)}
+    a:focus-visible,summary:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--egg);outline-offset:3px}
+    @media(max-width:980px){.hero-grid,.two,.three,.four,.wire-grid{grid-template-columns:1fr}.toolbar-wrap,.toc{position:static}.toolbar{grid-template-columns:1fr 1fr 1fr}.toolbar .search{grid-column:1/-1}.search-count{display:none}.status-strip{grid-template-columns:1fr 1fr}.landscape{max-width:720px;margin:auto}html{scroll-padding-top:18px}}
+    @media(max-width:600px){.shell{width:min(100% - 20px,var(--max))}.hero{padding-top:42px}.toolbar{grid-template-columns:1fr 1fr}.toolbar .filter{grid-column:1/-1}.section-head{grid-template-columns:1fr auto}th,td{padding:8px;font-size:12px}.piece{transform:scale(.72)}.skill{width:38px;height:38px}.hero-roster{grid-template-columns:repeat(10,160px)}}
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+    @media print{:root{--bg:#fff;--deep:#fff;--surface:#fff;--surface2:#f4f4f4;--ink:#111;--muted:#444;--line:#999}body{color:#111;background:#fff;font-size:10.5px}.toolbar-wrap,.toc,.anchor{display:none!important}.hero{padding:20px 0}.hero-grid{grid-template-columns:1fr}.landscape{display:none}main section{padding:23px 0}.card,.hero-card,.screen{break-inside:avoid;box-shadow:none}tr{break-inside:avoid}details>.body{display:block!important}a{color:#111;text-decoration:underline}}
+  </style>
+</head>
+<body>
+  <noscript><div class="no-script">검색·상태 필터·자동 목차는 JavaScript가 필요하지만 모든 명세 내용은 그대로 읽고 인쇄할 수 있습니다.</div></noscript>
+  <header class="hero" data-searchable data-status="locked" data-source="user-direction,argent-twilight-video-audit" data-decision="DS-PROD-001,DS-GAME-001">
+    <div class="shell hero-grid">
+      <div>
+        <div class="eyebrow">HOUSE DUCK · DRUMSTACK BATTLE · 3V3 BIRD TACTICS · MASTER SPEC v0.9 · 2026-08-11</div>
+        <h1>움직이고,<br>스킬 쓰고,<br>판을 뒤집는다</h1>
+        <p class="lead">도시 타일 전장에서 오리·닭·비둘기 3마리를 지휘한다. 각 조류는 자기 차례에 이동한 뒤 한 가지 스킬을 사용한다. 다음 행동 순서, 사거리, 위험 타일, 예상 결과를 전부 보고 판단하는 3대3 2.5D 전술 대전이다.</p>
+        <div class="hero-quote"><strong>제품 약속:</strong> 중학생은 첫 턴에 “파란 칸으로 움직이고, 빛나는 버튼을 눌러 적을 맞힌다”를 별도 설명 없이 이해한다. 숙련자는 순서, 장애물, 밀치기, 회복, 상태효과를 조합해 불리한 판도 뒤집는다.</div>
+        <div class="status-row">
+          <span class="badge locked">제품 방향 합의</span><span class="badge locked">AT식 개별 유닛 턴</span><span class="badge locked">3v3</span><span class="badge locked">가로 20:9 권장</span><span class="badge locked">무가챠·무장비</span><span class="badge proposed">HTML 명세 승인 대기</span><span class="badge proposed">수치 플레이테스트 전</span><span class="badge deferred">Supabase 후속</span>
+        </div>
+        <div class="trace"><b>문서 경계:</b> 이 파일은 구현 전 정본 후보이며, 코드·Godot 화면·실기기·재미를 증명하지 않는다. 승인 뒤 <code>DS-*</code> 항목을 구현·테스트·스크린샷과 대조한다.</div>
+      </div>
+      <div class="landscape" role="img" aria-label="가로 20대9 드럼스택 배틀 전투 HUD 개념도">
+        <div class="hud-top"><span>ROUND 2 · SCORE 4:3 · 04:18</span><div class="timeline"><span class="token chicken">C</span><span class="token enemy">E</span><span class="token pigeon">P</span><span class="token duck">D</span></div></div>
+        <span class="objective"></span>
+        <span class="piece p1 duck">D</span><span class="piece p2 chicken">C</span><span class="piece p3 pigeon">P</span>
+        <span class="piece e1 enemy">G</span><span class="piece e2 enemy">R</span><span class="piece e3 enemy">S</span>
+        <div class="portrait"><span class="token chicken">C</span><span><strong>콕스</strong><br>HP 742 / 980 · 이동 4</span></div>
+        <div class="skillbar"><span class="skill">1</span><span class="skill">2</span><span class="skill">3</span><span class="skill">방어</span></div>
+      </div>
+    </div>
+  </header>
+
+  <div class="toolbar-wrap"><div class="shell toolbar" role="search">
+    <input id="search" class="search" type="search" placeholder="한국어, English, 결정 ID, 테스트 ID 검색" aria-label="명세 검색">
+    <select id="status-filter" class="filter" aria-label="상태 필터"><option value="all">모든 상태</option><option value="locked">LOCKED</option><option value="proposed">PROPOSED</option><option value="playtest">NEEDS PLAYTEST</option><option value="deferred">DEFERRED</option><option value="cut">CUT</option></select>
+    <button id="expand-all" class="tool" type="button">모두 펼치기</button><button id="collapse-all" class="tool" type="button">모두 접기</button><span id="search-count" class="search-count" aria-live="polite">전체 표시</span>
+  </div></div>
+  <nav id="toc" class="toc" aria-label="자동 생성 목차"><div class="shell"></div></nav>
+
+  <main>
+    <section id="document-status" data-searchable data-status="locked proposed" data-source="user-direction,house-duck-rules" data-decision="DS-DOC-001" data-feature="DS-TC-SPEC-001">
+      <div class="shell"><div class="section-head"><div><div class="index">00 · DOCUMENT STATUS</div><h2>이 문서를 어떻게 읽고 승인하는가</h2></div></div>
+        <p class="intro">최신 사용자 지시가 구 Quirky Tower 명세보다 우선한다. 이 HTML은 드럼스택 배틀의 새 제품 정본 후보이며, 승인 전에는 기존 게임 코드를 삭제하거나 이름을 바꾸지 않는다.</p>
+        <div class="status-strip"><span class="locked">LOCKED · 사용자 확정</span><span class="proposed">PROPOSED · 추천 수치</span><span class="playtest">NEEDS PLAYTEST</span><span class="deferred">DEFERRED · 후속</span><span class="cut">CUT · 만들지 않음</span></div>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">SOURCE OF TRUTH</div><h3>우선순위</h3><ol><li>House Duck 공통 규칙</li><li>사용자의 최신 명시 지시</li><li>본 HTML의 LOCKED 결정</li><li>승인 뒤 생성할 구현 계획</li><li>코드·테스트·화면 증거</li></ol></article>
+          <article class="card info"><div class="kicker">EVIDENCE</div><h3>PASS를 섞지 않는다</h3><p><code>STATIC</code>, <code>HEADLESS</code>, <code>RUNTIME</code>, <code>VISUAL</code>, <code>DEVICE</code>, <code>HUMAN</code>을 분리한다. 문서 완성은 플레이 완성을 뜻하지 않는다.</p></article>
+          <article class="card cut-card"><div class="kicker">NO SILENT DRIFT</div><h3>바뀌면 기록한다</h3><p>최신 지시로 5스킬 카드·공용 3액션·세로 고정·메인 스토리·가챠·장비를 제외했다. 다시 넣으려면 결정 ID를 명시적으로 대체한다.</p></article>
+        </div>
+        <details open><summary>이번 버전에서 잠근 핵심 13개</summary><div class="body"><ol><li>작업명: 한국어 <b>드럼스택 배틀</b>, 글로벌 <b>Drumstack Battle</b>.</li><li>3대3 조류 전술 대전. 시작 조류는 오리·닭·비둘기.</li><li>AT처럼 개별 유닛 행동 순서를 보여준다.</li><li>자기 차례에는 이동 0~1회 → 스킬/방어 1회 → 턴 종료.</li><li>가로 20:9를 기본 방향으로 한다.</li><li>스토리는 메인 진입을 막지 않는 서브 모드다.</li><li>가챠와 장비 시스템을 만들지 않는다.</li><li>영웅은 총 10명, 3명 지급, 2명 진행 해금, 5명 격주 공개.</li><li>마을 허브를 둔다.</li><li>무료 재화는 알, 프리미엄 재화는 보석.</li><li>보석은 미션·광고·구매로 얻는다.</li><li>스태미나는 PvE 보상 루프에 적용하고 핵심 대전은 막지 않는다.</li><li>일반 13+이며 아동 대상/Kids/Family 앱으로 만들지 않는다.</li></ol></div></details>
+        <details><summary>사용자 결정 기록 · 전체 HTML 승인은 아직 대기</summary><div class="body"><table><thead><tr><th>날짜</th><th>대화에서 합의한 방향</th><th>대체한 구안</th><th>상태</th></tr></thead><tbody>
+          <tr><td>2026-08-11</td><td>3v3 조류 타일 전술, 오리·닭·비둘기 starter</td><td>Quirky Tower 3막 flock 게임</td><td>LOCKED</td></tr>
+          <tr><td>2026-08-11</td><td>AT식 개별 유닛 턴, 이동 뒤 스킬, 가로 허용</td><td>공용 3액션·하단 5카드·세로 고정</td><td>LOCKED</td></tr>
+          <tr><td>2026-08-11</td><td>무가챠·무장비, 10영웅, 3지급·2진행·5격주</td><td>300영웅·장비·소환 중심 성장</td><td>LOCKED</td></tr>
+          <tr><td>2026-08-11</td><td>마을, 서브 스토리, 알·보석·모이, 실제 비동기 대전 후속</td><td>스토리 강제 진입·실시간 PvP</td><td>LOCKED</td></tr>
+          <tr><td>2026-08-11</td><td>일반 13+, 중학생도 이해 가능한 직관성</td><td>아동 대상/Kids/Family 제품</td><td>LOCKED</td></tr>
+          <tr><td>현재</td><td>본 HTML의 세부 수치·게이트·BM·기술 계약</td><td>-</td><td>USER APPROVAL PENDING</td></tr>
+        </tbody></table><p class="subtle">LOCKED는 위 개별 제품 방향의 합의를 뜻한다. 본 HTML 전체를 승인했다는 뜻은 아니다.</p></div></details>
+        <div class="callout danger-callout"><strong>구현 금지:</strong> 이 문서 승인 전에는 기존 리부트 코드를 삭제하거나, 폴더·저장소·앱 ID를 드럼스택으로 바꾸거나, Supabase·광고 SDK·결제를 연결하지 않는다.</div>
+      </div>
+    </section>
+
+    <section id="executive" data-searchable data-status="locked" data-source="user-direction,store-policy" data-decision="DS-PROD-001,DS-PROD-002,DS-POLICY-001" data-feature="DS-TC-ENTRY-001,DS-TC-MATCH-001,DS-TC-POLICY-001">
+      <div class="shell"><div class="section-head"><div><div class="index">01 · PRODUCT ONE-PAGER</div><h2>무슨 게임이며, 왜 다시 하는가</h2></div></div>
+        <p class="intro">한 판의 목표와 한 번 더 하는 이유가 첫 화면부터 읽혀야 한다. 전술은 깊게 만들되 입력은 “이동하고 하나 쓰기”에서 벗어나지 않는다.</p>
+        <div class="grid four">
+          <article class="card keep"><div class="number">장르</div><h3>3v3 타일 전술 대전</h3><p>2.5D 고정 사선 카메라, 개별 유닛 턴, 장애물과 범위 스킬을 사용하는 모바일 전술 게임.</p></article>
+          <article class="card change"><div class="number">목표</div><h3>다운 또는 점수 우위</h3><p>적 3명을 모두 쓰러뜨리거나 제한된 행동 수가 끝났을 때 깃털 점수가 높으면 승리한다.</p></article>
+          <article class="card info"><div class="number">재미</div><h3>보이는 정보로 역전</h3><p>행동 순서·이동 칸·사거리·예상 피해·상태를 보고 한 수 앞서 위치를 만든다.</p></article>
+          <article class="card play"><div class="number">재도전</div><h3>다른 영웅·맵·사건</h3><p>3명 조합과 도시 장애물, 공개 랜덤 사건이 매 판 새로운 해법을 만든다.</p></article>
+        </div>
+        <div class="flow"><div class="flow-step"><b>마을</b>보상·미션 확인</div><span class="arrow">›</span><div class="flow-step"><b>모드 선택</b>훈련·아레나·스토리</div><span class="arrow">›</span><div class="flow-step"><b>전투 브리핑</b>맵·상대·조건</div><span class="arrow">›</span><div class="flow-step"><b>3v3 전투</b>이동→스킬→결과</div><span class="arrow">›</span><div class="flow-step"><b>결과</b>점수 근거·보상</div><span class="arrow">›</span><div class="flow-step"><b>한 번 더</b>재대결·조합 수정</div></div>
+        <div class="callout"><strong>대상 연령 계약 · LOCKED:</strong> 일반 이용자 13+이며 아동 대상/Kids/Family 카테고리로 마케팅하지 않는다. 목표는 중학생이 별도 설명 없이 첫 행동을 이해하는 수준이다. 부분유료 상품·광고·분석은 일반 게임의 스토어 연령, 개인정보, 결제 고지를 따른다. 향후 아동을 타깃에 포함하면 이 결정과 광고·SDK 설계를 전면 재승인한다.</div>
+        <details open><summary>첫 60초 플레이어 경험</summary><div class="body"><table><thead><tr><th>시간</th><th>화면</th><th>플레이어가 이해해야 할 것</th><th>금지</th></tr></thead><tbody>
+          <tr><td>0~3초</td><td>상대·맵·승리조건 카드</td><td>3대3, 적 전멸 또는 점수승</td><td>장문 세계관, 상점 팝업</td></tr>
+          <tr><td>3~8초</td><td>전장 전체와 현재 조류 강조</td><td>파란 발판이 내 차례, 상단이 다음 순서</td><td>카메라 회전, 버튼 난립</td></tr>
+          <tr><td>8~20초</td><td>이동 가능 칸</td><td>파란 칸을 누르면 유령 위치와 안전/위험이 보임</td><td>텍스트로 경로 설명</td></tr>
+          <tr><td>20~35초</td><td>스킬 선택·범위·예상치</td><td>근접은 강하고 광역은 약함</td><td>숨은 확률, 결과 미표시</td></tr>
+          <tr><td>35~45초</td><td>0.4~1.2초 타격</td><td>누가 무엇을 써서 HP/상태가 바뀌었는지</td><td>긴 컷인, 원인 가림</td></tr>
+          <tr><td>45~60초</td><td>상대 행동 예고·실행</td><td>상대 스킬과 대상, 다음 내 대응</td><td>11초 이상 조작 불가</td></tr>
+        </tbody></table></div></details>
+      </div>
+    </section>
+
+    <section id="reference" data-searchable data-status="locked" data-source="argent-twilight-video-audit,public-archive" data-decision="DS-REF-001,DS-REF-002" data-feature="DS-TC-REF-001">
+      <div class="shell"><div class="section-head"><div><div class="index">02 · ARGENT TWILIGHT REVERSE DESIGN</div><h2>AT에서 가져올 구조, 바꿀 문제, 넘지 않을 선</h2></div></div>
+        <p class="intro">사용자 제공 영상 0:00~23:21을 구간별로 확인했다. AT의 장점은 판단 중 전장을 읽게 하는 색·순서·범위와 스킬 인과다. 긴 컷신·복잡 성장·가챠·장비는 드럼스택에 맞지 않는다.</p>
+        <div class="grid three">
+          <article class="card keep"><div class="number">KEEP</div><ul><li>판단 중 고정 사선 전장 전체 보기</li><li>실행 순간의 짧은 action camera와 contact VFX</li><li>현재 유닛 파란 발판, 적 주황/빨강 윤곽</li><li><code>NEXT</code>와 상단 행동 순서</li><li>선택 시만 이동·범위 타일 강조</li><li>스킬명→대상→피해/상태 인과</li><li>상자·폭발물 같은 상호작용 장애물</li><li>이동과 공격이 결합된 일부 스킬</li></ul></article>
+          <article class="card change"><div class="number">CHANGE</div><ul><li>4인/웨이브 PvE를 3대3 대전 기본으로</li><li>가로 UI를 20:9 안전영역 기준으로 재구성</li><li>여러 능력치 감소를 9개 핵심 지속 상태로 축소</li><li>적 행동도 대상·범위를 먼저 예고</li><li>일반기 0.4~1.2초, 대표기 1.8~2.5초</li><li>승리 직후 1초 안에 결과 표시</li><li>조류·도시 사건·밀치기로 House Duck화</li></ul></article>
+          <article class="card cut-card"><div class="number">CUT</div><ul><li>가챠와 희귀도</li><li>장비·아티팩트·먹이 영웅·중복 각성</li><li>6중 성장과 확률 장비</li><li>40초대 필살기·백색 과노출</li><li>전투를 38~55초 끊는 강제 컷신</li><li>초반부터 다중 속성 상성표</li><li>결과창 없이 스토리로 강제 전환</li></ul></article>
+        </div>
+        <details open><summary>영상 타임라인에서 확인한 설계 근거</summary><div class="body"><table><thead><tr><th>구간</th><th>관찰</th><th>드럼스택 적용</th></tr></thead><tbody>
+          <tr><td>00:00~07:00</td><td>긴 시네마틱 뒤 타일 튜토리얼. 파랑/주황 발판, HP, NEXT, 스킬, 반격 위험.</td><td>첫 입력은 15초 이내. 위험과 결과를 색·윤곽·한 문장으로 표시.</td></tr>
+          <tr><td>07:00~09:10</td><td>대시, 2×2, 직사각형, 직선 범위와 상태 표시. 실행 시 짧은 줌·시점 전환·contact VFX, 이후 긴 필살기.</td><td>범위와 짧은 action camera는 유지하되 방향을 잃는 orbit와 장시간 전체 화면 컷인은 제거.</td></tr>
+          <tr><td>09:20~15:00</td><td>전투·대화·로딩이 반복되고 하단 말풍선이 전장을 가림.</td><td>결과 뒤 선택형 스토리. 전투 안내는 한 문장·2초·전장 비가림.</td></tr>
+          <tr><td>15:00~18:23</td><td>개별 유닛 순서, 3웨이브, 상자·폭발 수레. 승리 표시는 마지막 전투 후 지연.</td><td>상호작용 장애물 채택. 대전은 한 전장, 마지막 타격 1초 안에 결과.</td></tr>
+          <tr><td>19:36~23:21</td><td>빠른 적이 아군 사이에 끼어들고 적 연속 행동이 길어짐.</td><td>행동 순서 6칸 공개. AI 결정+연출 한 유닛 2.5초, 연속 5초 상한.</td></tr>
+        </tbody></table></div></details>
+        <div class="callout danger-callout"><strong>복제 금지선:</strong> AT의 캐릭터·세계관·대사·맵·아이콘·스킬명·수치·카메라 컷·UI 픽셀 배치를 복사하지 않는다. 일반적인 타일 전술 문법을 조류 캐릭터, 3대3 목표, 도시 소동, 새 아트와 새 오디오로 다시 설계한다.</div>
+      </div>
+    </section>
+
+    <section id="battle-rules" data-searchable data-status="locked proposed playtest" data-source="user-direction,argent-twilight-analysis" data-decision="DS-GAME-001,DS-GAME-002,DS-GAME-003,DS-GAME-004" data-feature="DS-TC-TURN-001,DS-TC-RANGE-001,DS-TC-VICTORY-001">
+      <div class="shell"><div class="section-head"><div><div class="index">03 · CORE BATTLE RULES</div><h2>3대3, 개별 순서, 이동 후 한 번의 기술</h2></div></div>
+        <p class="intro">공용 3액션과 하단 5카드 계획은 최신 지시로 제외한다. 각 조류는 고정 기술 3개와 패시브 1개를 가지며, 자기 차례에 이동하고 기술 하나를 쓰면 끝난다.</p>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">TEAM</div><h3>각 팀 3명</h3><p>한 타일에는 한 유닛만 선다. 출전 조류는 역할과 스킬이 겹치지 않도록 편성한다. 동일 영웅 중복 편성은 금지한다.</p></article>
+          <article class="card change"><div class="kicker">UNIT TURN</div><h3>이동 → 스킬 → 종료</h3><ol><li>현재 유닛 자동 선택</li><li>이동 0~1회</li><li>기본/액티브/대표기 또는 방어</li><li>결과 재생</li><li>다음 유닛</li></ol></article>
+          <article class="card info"><div class="kicker">INFORMATION</div><h3>숨기지 않는 전술</h3><p>상단에 다음 6행동, 바닥에 합법 이동·범위·위험, 대상 위에 예상 피해/회복/상태를 표시한다.</p></article>
+        </div>
+        <details open><summary>행동 순서 산식 · PROPOSED</summary><div class="body">
+          <div class="metric"><b>Turn Gauge</b><span>전투 시작 시 생존 6유닛의 게이지는 모두 0이다. 한 virtual tick마다 <code>effective_SPD</code>를 더하고, 먼저 1000에 도달한 유닛이 행동한다. 고정 정수 tick이라 클라이언트·서버 결과가 같다.</span></div>
+          <div class="metric"><b>행동 후</b><span>게이지에서 1000을 뺀다. 남은 초과분은 유지한다. 빠른 유닛은 긴 경기에서 가끔 한 번 더 행동한다.</span></div>
+          <div class="metric"><b>동률</b><span>현재 SPD → 팀 우선권 → 안정적인 유닛 ID 순서. 최초 우선 팀은 <code>seed % 2</code>로 정하고, 서로 다른 팀의 실제 동률을 한 번 해결할 때만 반대 팀으로 토글한다. 같은 팀 내부 동률은 ID만 사용하며 토큰을 바꾸지 않는다.</span></div>
+          <div class="metric"><b>타임라인</b><span>다음 6행동을 예측 표시한다. SPD 버프/감속을 확정하기 전 예상 순서도 미리 갱신한다.</span></div>
+          <div class="metric"><b>상한</b><span>SPD 기본 60~120, 전투 중 증감은 합산 ±20점, 최종 50~130으로 clamp한다. 영구 무한턴 조합을 금지한다.</span></div>
+        </div></details>
+        <details open><summary>입력 상태와 취소 규칙</summary><div class="body"><table><thead><tr><th>상태</th><th>보이는 것</th><th>입력</th><th>취소</th></tr></thead><tbody>
+          <tr><td>TURN_START</td><td>현재 유닛 파란 발판, 타임라인 확대</td><td>전장 또는 이동 버튼</td><td>없음</td></tr>
+          <tr><td>MOVE_PREVIEW</td><td>합법 칸 파랑, 위험 칸 빨강, 유령 위치</td><td>타일 탭/드래그</td><td>원위치 탭 또는 취소</td></tr>
+          <tr><td>MOVE_COMMITTED</td><td>현재 위치, 기술 버튼 활성</td><td>기술 또는 방어</td><td>기술 전 1회 이동 되돌리기</td></tr>
+          <tr><td>SKILL_PREVIEW</td><td>범위, 대상 윤곽, 예상 HP·상태</td><td>대상/타일 선택</td><td>기술 버튼 재탭 또는 취소</td></tr>
+          <tr><td>CONFIRM</td><td>큰 실행/취소 2개를 세로로 표시</td><td>실행</td><td>취소</td></tr>
+          <tr><td>RESOLVE</td><td>스킬명→동작→수치→상태</td><td>입력 잠금</td><td>불가</td></tr>
+        </tbody></table><p class="subtle">팝업의 선택류는 다국어 길이 대응을 위해 가로 나열하지 않고 세로 스택을 사용한다.</p></div></details>
+        <details open><summary>승리·점수·시간 · PROPOSED</summary><div class="body"><table><thead><tr><th>규칙</th><th>값</th><th>이유</th></tr></thead><tbody>
+          <tr><td>즉시 승리</td><td>한 command의 전체 RESOLVE 뒤 상대 3명 전원 다운</td><td>남은 배럴·충돌까지 끝낸 뒤 다음 턴 전에 판정</td></tr>
+          <tr><td>행동 상한</td><td>총 24유닛 행동</td><td>각 유닛 평균 약 4회, 장기 교착 방지.</td></tr>
+          <tr><td>전체 시간</td><td>7분 wall-clock hard cap</td><td>24행동 또는 7분 중 먼저 도달. 진행 중 RESOLVE는 끝낸 뒤 판정.</td></tr>
+          <tr><td>개인 제한</td><td>15초, 남은 5초 경고, 0초 자동 방어</td><td>입력 360초+최대 연출 60초 예산.</td></tr>
+          <tr><td>다운</td><td>+3점</td><td>공격 성공을 가장 크게 보상</td></tr>
+          <tr><td>Spotlight</td><td>Gate C 변형 모드 후보, 기본 점수에서 제외</td><td>연속 게이지의 마지막 행동자 편향을 먼저 제거.</td></tr>
+          <tr><td>동점</td><td>생존 수 → 각 유닛 HP% 합 → 영웅에게 준 실제 HP 피해 → 무승부</td><td>보호막 피해·초과 피해·소품 피해는 tie-break에서 제외.</td></tr>
+          <tr><td>항복</td><td>모든 모드에서 총 6행동 뒤 가능. 봇전은 확인 없이 즉시 처리하고 사람전은 세로 확인 1회.</td><td>초반 오입력과 악용 방지</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>방어·쿨다운·상태 수명</summary><div class="body"><ul><li><b>방어:</b> 이동 뒤 또는 제자리에서 선택한다. 스킬을 쓰지 않고 턴을 끝내며 다음 자기 행동 시작 전까지 받는 직접 피해와 DoT -15%. 충돌·배럴 같은 고정 환경 피해에는 적용하지 않는다. CD 0.</li><li><b>15초 종료:</b> 제출 전 preview를 폐기하고 원래 타일에서 제자리 방어 command를 확정한다. AI가 임의 공격을 대신 고르지 않는다.</li><li><b>7분 종료:</b> PREVIEW/CONFIRM이면 같은 자동 방어 command를 RESOLVE한 뒤 판정하고, 이미 RESOLVE 중이면 그 command만 끝낸 뒤 판정한다.</li><li><b>쿨다운:</b> 모두 ‘시전자 자신의 완료된 행동 수’로 센다. 스킬 사용 직후 CD N을 기록하고, 이후 자기 행동을 끝낼 때마다 1 감소한다. 0인 자기 행동부터 다시 사용한다.</li><li><b>초기값:</b> 기본기·액티브는 ready, 대표기는 초기 CD 1. KO 유닛의 쿨다운과 상태는 동결하며 PvP 부활은 없다.</li><li><b>지속:</b> ‘1행동’은 대상의 다음 자기 행동이 끝날 때까지다. DoT는 대상 행동 시작에 발동하고, 지속 감소는 그 행동의 RESOLVE 종료 뒤 수행한다.</li><li><b>보호막:</b> 별도 표기가 없으면 대상의 다음 자기 행동 종료까지 유지한다. 현재 값과 새 값 중 큰 수치를 유지하고 더 긴 지속으로 갱신하며 서로 더하지 않는다.</li></ul></div></details>
+        <details open><summary>한 행동의 권위적 판정 순서</summary><div class="body"><ol><li>행동 시작 DoT → HP 0/KO 판정. 이 시점에 KO되어도 <code>DOT_KO</code> 한 행동으로 ledger와 24행동 상한에 포함하고, 해당 DoT tick만 소모한 뒤 다른 쿨다운·상태는 동결한다.</li><li>이동과 이동 중 소품 접촉을 tile ID 오름차순으로 판정.</li><li>스킬 대상 snapshot → 직접 피해/회복/보호막을 대상 ID 오름차순으로 계산.</li><li>같은 스킬의 동시 피해를 모두 적용한 뒤 동시 KO를 판정.</li><li>밀침 → 벽/유닛 충돌 → 배럴 연쇄를 최대 1회 판정. 중간에 마지막 적이 KO되어도 이미 시작한 command의 authored event를 생략하지 않는다.</li><li>상태 부여·정화 → 점수 → 쿨다운/지속 감소 → 다음 게이지 순서 갱신.</li><li>전체 RESOLVE 뒤 먼저 전멸을 판정하고, 전멸이 없을 때 24행동/시간 종료를 판정한다. 양 팀 동시 전멸이면 점수와 동점 규칙을 사용한다.</li></ol><p>DoT·환경 KO는 원래 상태/환경을 발생시킨 영웅에게 귀속한다. source가 없으면 팀 점수만 기록하고 개인 통계에는 넣지 않는다.</p></div></details>
+      </div>
+    </section>
+
+    <section id="board" data-searchable data-status="locked proposed" data-source="user-direction,argent-twilight-analysis" data-decision="DS-MAP-001,DS-MAP-002,DS-MAP-003" data-feature="DS-TC-PATH-001,DS-TC-LOS-001,DS-TC-HAZARD-001">
+      <div class="shell"><div class="section-head"><div><div class="index">04 · BOARD, CAMERA &amp; ENVIRONMENT</div><h2>11×9 도시 타일과 읽히는 장애물</h2></div></div>
+        <p class="intro">15×15는 가로 화면에서도 조류·HP·범위를 작게 만들어 첫 프로토타입에 과하다. 기본 11×9, 소형 9×7, 후속 대형 13×11까지만 허용한다.</p>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">BOARD</div><h3>11열 × 9행</h3><ul><li>8방향 이동, Chebyshev 거리</li><li>대각선 비용 1</li><li>막힌 모서리 관통 금지</li><li>한 타일 한 유닛</li><li>시작 진영 각 2행</li><li>스킬 범위는 명시적 tile offset</li></ul></article>
+          <article class="card info"><div class="kicker">CAMERA</div><h3>고정 직교 사선</h3><ul><li>판단 중 전체 보드 유지</li><li>일반기 5~8% 짧은 줌</li><li>대표기 최대 15% 줌</li><li>결과 뒤 즉시 원위치</li><li>회전 금지</li><li>Reduce Motion 지원</li></ul></article>
+          <article class="card change"><div class="kicker">READABILITY</div><h3>타일은 필요할 때 강해진다</h3><ul><li>평상시 은은한 격자</li><li>이동 파랑</li><li>공격 주황</li><li>적 위협 빨강</li><li>회복 초록</li><li>색+선+아이콘 중복 표기</li></ul></article>
+        </div>
+        <details open><summary>장애물 6종과 프로토타입 범위</summary><div class="body"><table><thead><tr><th>오브젝트</th><th>기능</th><th>읽히는 표식</th><th>Gate</th></tr></thead><tbody>
+          <tr><td>벽·컨테이너</td><td>이동·시야 완전 차단</td><td>높은 실루엣, 그림자</td><td>A</td></tr>
+          <tr><td>낮은 상자</td><td>이동 차단, 투사체는 통과</td><td>허리 높이, 점선 시야</td><td>A</td></tr>
+          <tr><td>폭발 배럴</td><td>피격 시 주변 1칸 고정 60+밀침 1</td><td>노란 경고띠, 예상 범위</td><td>A</td></tr>
+          <tr><td>맨홀</td><td>도시 소동 때 밀침/이동 변화</td><td>라운드 예고 아이콘</td><td>B</td></tr>
+          <tr><td>간식 자판기</td><td>파괴 시 인접 1회 회복</td><td>초록 십자, HP 미리보기</td><td>B</td></tr>
+          <tr><td>비둘기 떼</td><td>공개 후 다음 6개 완료 행동 동안 시야 차단 후 이동</td><td>바닥 그림자+남은 행동 수+다음 위치</td><td>B</td></tr>
+        </tbody></table><p>장애물은 전체 타일의 12~16%, 중앙 진입로는 최소 3개를 유지한다. 완전 봉쇄 맵은 만들지 않는다. 밀침이 벽에 막히면 고정 50, 유닛과 충돌하면 두 유닛에 고정 35를 적용하며 보호막이 먼저 흡수한다. 배럴·충돌은 DEF와 일반 피해 증감 modifier를 무시하되 ‘충돌 피해 -50%’처럼 충돌을 직접 지목한 패시브는 적용한다. 연쇄는 행동당 1회만 허용한다.</p></div></details>
+        <details open><summary>AT에서 참고할 action camera·VFX 문법</summary><div class="body"><table><thead><tr><th>행동</th><th>카메라</th><th>이펙트·표정</th><th>상한</th></tr></thead><tbody>
+          <tr><td>판단/preview</td><td>기본 사선·방향·각도 고정, 전체 보드와 타임라인 유지</td><td>바닥 범위·유령 위치만 표시, 얼굴은 focus</td><td>카메라 이동 0</td></tr>
+          <tr><td>이동/대시</td><td>출발→도착을 같은 프레임에 두고 5~8% 짧은 tracking</td><td>발 먼지·속도선은 경로 밖으로 번지지 않음</td><td>0.4~0.8초</td></tr>
+          <tr><td>근접/contact</td><td>고정 사선 각도에서 공격자·대상을 함께 담는 pan, 최대 10% zoom</td><td>준비 silhouette→contact flash→피해수치; hit 표정 0.25초 이상</td><td>0.6~1.2초</td></tr>
+          <tr><td>원거리</td><td>고정 사선 각도에서 발사자와 대상을 동시에 담는 pan/zoom</td><td>투사체 궤적→impact를 한 눈에 연결</td><td>0.6~1.2초</td></tr>
+          <tr><td>광역/회복</td><td>범위 중심으로 8~12% zoom-out 또는 평행 이동, 각도 고정</td><td>영향 타일→대상별 hit/heal 순서, HP·상태를 가리지 않음</td><td>0.8~1.2초</td></tr>
+          <tr><td>대표기</td><td>최대 15% zoom, 캐릭터 cut 1회 뒤 같은 방향 전장 복귀</td><td>assertive 표정+고유 silhouette+명확한 contact</td><td>1.8~2.5초</td></tr>
+        </tbody></table><ul><li>AT의 구체적인 카메라 좌표·컷·VFX 모양은 복제하지 않고, <b>전술 보기→행동 강조→결과 보기</b>의 문법만 가져온다.</li><li>모든 전투 카메라는 yaw/pitch/roll을 기본 사선 값으로 고정한다. 허용 transform은 보드 평면의 pan과 5~15% zoom뿐이며 orbit·반대편 월선·각도 전환은 금지한다.</li><li>표의 시간은 RESOLVE 시작부터 contact, 수치·상태, 기본 사선 복귀까지 포함한 end-to-end 상한이다. 일반기는 0.4~1.2초, 대표기는 1.8~2.5초 안에 끝나며 복귀 0.16초도 그 안에 포함한다.</li><li>공격자, 대상, 영향 타일, HP/상태 중 하나라도 가려지면 연출보다 가독성을 우선한다.</li><li>contact는 2~3 render frame hold, 3~6px screen shake 후보를 사용하되 논리 판정과 물리는 멈추지 않는다. Reduce Motion에서는 shake·cut·tracking·pan·zoom을 모두 끄고 기본 Camera3D transform을 유지하며 flash/outline/수치·표정은 같은 순서와 정보로 남긴다.</li><li>상대 행동도 같은 품질로 재생하며 스킬명→대상→contact→HP/상태 변화 순서를 생략하지 않는다.</li></ul></div></details>
+        <div class="callout"><strong>타일 인과 계약:</strong> 선택 전에는 결과를 숨기지 않는다. 이동 경로, 시야 차단, 밀침 도착점, 배럴 연쇄 범위, 예상 HP 변화를 확정 전에 보여준다.</div>
+      </div>
+    </section>
+
+    <section id="skills-status" data-searchable data-status="locked proposed playtest" data-source="user-direction" data-decision="DS-SKILL-001,DS-SKILL-002,DS-BAL-001" data-feature="DS-TC-DAMAGE-001,DS-TC-STATUS-001,DS-TC-COOLDOWN-001">
+      <div class="shell"><div class="section-head"><div><div class="index">05 · SKILLS, DAMAGE &amp; STATUS</div><h2>근접은 강하고, 광역은 약하며, 결과는 예측 가능하다</h2></div></div>
+        <p class="intro">모든 영웅은 기본기·액티브·대표기·패시브를 가진다. 이동은 별도 스킬 슬롯이 아니다. 스킬 커스터마이즈와 5카드 덱은 밸런스가 검증된 뒤에만 재검토한다.</p>
+        <div class="grid four">
+          <article class="card keep"><div class="kicker">BASIC</div><h3>기본기</h3><p>쿨다운 0. 근접 1.15~1.40배, 원거리 0.80~1.00배. 턴이 막히지 않는 안전 행동.</p></article>
+          <article class="card change"><div class="kicker">ACTIVE</div><h3>전술기</h3><p>쿨다운 2~3행동. 이동 결합, 밀침, 회복, 보호, 제어 중 영웅 역할을 보여주는 하나.</p></article>
+          <article class="card play"><div class="kicker">SIGNATURE</div><h3>대표기</h3><p>쿨다운 4~5행동 또는 전투당 1~2회. 1.8~2.5초, 전장과 결과를 가리지 않는다.</p></article>
+          <article class="card info"><div class="kicker">PASSIVE</div><h3>특성</h3><p>항상 켜져 있지만 한 문장으로 설명한다. 조건·보상은 캐릭터 위 아이콘으로 보인다.</p></article>
+        </div>
+        <details open><summary>피해·회복 산식 · PROPOSED</summary><div class="body"><pre><code>base_damage = attacker.ATK × skill.power
+defense_factor = 100 / (100 + target.DEF)
+exact modifier order = see the authoritative table below
+
+AoE direct guideline     0.55 ~ 0.85; signature up to 1.20
+Ranged single guideline  0.80 ~ 1.20; signature up to 1.90
+Melee single guideline   1.00 ~ 1.55; signature up to 2.20
+Utility lowers power     push/control/shield value is paid from damage budget
+Heal                     caster.ATK × skill.heal_power, one action max 28% target HP
+Shield                   fixed skill value, max 18% target HP, one shield only
+DoT tick                 source.ATK × skill.dot_power × dot_outgoing × dot_incoming
+dot_outgoing             only modifiers explicitly tagged DOT, clamp 0.50~1.50
+dot_incoming             guard/fortify reductions, clamp 0.50~1.00
+DoT ignores              DEF, mark/exposure, general direct-damage outgoing</code></pre><p>크리스피의 DoT +20%는 <code>dot_outgoing</code>에 들어가고, 방어·요새화는 <code>dot_incoming</code>에 들어간다. 최소 피해는 1. 치명타·회피·명중 랜덤은 프로토타입에서 사용하지 않는다. 운은 공개 사건과 맵에서 주고, 같은 입력의 전투 결과는 재현 가능하게 한다.</p></div></details>
+        <details open><summary>출시 핵심 상태와 즉시 이벤트</summary><div class="body"><table><thead><tr><th>종류</th><th>효과</th><th>중첩/지속</th><th>표시</th></tr></thead><tbody>
+          <tr><td>보호막</td><td>고정 HP를 먼저 흡수</td><td>기본 1행동, 큰 값/긴 지속으로 갱신, 합산 없음</td><td>청록 외곽선+수치</td></tr>
+          <tr><td>DoT</td><td>행동 시작 시 시전자 ATK × 스킬 표기값, DEF 무시</td><td>각 stack 2행동, 최대 3개; 4번째부터 아래 우선순위로 3개만 유지</td><td>불씨/깃털 아이콘+남은 수</td></tr>
+          <tr><td>가속/감속</td><td>SPD ±표기 정수</td><td>합산 ±20점, 1행동</td><td>타임라인 이동 미리보기</td></tr>
+          <tr><td>이동 불가</td><td>이동만 금지, 기술 가능</td><td>1행동</td><td>발판 자물쇠</td></tr>
+          <tr><td>표식</td><td>다음 직접 피해 +15~30%</td><td>1회 소비, 최대 30%</td><td>대상 링+예상 피해</td></tr>
+          <tr><td>약화</td><td>주는 직접 피해 -20%</td><td>1행동, 중첩 없음</td><td>깨진 부리 아이콘</td></tr>
+          <tr><td>도전</td><td>시전자 외 대상에게 주는 직접 피해 -25%</td><td>1행동, 가장 강한 값만</td><td>시전자 연결선</td></tr>
+          <tr><td>요새화</td><td>받는 직접 피해와 DoT -15~25%; 고정 환경 피해 제외</td><td>다음 자기 행동 전까지</td><td>방패 아이콘+수치</td></tr>
+          <tr><td>밀침 면역</td><td>강제 이동만 무효, 피해는 적용</td><td>1행동</td><td>닻 아이콘</td></tr>
+        </tbody></table><p><b>DoT 3-stack 규칙:</b> 기존 3개와 새 stack을 <code>남은 총 피해(power×remaining) 내림차순 → remaining 내림차순 → source_id 오름차순 → applied_command_index 오름차순</code>으로 정렬해 앞 3개만 유지한다. 각 tick의 KO 귀속은 보존된 stack의 source_id를 사용한다.</p><p><b>즉시 이벤트:</b> 회복, 정화, 밀침, 충돌, 장애물 생성은 지속 상태가 아니다. 정화는 남은 행동 수가 가장 긴 해로운 상태 → 동일하면 상태 ID 순으로 1개 제거한다. 공격력/방어력/명중/저항을 별도 증감하는 상태와 스턴은 초기 버전에서 제외한다.</p></div></details>
+        <details open><summary>직접 피해 modifier·반올림 순서</summary><div class="body"><pre><code>outgoing = clamp(1 + sum(attacker outgoing modifiers), 0.50, 1.50)
+exposure = clamp(1 + sum(target mark/vulnerability), 1.00, 1.50)
+incoming = clamp(1 - sum(target reductions), 0.50, 1.00)
+raw = attacker.ATK × skill.power × outgoing × exposure
+post_defense = raw × 100 / (100 + target.DEF)
+final_damage = max(1, round(post_defense × incoming))</code></pre><p>모든 퍼센트 modifier는 같은 그룹 안에서 더하고 그룹끼리 곱한다. 반올림은 마지막 한 번만 한다. 보호막을 먼저 줄이고 남은 피해만 HP와 tie-break 피해에 기록한다. 고정 환경 피해는 일반 outgoing/incoming modifier와 DEF를 건너뛰고 보호막을 적용한다. 단, 충돌 피해만 직접 지목한 패시브는 마지막에 곱한다.</p></div></details>
+      </div>
+    </section>
+
+    <section id="roster" data-searchable data-status="locked proposed playtest" data-source="user-direction,balance-draft" data-decision="DS-HERO-001,DS-HERO-002,DS-HERO-003" data-feature="DS-TC-ROSTER-001,DS-TC-HERO-001,DS-TC-BALANCE-001">
+      <div class="shell"><div class="section-head"><div><div class="index">06 · INITIAL 10 BIRDS</div><h2>3명 지급, 2명 진행 해금, 5명 격주 공개</h2></div></div>
+        <p class="intro">모든 영웅은 같은 등급이며 중복 뽑기와 별 승급이 없다. 첫 프로토타입은 지급 3명만 실제 제작하고, 나머지 7명은 코어 재미 Gate를 통과한 뒤 순서대로 만든다.</p>
+        <div class="hero-roster" aria-label="초기 10영웅 역할 분포">
+          <article class="hero-card tank"><div class="silhouette">D</div><b>덕 대장</b><div class="subtle">오리 · 탱커 · 지급</div></article>
+          <article class="hero-card damage"><div class="silhouette">C</div><b>치키 러시</b><div class="subtle">닭 · 근접 딜러 · 지급</div></article>
+          <article class="hero-card support"><div class="silhouette">P</div><b>구구 메딕</b><div class="subtle">비둘기 · 서포터 · 지급</div></article>
+          <article class="hero-card bruiser"><div class="silhouette">G</div><b>거위 경비</b><div class="subtle">거위 · 브루저 · 진행</div></article>
+          <article class="hero-card control"><div class="silhouette">R</div><b>까마귀 기록관</b><div class="subtle">까마귀 · 컨트롤 · 진행</div></article>
+          <article class="hero-card support"><div class="silhouette">S</div><b>참새 퀵</b><div class="subtle">참새 · 기동 지원 · W2</div></article>
+          <article class="hero-card damage"><div class="silhouette">L</div><b>갈매기 약탈자</b><div class="subtle">갈매기 · 밀침 딜러 · W4</div></article>
+          <article class="hero-card damage"><div class="silhouette">O</div><b>부엉이 스코프</b><div class="subtle">부엉이 · 저격수 · W6</div></article>
+          <article class="hero-card tank"><div class="silhouette">T</div><b>칠면조 바리케이드</b><div class="subtle">칠면조 · 수비 · W8</div></article>
+          <article class="hero-card damage"><div class="silhouette">K</div><b>크리스피</b><div class="subtle">치킨 · DoT 딜러 · W10</div></article>
+        </div>
+
+        <details open><summary>지급 3종 · Gate A 실제 제작 대상</summary><div class="body grid three">
+          <article class="card keep tank"><div class="kicker">DUCK_GUARD · TANK</div><h3>덕 대장</h3><p><b>HP 960 · ATK 90 · DEF 42 · SPD 78 · MOV 3</b></p><ul><li><b>패시브 · 묵직한 깃:</b> 다음 자기 행동 전 처음 받는 밀침 거리 -1, 해당 충돌 피해 -50%.</li><li><b>기본 · 부리방패:</b> 인접 단일 1.15배, 자신 보호막 50.</li><li><b>액티브 · 꽥 도전:</b> 2칸 부채꼴 0.70배, 대상은 1행동 동안 덕 대장 외 대상 피해 -25%. CD 2.</li><li><b>대표 · 오리 방진:</b> 반경 2 아군 보호막 150, 1행동 밀침 면역. CD 4.</li></ul><p class="subtle">아군 보호와 길목 유지 역할을 보여주는 첫 탱커.</p></article>
+          <article class="card change damage"><div class="kicker">CHICKEN_RUSH · STRIKER</div><h3>치키 러시</h3><p><b>HP 650 · ATK 136 · DEF 18 · SPD 108 · MOV 4</b></p><ul><li><b>패시브 · 마무리 쪼기:</b> HP 50% 이하 적에게 직접 피해 +15%.</li><li><b>기본 · 연속쪼기:</b> 인접 단일 1.15배.</li><li><b>액티브 · 날개돌진:</b> 직선 3칸 이동 후 첫 적 1.45배, 밀침 1. CD 2.</li><li><b>대표 · 새벽난타:</b> 인접 단일 2.20배, 이후 밀침 1. 벽이면 전역 고정 50, 유닛이면 양쪽 고정 35만 적용하며 별도 60을 더하지 않는다. CD 4.</li></ul><p class="subtle">가까이 갈수록 강한 단거리 공격 약속을 대표한다.</p></article>
+          <article class="card info support"><div class="kicker">PIGEON_MEDIC · SUPPORT</div><h3>구구 메딕</h3><p><b>HP 720 · ATK 88 · DEF 24 · SPD 96 · MOV 4</b></p><ul><li><b>패시브 · 급한 배달:</b> HP 50% 이하 아군에게 주는 회복 +20%.</li><li><b>기본 · 모이탄:</b> 사거리 4 단일 0.85배.</li><li><b>액티브 · 응급배달:</b> 사거리 4 아군 ATK 1.50배 회복, 해로운 상태 1개 정화. CD 2.</li><li><b>대표 · 회색날개:</b> 반경 2 아군 ATK 0.90배 회복+보호막 100. CD 4.</li></ul><p class="subtle">회복이 턴을 낭비하는 선택이 아니라 점령을 유지하는 수가 되게 한다.</p></article>
+        </div></details>
+
+        <details><summary>진행 해금 2종 · Gate B 이후</summary><div class="body grid two">
+          <article class="card change bruiser"><div class="kicker">GOOSE_WARDEN · BRUISER</div><h3>거위 경비</h3><p><b>HP 1050 · ATK 104 · DEF 35 · SPD 70 · MOV 3</b></p><ul><li><b>해금:</b> 봇전 3승 또는 계정 레벨 3.</li><li><b>패시브:</b> 밀침 면역, 충돌 피해 -50%.</li><li><b>기본 · 목 밀치기:</b> 인접 1.05배+밀침 1.</li><li><b>액티브 · 통행금지:</b> 자신과 인접 아군이 다음 거위 턴까지 피해 -25%. CD 2.</li><li><b>대표 · 거위난입:</b> 직선 3칸의 모든 적 1.10배+밀침 1. CD 4.</li></ul></article>
+          <article class="card play control"><div class="kicker">CROW_HEX · CONTROLLER</div><h3>까마귀 기록관</h3><p><b>HP 680 · ATK 112 · DEF 20 · SPD 102 · MOV 4</b></p><ul><li><b>해금:</b> 도시 사건 1개 완료+상태효과 10회 적용.</li><li><b>패시브:</b> 상태가 있는 적에게 직접 피해 +15%.</li><li><b>기본 · 검은깃:</b> 사거리 4, 0.90배+다음 피해 +15% 표식.</li><li><b>액티브 · 불길한 낙서:</b> 사거리 4의 2×2, 0.55배+주는 피해 -20% 1행동. CD 2.</li><li><b>대표 · 먹물장례식:</b> 반경 1, 1.10배+DoT 25%×2행동. CD 4.</li></ul></article>
+        </div></details>
+
+        <details><summary>격주 공개 5종 · 데이터 초안, 선제작 금지</summary><div class="body"><p><b>잠긴 것은 5종의 역할과 공개 순서뿐이다.</b> 아래 수치·범위는 starter 시뮬레이션 전 PROPOSED다. 공통으로 기본기 CD 0, 액티브 CD 2, 대표기 초기 CD 1·사용 CD 4를 적용하며 표에 없는 지속은 1행동이다.</p><table><thead><tr><th>주차</th><th>영웅·역할</th><th>기본 수치 HP/ATK/DEF/SPD/MOV</th><th>패시브</th><th>기본 / 액티브 / 대표기</th></tr></thead><tbody>
+          <tr><td>Week 2</td><td>참새 퀵 · 기동 지원</td><td>610/94/16/118/5</td><td>아군 타일 통과 가능</td><td>콩알탄 0.80배 / 아군 보호막90+SPD+20 / 아군 재배치+보호막120</td></tr>
+          <tr><td>Week 4</td><td>갈매기 약탈자 · 밀침 딜러</td><td>740/122/22/94/4</td><td>보호막 대상 피해 +25%</td><td>낚아채기 1.05배 / 십자 0.90배+밀침 / 직선 급강하 1.80배</td></tr>
+          <tr><td>Week 6</td><td>부엉이 스코프 · 저격수</td><td>620/145/14/82/3</td><td>제자리 공격 피해 +20%</td><td>사거리 3~6 1.20배 / 표식 +30% / 직선 관통 1.90배</td></tr>
+          <tr><td>Week 8</td><td>칠면조 바리케이드 · 탱커</td><td>1120/84/46/62/3</td><td>인접 아군이 받는 원거리 피해 -10%</td><td>인접 0.80배 / HP180 깃털벽 / 반경2 보호막170</td></tr>
+          <tr><td>Week 10</td><td>크리스피 · DoT 딜러</td><td>690/126/17/104/4</td><td>자신의 DoT +20%</td><td>인접 1.00배 / 2×2 0.70배+화상 / 반경1 1.00배+DoT 즉시 1틱</td></tr>
+        </tbody></table><p class="subtle">후속 영웅은 starter의 상위호환이 아니라 다른 위치·상태·장애물 해법을 주는 sidegrade여야 한다.</p></div></details>
+
+        <details open><summary>영웅 공개·해금 정책</summary><div class="body"><table><thead><tr><th>구분</th><th>방식</th><th>유료 우회</th><th>금지</th></tr></thead><tbody>
+          <tr><td>지급 3종</td><td>첫 계정에서 즉시 보유</td><td>없음</td><td>튜토리얼 뒤 회수</td></tr>
+          <tr><td>진행 2종</td><td>명시 미션 완료 시 즉시 해금</td><td>없음</td><td>랜덤 조각, 반복 파밍 벽</td></tr>
+          <tr><td>격주 5종</td><td>공개 후 14일 영웅 미션 또는 2,500알</td><td>300보석 즉시 해금</td><td>확률 상자, 중복, 기간 독점</td></tr>
+          <tr><td>이벤트 종료</td><td>2,500알 직접 해금 경로 유지</td><td>동일 300보석</td><td>획득 불가능 FOMO</td></tr>
+        </tbody></table></div></details>
+      </div>
+    </section>
+
+    <section id="bot" data-searchable data-status="locked proposed playtest" data-source="user-direction" data-decision="DS-AI-001,DS-AI-002" data-feature="DS-TC-AI-001,DS-TC-AI-002,DS-TC-SIM-001">
+      <div class="shell"><div class="section-head"><div><div class="index">07 · BOT FIRST</div><h2>사람이 없어도 바로 매칭되는 설명 가능한 봇</h2></div></div>
+        <p class="intro">초기에는 Supabase도 실시간 서버도 붙이지 않는다. 봇은 플레이어와 같은 합법 행동 목록을 사용하고, 숨은 능력치 보정 없이 점수표로 행동을 고른다.</p>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">EASY · DEFAULT FILL</div><h3>한 수만 본다</h3><p>현재 행동의 상위 3개 중 시드 기반 60/30/10으로 선택한다. 일부러 허공에 쓰지는 않지만 위험 타일과 2연쇄는 놓칠 수 있다.</p></article>
+          <article class="card info"><div class="kicker">NORMAL · PROTOTYPE CEILING</div><h3>다음 적 행동까지 본다</h3><p>현재 계획 뒤 다음 상대 1행동을 1-ply로 계산한다. 계산 p95는 60ms 이하, 플레이어가 의도를 읽는 연출 대기는 0.3~0.6초로 별도 둔다.</p></article>
+          <article class="card cut-card"><div class="kicker">NOT NOW</div><h3>ML·MCTS·행동트리 없음</h3><p>11×9의 합법 계획을 전부 열거해도 충분하다. 실제 승률과 CPU 문제가 측정되기 전에는 복잡한 AI를 만들지 않는다.</p></article>
+        </div>
+        <details open><summary>평가 함수 · PROPOSED</summary><div class="body"><pre><code>score =
+  confirmed_KO                    × 1000
++ optional_objective_control     × mode_weight
++ effective_damage               × 1.0
++ effective_heal                 × 0.9
++ shield_added                   × 0.5
++ expected_DoT                   × 0.8
++ mark_or_debuff_value           × 45
+- expected_enemy_damage_next     × 0.8
+- ally_collision_damage          × 3.0
+- illegal_or_friendly_target     × ∞</code></pre><p>동률은 seed 기반으로 고른다. 봇은 같은 seed·state에서 같은 command를 반환해야 한다.</p></div></details>
+        <details><summary>봇 완료 기준</summary><div class="body"><ul><li>10,000 seeded matches에서 불법 이동·대상 0건.</li><li>무한 경기 0건, 24행동/7분 종료 규칙 100% 도달.</li><li>Starter 미러 1,000판 선공 승률 47~53% 목표.</li><li>5영웅 해금 뒤 영웅별 포함 승률 45~55% 목표.</li><li>한 스킬로 full-HP 탱커 즉사 0건.</li><li>Easy는 첫 플레이어에게 60~75% 승률, Normal은 45~55%를 목표로 사람 테스트에서 조정.</li></ul></div></details>
+      </div>
+    </section>
+
+    <section id="modes" data-searchable data-status="locked proposed deferred" data-source="user-direction" data-decision="DS-MODE-001,DS-MODE-002,DS-MODE-003" data-feature="DS-TC-FLOW-001,DS-TC-MODE-001">
+      <div class="shell"><div class="section-head"><div><div class="index">08 · MODE HIERARCHY</div><h2>대전이 메인, 스토리는 서브, 협동은 코어 뒤</h2></div></div>
+        <p class="intro">런칭 전 화면을 많이 만드는 것이 목표가 아니다. 첫 공개 루프는 마을→봇 대전→결과→재대결 하나다. 나머지는 우선순위와 서버 경계를 명확히 둔다.</p>
+        <table><thead><tr><th>우선순위</th><th>모드</th><th>상대/서버</th><th>핵심 규칙</th><th>스태미나</th><th>상태</th></tr></thead><tbody>
+          <tr><td>P0</td><td>튜토리얼</td><td>로컬 scripted bot</td><td>3 starter, 12행동 축약</td><td>0</td><td>Gate B</td></tr>
+          <tr><td>P0</td><td>봇 스커미시</td><td>로컬 Easy/Normal</td><td>정식 24행동</td><td>0</td><td>Gate B</td></tr>
+          <tr><td>P1</td><td>시즌 아레나</td><td>서버 비동기 command exchange</td><td>개인 24시간 chess-clock bank, 단일 랭킹</td><td>0</td><td>Supabase 이후</td></tr>
+          <tr><td>P1</td><td>스토리</td><td>로컬/PvE</td><td>짧은 대화+미션+보스</td><td>6</td><td>서브 모드</td></tr>
+          <tr><td>P1</td><td>친구전</td><td>초대 코드+비동기 command exchange</td><td>동일 전투 규칙, 랭킹·보상 없음</td><td>0</td><td>백엔드 이후</td></tr>
+          <tr><td>P2</td><td>즉시 방어전</td><td>상대 snapshot을 Normal bot이 조종</td><td>대기 없는 별도 연습, 시즌 점수 없음</td><td>0</td><td>후속</td></tr>
+          <tr><td>P2</td><td>협동 보스</td><td>2인 공동 squad 또는 비동기 기여</td><td>사람이 아닌 보스, 3페이즈</td><td>12</td><td>후속</td></tr>
+          <tr><td>P3</td><td>길드</td><td>Supabase</td><td>소속·협력 이벤트</td><td>-</td><td>명시적 보류</td></tr>
+        </tbody></table>
+        <details open><summary>사람이 없어도 첫 경기가 멈추지 않는 규칙</summary><div class="body"><p>Gate B까지는 로컬 봇만 사용한다. 서버 시즌이 열린 뒤 eligible 상대가 없으면 같은 규칙·전투력 범위의 봇을 배정하고 상대가 봇임을 표시한다. 봇도 동일한 단일 랭킹에 기록하되 배치 구간과 저레이팅에서만 사용하고, 난이도·레이팅 획득 상한은 soft launch 데이터로 조정한다. 사람 경기의 핵심 계약은 실제 command를 한 행동씩 주고받는 비동기 턴 교환이다.</p></div></details>
+        <details><summary>House Duck 킥 · 도시 소동</summary><div class="body"><p>Gate B 후보로 총 행동 8·16 직전에 양쪽에게 같은 사건을 2행동 먼저 공개한다. 비둘기 떼 3칸 임시 봉쇄, 간식 카트 첫 진입 회복, 빗물길 밀침 +1 세 종류만 시작한다. 운은 숨은 명중이 아니라 양쪽이 보고 계획을 바꾸는 공개 환경 변화다. <span class="badge playtest">NEEDS PLAYTEST</span></p><p><b>중요:</b> 제목의 “스택”을 억지로 별도 합성 시스템으로 만들지 않는다. 전술 재미가 부족할 때 새 자원을 더하지 말고 위치·순서·장애물을 먼저 고친다.</p></div></details>
+      </div>
+    </section>
+
+    <section id="village-story" data-searchable data-status="locked proposed" data-source="user-direction" data-decision="DS-HOME-001,DS-STORY-001" data-feature="DS-TC-VILLAGE-001,DS-TC-STORY-001">
+      <div class="shell"><div class="section-head"><div><div class="index">09 · VILLAGE &amp; SIDE STORY</div><h2>마을은 짧은 허브, 스토리는 선택형 서브</h2></div></div>
+        <p class="intro">마을은 걷는 오픈월드가 아니다. 2.5D 도시 한 장면에 3개 hotspot과 하단 5탭을 두고, 플레이어가 2탭 안에 대전에 들어가게 한다.</p>
+        <div class="wire-grid">
+          <article class="screen"><div class="screen-title"><span>마을</span><span>알 1,240 · 보석 95 · 모이 48/60</span></div><div class="screen-main"><span>스토리 관문　　<b>아레나</b>　　훈련장<br><small>큰 hotspot 3개, 나머지는 하단 탭</small></span></div><div class="screen-actions"><div class="screen-action">마을　 대전　 조류　 상점　 소셜</div></div></article>
+          <article class="screen"><div class="screen-title"><span>전투 브리핑</span><span>예상 4~7분</span></div><div class="screen-main">상대 3명 · 11×9 맵 · 도시 소동 예고<br>승리: 전멸 또는 24행동 뒤 점수</div><div class="screen-actions"><div class="screen-action">내 3인 편성 확인</div><div class="screen-action">전투 시작 · 모이 0</div></div></article>
+          <article class="screen"><div class="screen-title"><span>스토리 기록실</span><span>서브</span></div><div class="screen-main">Chapter 0 · 밤시장 소동<br>3전투 + 보스 1회 · 대화 Skip/Replay</div><div class="screen-actions"><div class="screen-action">미션 1 · 첫 클리어 알 50</div><div class="screen-action">컷신 다시보기</div></div></article>
+        </div>
+        <details open><summary>마을 정보 구조</summary><div class="body"><table><thead><tr><th>영역</th><th>항목</th><th>첫 버전</th><th>금지</th></tr></thead><tbody>
+          <tr><td>상단</td><td>프로필+테두리, 알, 보석, 모이, 설정</td><td>모두 표시</td><td>4개 이상 재화</td></tr>
+          <tr><td>중앙</td><td>스토리 관문, 아레나, 훈련장</td><td>아레나 가장 큼</td><td>같은 목적지 중복 건물</td></tr>
+          <tr><td>하단 5탭</td><td>마을/대전/조류/상점/소셜</td><td>항상 동일 순서</td><td>길드 빈 탭 노출</td></tr>
+          <tr><td>마스코트</td><td>작은 병아리 안내 1개</td><td>초기 3회만 능동 말풍선</td><td>전투 가림, 장문</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>전투 밖 화면 IA·CTA·Back 계약</summary><div class="body"><table><thead><tr><th>화면</th><th>진입→하위 상태</th><th>주 CTA</th><th>Back/완료</th><th>Gate</th></tr></thead><tbody>
+          <tr><td>조류</td><td>보유 목록→상세→3인 편성/해금처/외형</td><td>팀에 배치·교체</td><td>미저장 편성만 세로 확인</td><td>E</td></tr>
+          <tr><td>프로필</td><td>마을 초상→프로필·테두리·국가/유머 소속</td><td>미리보기 적용</td><td>저장 뒤 이전 화면</td><td>E</td></tr>
+          <tr><td>상점</td><td>추천→외형/보석/전면광고 제거</td><td>가격·내용 확인 후 구매</td><td>결제 중 이탈 시 pending 복구</td><td>F</td></tr>
+          <tr><td>소셜</td><td>단일 랭킹→글로벌/친구/소속 필터→상대 프로필</td><td>친구 코드·재대결</td><td>필터 유지 후 목록 복귀</td><td>F</td></tr>
+          <tr><td>설정</td><td>오디오/언어/접근성/계정/법적 고지</td><td>즉시 적용</td><td>파괴적 계정 작업만 세로 확인</td><td>B/F</td></tr>
+        </tbody></table><p>모든 화면은 마을 또는 직전 화면으로 한 번에 돌아가며, 저장되지 않은 변경과 결제 pending 외에는 Back 확인 팝업을 띄우지 않는다.</p></div></details>
+        <details open><summary>스토리 모드 계약</summary><div class="body"><ul><li><b>Chapter 0:</b> 마을 소개 10~15초 → 전투 3개 → 도시 소동 보스 1개 → 까마귀 해금 미션.</li><li>전투 전 대화 2~4문장, 전투 중 한 문장, 전투 후 2~4문장 상한.</li><li>Skip과 Replay를 항상 제공한다.</li><li>승패 결과와 보상을 먼저 보여주고, 후속 대화는 선택 재생한다.</li><li>PvP 첫 진입을 스토리 완료로 잠그지 않는다.</li><li>스토리 전용 스탯·장비·재화는 만들지 않는다.</li></ul></div></details>
+      </div>
+    </section>
+
+    <section id="ui-flow" data-searchable data-status="locked proposed playtest" data-source="user-ui-references,quirky-ball-ui-rules" data-decision="DS-UI-001,DS-UI-002,DS-UI-003" data-feature="DS-TC-UI-001,DS-TC-I18N-001,DS-TC-VISUAL-001">
+      <div class="shell"><div class="section-head"><div><div class="index">10 · UI, UX &amp; MOTION</div><h2>가로 20:9에서 전장보다 UI가 먼저 소리치지 않는다</h2></div></div>
+        <p class="intro">세로는 6유닛·11×9보드·행동 순서·스킬을 동시에 작게 만든다. 첫 프로토타입은 가로 2400×1080을 기준으로 하고, 중요 UI는 중앙 16:9 안전영역에 둔다.</p>
+        <div class="grid two">
+          <article class="card keep"><div class="kicker">DISPLAY CONTRACT</div><h3>20:9 FHD+</h3><ul><li>기기·QA 목표 2400×1080</li><li>논리 화면 1600×720</li><li>중앙 1280×720 critical safe frame</li><li>좌우 160px는 배경·보조 정보</li><li>노치·홈 인디케이터 실제 safe area 반영</li><li>에디터 창도 20:9 유지</li></ul></article>
+          <article class="card info"><div class="kicker">BATTLE HUD</div><h3>시선 순서</h3><ol><li>현재/다음 행동자</li><li>전장과 목표</li><li>선택 영웅 HP·상태</li><li>기본/액티브/대표/방어</li><li>취소/실행</li></ol><p>버튼은 한 번에 현재 행동에 필요한 것만 활성화한다.</p></article>
+        </div>
+        <details open><summary>전투 HUD 상세 배치</summary><div class="body"><table><thead><tr><th>위치</th><th>항목</th><th>항상/상황</th><th>가독성 계약</th></tr></thead><tbody>
+          <tr><td>상단 좌</td><td>행동 n/24, 점수, 전체 시간</td><td>항상</td><td>숫자+라벨, 44px 이상</td></tr>
+          <tr><td>상단 중앙</td><td>다음 6행동 초상 큐</td><td>항상</td><td>팀색+테두리+NEXT</td></tr>
+          <tr><td>상단 우</td><td>행동 제한시간, 설정, 항복</td><td>항상</td><td>항복은 메뉴 안+세로 확인</td></tr>
+          <tr><td>전장</td><td>타일, 유닛, HP, 상태, 범위</td><td>항상/선택</td><td>UI가 타일 2열 이상 가리지 않음</td></tr>
+          <tr><td>하단 좌</td><td>현재 영웅 초상, HP, 패시브</td><td>항상</td><td>상태 최대 4개, 초과 +N</td></tr>
+          <tr><td>하단 우</td><td>기본/액티브/대표/방어</td><td>현재 턴</td><td>최소 72px, cooldown 숫자</td></tr>
+          <tr><td>중앙 하단</td><td>예상 피해·회복·상태, 실행/취소</td><td>preview</td><td>긴 문장 대신 한 줄+아이콘</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>행동 노출 애니메이션</summary><div class="body"><table><thead><tr><th>상태</th><th>연출</th><th>시간</th><th>Reduce Motion</th></tr></thead><tbody>
+          <tr><td>내 턴</td><td>현재 초상 6% 확대, 발판 pulse 1회</td><td>0.35초</td><td>외곽선 교체</td></tr>
+          <tr><td>스킬 선택</td><td>버튼→범위→대상 순 70ms 간격</td><td>0.21초</td><td>동시 표시</td></tr>
+          <tr><td>스킬 실행</td><td>이름 toast→동작→수치/상태</td><td>0.4~1.2초</td><td>카메라 punch 제거</td></tr>
+          <tr><td>대표기</td><td>캐릭터 컷 0.4초+필드 동작</td><td>1.8~2.5초</td><td>컷 생략</td></tr>
+          <tr><td>상대 행동</td><td>스킬명·대상 미리보기 0.4초 후 실행</td><td>최대 2.5초</td><td>동일 정보, zoom 없음</td></tr>
+          <tr><td>결과</td><td>마지막 변화 hold→승/패 stamp</td><td>1초 이내</td><td>fade 없음</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>다국어·팝업 공통규칙</summary><div class="body"><ul><li>선택 버튼은 항상 <code>VBoxContainer + ScrollContainer</code> 세로 배치.</li><li>팝업 선택 버튼 최소 높이 96 논리 px, 가로 CTA 병렬 배치 금지.</li><li>독일어 1.6배, 아랍어 RTL, 한국어/일본어 줄바꿈을 같은 상태에서 캡처한다.</li><li>텍스트 자동 축소는 최소 크기 아래로 내리지 않고, 그 전에는 줄바꿈·스크롤을 사용한다.</li><li>색만으로 팀·범위·상태를 구분하지 않고 외곽선·문양·아이콘을 함께 쓴다.</li><li>한 번 누른 실행·보상·결과 버튼은 즉시 잠기며 중복 콜백 0회.</li><li>마스코트는 modal 하나당 한 개만 보이고, 전투 유닛과 겹치지 않는다.</li></ul></div></details>
+      </div>
+    </section>
+
+    <section id="results-rematch" data-searchable data-status="locked" data-source="user-feedback" data-decision="DS-UI-004,DS-UX-001" data-feature="DS-TC-RESULT-001,DS-TC-REMATCH-001">
+      <div class="shell"><div class="section-head"><div><div class="index">11 · RESULT &amp; REMATCH</div><h2>무엇 때문에 이겼는지 한 화면에 보인다</h2></div></div>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">RESULT</div><h3>승패와 근거</h3><ul><li>승/패/무승부</li><li>최종 점수</li><li>다운 점수</li><li>생존 수·HP% tie-break</li><li>결정적 마지막 행동</li></ul></article>
+          <article class="card info"><div class="kicker">REWARD</div><h3>보상</h3><ul><li>알 기본 보상</li><li>미션 진척</li><li>영웅 숙련도</li><li>랭킹 변화</li><li>새 해금 진행</li></ul></article>
+          <article class="card change"><div class="kicker">NEXT</div><h3>두 개의 큰 CTA</h3><ul><li>재대결</li><li>마을로</li><li>팀 수정은 보조 링크</li><li>광고는 결과 인지 뒤</li><li>마지막 터치 4초 안에 재시작</li></ul></article>
+        </div>
+        <div class="callout success-callout"><strong>완료 기준:</strong> 처음 본 플레이어가 결과 화면만 보고 “어느 팀이 왜 이겼는지”와 “다음에 무엇을 바꿀지”를 10초 안에 말할 수 있어야 한다.</div>
+      </div>
+    </section>
+
+    <section id="progression" data-searchable data-status="locked proposed playtest" data-source="user-direction,prior-house-duck-bm-rule" data-decision="DS-PROG-001,DS-PROG-002" data-feature="DS-TC-PROG-001,DS-TC-ECON-001">
+      <div class="shell"><div class="section-head"><div><div class="index">12 · PROGRESSION WITHOUT GACHA OR GEAR</div><h2>영웅을 키우되 조각·장비·중복은 없다</h2></div></div>
+        <p class="intro">성장은 영웅 레벨 1~10과 숙련 보상만 둔다. 유료·광고로 같은 재화를 더 빨리 얻을 수 있지만, 유료 전용 스킬과 영웅은 없다.</p>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">HERO LEVEL</div><h3>1~10</h3><p>알로 훈련한다. 10레벨에서 HP·ATK·DEF가 각각 Lv1 대비 +8%. SPD·MOV·스킬 메커니즘·범위는 변하지 않는다.</p></article>
+          <article class="card info"><div class="kicker">MASTERY</div><h3>플레이 숙련</h3><p>영웅 사용·미션으로 프로필 표정, 칭호, 테두리 색, 마을 대사를 해금한다. 능력치는 주지 않는다.</p></article>
+          <article class="card cut-card"><div class="kicker">CUT</div><h3>복잡 성장 없음</h3><p>희귀도, 별, 중복 돌파, 장비, 룬, 아티팩트, 랜덤 옵션, 먹이 영웅, 스킬 레벨업을 만들지 않는다.</p></article>
+        </div>
+        <details open><summary>레벨 비용·힘 차이 · PROPOSED</summary><div class="body"><table><thead><tr><th>구간</th><th>알 비용</th><th>누적 스탯</th><th>목표</th></tr></thead><tbody>
+          <tr><td>Lv1→2</td><td>100</td><td>+1%</td><td>첫날 체험</td></tr><tr><td>2→3</td><td>150</td><td>+2%</td><td>3영웅 분산 육성</td></tr><tr><td>3→4</td><td>200</td><td>+3%</td><td>초반 미션</td></tr><tr><td>4→5</td><td>250</td><td>+4%</td><td>첫 주</td></tr><tr><td>5→6</td><td>300</td><td>+5%</td><td>첫 주</td></tr><tr><td>6→7</td><td>350</td><td>+6%</td><td>2주</td></tr><tr><td>7→8</td><td>400</td><td>+7%</td><td>2주+</td></tr><tr><td>8→9</td><td>450</td><td>+7.5%</td><td>장기</td></tr><tr><td>9→10</td><td>500</td><td>+8%</td><td>장기</td></tr>
+        </tbody></table><p>공식/비공식 랭킹을 나누지 않는다. 팀 성장 보너스는 세 영웅의 HP/ATK/DEF 증가율 평균이며, 시즌 매칭은 양 팀 성장 보너스 차이 4%p를 hard cap으로 한다. eligible 사람이 없으면 범위를 넓히지 않고 같은 범위의 봇을 사용한다. 광고·구매·플레이가 같은 알/보석 경로를 사용한다. payer/non-payer 및 레벨차별 승률이 45~55%를 벗어나면 성장폭·매칭폭을 낮춘다.</p></div></details>
+      </div>
+    </section>
+
+    <section id="economy-bm" data-searchable data-status="locked proposed playtest" data-source="user-direction,store-policy,balance-proposal" data-decision="DS-BM-001,DS-BM-002,DS-BM-003,DS-BM-004" data-feature="DS-TC-BM-001,DS-TC-AD-001,DS-TC-PURCHASE-001,DS-TC-STAMINA-001">
+      <div class="shell"><div class="section-head"><div><div class="index">13 · ECONOMY &amp; BM</div><h2>알·보석·모이, 세 개만 쓴다</h2></div></div>
+        <p class="intro">초기 BM은 광고·보석 팩·광고 제거·직접 해금·코스메틱이다. 확률형 영웅, 장비, 시즌패스, 여러 토큰은 넣지 않는다.</p>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">알 · EGG</div><h3>무료 재화</h3><p>대전·스토리·미션에서 획득. 영웅 레벨, 공개된 영웅 직접 해금, 일부 기본 코스메틱에 사용.</p></article>
+          <article class="card info"><div class="kicker">보석 · GEM</div><h3>프리미엄 재화</h3><p>보상광고·미션·구매로 획득하며 만료되지 않는다. 새 영웅 즉시 해금, 스킨·테두리, 알 교환, PvE 모이 회복에 사용.</p></article>
+          <article class="card change"><div class="kicker">모이 · STAMINA</div><h3>PvE 보상 제한</h3><p>스토리·협동 보스에만 사용한다. 훈련·아레나·친구전은 모이 0으로 핵심 대전을 막지 않는다.</p></article>
+        </div>
+        <details open><summary>경제 시작값 · BALANCE DRAFT</summary><div class="body"><table><thead><tr><th>항목</th><th>제안값</th><th>근거/상한</th></tr></thead><tbody>
+          <tr><td>신규 계정</td><td>알 500, 보석 100, 모이 60/60</td><td>3 starter를 각 2~3레벨로 시험</td></tr>
+          <tr><td>아레나</td><td>승 25알, 패 15알</td><td>완주 보상. 조기 항복 0알.</td></tr>
+          <tr><td>스토리</td><td>첫 클리어 50알, 반복 15알</td><td>모이 6 사용</td></tr>
+          <tr><td>일일 미션</td><td>100알+5보석</td><td>대전 3회·스킬 10회 등</td></tr>
+          <tr><td>주간 미션</td><td>300알+40보석</td><td>과금 없이 격주 영웅 진척 가능</td></tr>
+          <tr><td>알 교환</td><td>50보석→400알</td><td>고정 교환. 영웅 2,500알≈312.5보석이라 300보석 직접 해금이 손해가 아님.</td></tr>
+          <tr><td>영웅 해금</td><td>2,500알 또는 300보석</td><td>격주 공개 뒤 항상 직접 선택</td></tr>
+          <tr><td>테두리</td><td>150보석</td><td>프로필·랭킹 공용</td></tr>
+          <tr><td>캐릭터 스킨</td><td>500~900보석</td><td>스탯 없음, 3D/초상 함께 변경</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>스태미나 · 모이</summary><div class="body"><table><thead><tr><th>규칙</th><th>제안값</th><th>실패 방지</th></tr></thead><tbody>
+          <tr><td>최대</td><td>자연 회복 60, 보상 보관 120</td><td>+12 광고는 108 초과 시 숨김. 60 완충은 현재 60 초과 시 구매 버튼 비활성.</td></tr>
+          <tr><td>자연 회복</td><td>8분당 1</td><td>서버 시간 연결 전 로컬 monotonic+save 검증</td></tr>
+          <tr><td>스토리</td><td>6</td><td>패배 시 3만 차감 후보, 플레이테스트</td></tr>
+          <tr><td>협동 보스</td><td>12</td><td>P2 이후</td></tr>
+          <tr><td>보상광고</td><td>+12, 하루 3회</td><td>광고 실패·취소 시 지급 0, 복귀 안전</td></tr>
+          <tr><td>보석 완충</td><td>50보석→60, 하루 2회</td><td>구매 전 현재/결과 명시</td></tr>
+          <tr><td>PvP·훈련·친선</td><td>0</td><td>대전 핵심 진입 제한 금지</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>광고·구매 상품</summary><div class="body"><table><thead><tr><th>상품/광고</th><th>제안</th><th>노출 규칙</th><th>상태</th></tr></thead><tbody>
+          <tr><td>보상광고 · 보석</td><td>5보석, 하루 3회</td><td>상점/마을에서만 자발 선택. 알 환산 40.</td><td>LOCKED 구조, 수치 후보</td></tr>
+          <tr><td>보상광고 · 모이</td><td>+12, 하루 3회</td><td>모이 부족 팝업의 세로 선택</td><td>PROPOSED</td></tr>
+          <tr><td>전면광고</td><td>완주 결과 뒤 3경기당 최대 1회, 8분 간격</td><td>첫 세션·튜토리얼·스토리 대화·재대결 직전 금지</td><td>NEEDS PLAYTEST</td></tr>
+          <tr><td>전면광고 제거</td><td>€4.99 1회 non-consumable</td><td>상품명·확인창에 “강제 전면만 제거, 선택 보상광고 유지” 명시</td><td>PROPOSED</td></tr>
+          <tr><td>보석 팩 S/M/L</td><td>€1.99=200 / €4.99=550 / €9.99=1,200</td><td>앱은 스토어가 제공한 현지화 가격 문자열만 표시</td><td>PROPOSED</td></tr>
+          <tr><td>Starter Pack</td><td>€4.99: 550보석+테두리+500알</td><td>계정당 1회, 영웅 독점 없음</td><td>DEFERRED</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>구매·복원 원장 계약</summary><div class="body"><ul><li>보석 팩은 consumable, 전면광고 제거는 non-consumable entitlement로 분리한다.</li><li>transaction ID를 idempotency key로 사용해 구매·복원·재시도에서 지급은 정확히 1회다.</li><li><code>pending / completed / cancelled / refunded / revoked</code>를 서버 원장에 기록하고 pending·cancel에는 지급하지 않는다.</li><li>전면광고 제거는 새 기기·재설치·계정 이전에서 스토어 소유권과 서버 entitlement를 함께 확인해 복원한다.</li><li>consumable 보석은 스토어 restore가 아니라 서버 재화 원장과 검증 receipt로 동기화한다.</li><li>refund/revoke 처리와 이미 소비한 보석의 정책은 SDK 도입 전 별도 승인하며 음수 잔액을 임의 적용하지 않는다.</li></ul></div></details>
+        <div class="callout danger-callout"><strong>BM 금지선:</strong> 유료 랜덤 알, 영웅 확률 상자, 중복 조각, 장비, 스킬 범위 판매, paid-only 영웅, 전투 중 부활 결제, 랭크 결과 재추첨, 광고를 보지 않으면 전술 기능을 잃는 설계를 만들지 않는다.</div>
+      </div>
+    </section>
+
+    <section id="ranking-social" data-searchable data-status="locked proposed deferred" data-source="user-direction,quirky-ball-ranking-rules" data-decision="DS-RANK-001,DS-SOCIAL-001,DS-SERVER-001" data-feature="DS-TC-RANK-001,DS-TC-AFFIL-001,DS-TC-ASYNC-001">
+      <div class="shell"><div class="section-head"><div><div class="index">14 · RANKING, SOCIAL &amp; ASYNC</div><h2>한 시즌 랭킹, 여러 보기, 같은 경기 결과</h2></div></div>
+        <p class="intro">공식·비공식 또는 과금·무과금 랭킹을 나누지 않는다. 글로벌/친구/국가·유머 소속은 같은 시즌 점수를 다른 필터로 보는 방식이다.</p>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">SEASON RATING</div><h3>윙 레이팅 · 작업명</h3><p>초기 1000. 승패와 상대 레이팅 차이로 증감한다. 영웅 전투력 차이는 매칭에 쓰되 결과를 별도 랭킹으로 분리하지 않는다.</p></article>
+          <article class="card info"><div class="kicker">FILTERS</div><h3>글로벌·친구·소속</h3><p>국가와 “야근금지단”, “민트초코파” 같은 유머 소속은 사용자가 하나의 code로 선택한다. 동일 카테고리다.</p></article>
+          <article class="card change"><div class="kicker">FRIENDS</div><h3>초대·재대결</h3><p>친구 코드, 최근 상대, 재대결을 제공한다. 채팅과 길드는 후속이며 기본 emote 6개만 검토한다.</p></article>
+        </div>
+        <details open><summary>서버 도입 순서</summary><div class="body"><ol><li><b>Local:</b> battle state, seed, command ledger, bot, 결과를 한 기기에서 재현.</li><li><b>Supabase P1:</b> 계정, 프로필, 편성 snapshot, 단일 시즌 랭킹, match/command 원장.</li><li><b>시즌 비동기:</b> server seed/state 수신 → 현재 유닛의 command 1개 제출 → 서버 검증·새 state 저장 → 상대 알림.</li><li><b>재접속:</b> 마지막 승인 turn_index부터 재생하고 같은 command_id 재전송은 기존 결과를 반환한다.</li><li><b>친구 초대:</b> 같은 실제 턴 교환을 사용하되 랭킹 보상 없음.</li><li><b>즉시 방어전·협동·길드:</b> 실제 턴 교환과 원장이 안정된 뒤.</li></ol></div></details>
+        <details open><summary>비동기 command·시간 권위 · Gate F 계약</summary><div class="body"><pre><code>{
+  match_id, rule_version, turn_index, command_id,
+  client_sequence, actor_id, move_tile, skill_id, target_tile,
+  state_hash_before
+}</code></pre><ul><li><b>원자성:</b> 이동과 스킬/방어를 command 1개로 제출한다. 서버 승인 전 클라이언트 화면은 preview일 뿐이다.</li><li><b>순서:</b> 서버는 해당 match의 정확한 rule_version, 예상 turn_index, 현재 actor_id, state_hash_before가 모두 맞을 때만 수락한다.</li><li><b>중복:</b> command_id는 match 안에서 unique다. 같은 ID 재전송은 새 행동을 만들지 않고 저장된 동일 응답을 반환한다. client_sequence는 진단용이며 권위가 아니다.</li><li><b>시간:</b> 비동기 아레나에는 로컬 15초/7분 제한을 적용하지 않는다. 각 플레이어의 24시간 chess-clock bank를 서버 시각으로 자기 활성 턴에만 차감하고 0이면 <code>TIMEOUT_LOSS</code>로 종료한다.</li><li><b>서버 규칙:</b> Supabase Edge Function의 순수 TypeScript BattleRules가 랭크 권위다. Godot GDScript BattleRules는 로컬/preview mirror이며 서버 응답을 덮어쓰지 않는다.</li><li><b>드리프트 방지:</b> Gate F 전에 동일 JSON state/command/result golden vector 1,000개 이상을 GDScript와 TypeScript 양쪽에 실행해 state/event hash 불일치 0을 증명한다. match는 시작 rule_version에 고정한다.</li></ul></div></details>
+        <details><summary>랭킹 무결성 경계</summary><div class="body"><ul><li>서버가 허용한 seed, map, roster snapshot, rule_version을 기록한다.</li><li>서버는 이산 규칙을 재생해 승인 state hash와 reward를 저장한다.</li><li>Godot 3D 물리·애니메이션 좌표는 랭킹 판정에 포함하지 않는다.</li><li>결과·reward도 match_id+rule_version idempotency key로 한 번만 반영한다.</li><li>오프라인 봇전과 서버 랭크 결과를 같은 증거로 간주하지 않는다.</li></ul></div></details>
+      </div>
+    </section>
+
+    <section id="art" data-searchable data-status="locked proposed deferred" data-source="user-art-direction,project-k-art-direction" data-decision="DS-ART-001,DS-ART-002,DS-ART-003" data-feature="DS-TC-ART-001,DS-TC-RIG-001,DS-TC-ASSET-001">
+      <div class="shell"><div class="section-head"><div><div class="index">15 · ART, RIG &amp; ASSET PIPELINE</div><h2>셀 애니 조류와 도시 네온, 실루엣은 한눈에</h2></div></div>
+        <p class="intro">최신 Project K의 중간밀도 cel 3D 방향과 ZZZ에서 느껴지는 도시 리듬·굵은 실루엣을 높은 수준의 영감으로만 사용한다. 캐릭터·팔레트·그래픽 모티브·UI 배치를 복사하지 않는다.</p>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">CHARACTER</div><h3>둥글고 유기적인 조류</h3><ul><li>오리 부리·닭 볏·비둘기 가슴 등 종 판독</li><li>네모 몸통 금지</li><li>2~3개 큰 질량으로 단순화</li><li>역할 소품은 하나만</li><li>팀색은 의상 띠/발판에, 깃털 원색 보존</li></ul></article>
+          <article class="card info"><div class="kicker">WORLD</div><h3>커닝시티식 골목 구조</h3><ul><li>옥상·간판·맨홀·자판기·배럴</li><li>청록/호박/코랄 도시 팔레트</li><li>전술 타일보다 배경 대비 낮게</li><li>기능 장애물은 실루엣과 아이콘 반복</li><li>직접 IP 건물·로고 복제 금지</li></ul></article>
+          <article class="card change"><div class="kicker">MASTER</div><h3>3D 하나에서 파생</h3><ul><li>cel 3D model+rig가 master</li><li>2D 전신·프로필·카드·상점 렌더 파생</li><li>같은 hero_id·의상_id 공유</li><li>수동 재그림으로 얼굴 drift 금지</li><li>asset manifest에 source hash 기록</li></ul></article>
+        </div>
+        <details open><summary>영웅 1종 필수 산출물</summary><div class="body"><table><thead><tr><th>종류</th><th>규격/상태</th><th>필수</th><th>Gate</th></tr></thead><tbody>
+          <tr><td>3D 모델</td><td>중간밀도 cel, LOD 0/1, 단일 skeleton</td><td>예</td><td>D</td></tr>
+          <tr><td>리깅</td><td>root/hips/spine/head/beak/wing.LR/leg.LR/toe/tail</td><td>예</td><td>D</td></tr>
+          <tr><td>애니메이션</td><td>idle, move, hit, KO, basic, active, signature, celebrate</td><td>8개</td><td>D</td></tr>
+          <tr><td>표정</td><td>neutral, focus, assertive, hit, uneasy, victory</td><td>6개</td><td>D</td></tr>
+          <tr><td>2D 전신</td><td>400×800 alpha, 동일 6표정 crop 파생</td><td>6장</td><td>D</td></tr>
+          <tr><td>프로필</td><td>256×256/128×128 crop</td><td>2규격</td><td>D</td></tr>
+          <tr><td>전투 큐 아이콘</td><td>96×96, 팀 외곽선 적용 가능</td><td>1장</td><td>D</td></tr>
+          <tr><td>상점 카드</td><td>900×1200 source에서 crop</td><td>1장</td><td>E</td></tr>
+          <tr><td>테두리 미리보기</td><td>프로필+frame 조합</td><td>1상태</td><td>E</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>리깅·애니메이션·표정 가독성 계약</summary><div class="body"><ul><li>부리·날개·발이 종과 스킬을 읽히게 해야 하며 사람형 팔 동작을 그대로 씌우지 않는다.</li><li>이동은 보폭보다 몸통 bob·날개 균형으로 종 차이를 만든다.</li><li>얼굴 rig는 눈꺼풀/눈 크기·시선, 부리 열림, 머리 기울기, 볏·목깃 보조 움직임을 제공한다. 종마다 없는 부위를 억지 사람 얼굴처럼 만들지 않는다.</li><li>neutral→focus→assertive, hit→uneasy, victory의 6 pose가 3D·프로필·말풍선 초상에서 같은 감정으로 읽혀야 한다.</li><li>공격 준비 silhouette 0.12~0.25초, contact 2 render frame 이상, recovery 0.18~0.45초.</li><li>대표기 중에도 출발 타일·대상·도착 타일이 최소 한 프레임 보인다.</li><li>스킬 VFX는 바닥 telegraph, 행동 본체, contact/수치의 세 layer로 분리하고 타일·얼굴·HP를 0.25초 넘게 가리지 않는다.</li><li>프로토타입 greybox가 재미 Gate를 통과하기 전 10영웅 최종 모델을 선제작하지 않는다.</li></ul></div></details>
+        <details open><summary>전투 말풍선·조류 반응 규칙</summary><div class="body"><table><thead><tr><th>계기</th><th>표정/말풍선</th><th>빈도</th><th>금지</th></tr></thead><tbody>
+          <tr><td>첫 선택</td><td>focus+역할 한마디</td><td>경기당 영웅 1회</td><td>튜토리얼 장문</td></tr>
+          <tr><td>대표기</td><td>assertive+고유 한마디</td><td>첫 사용 필수, 이후 50%</td><td>행동 지연</td></tr>
+          <tr><td>큰 피해/저HP</td><td>hit 또는 uneasy+짧은 반응</td><td>팀당 2행동 cooldown</td><td>연속 spam</td></tr>
+          <tr><td>아군 회복/보호</td><td>neutral/victory+감사 반응</td><td>경기당 2회 상한</td><td>결과 수치 가림</td></tr>
+          <tr><td>승리/패배</td><td>victory 또는 uneasy</td><td>결과 화면 1회</td><td>CTA 가림</td></tr>
+        </tbody></table><ul><li>전투 말풍선은 한국어 18자·최대 2줄·1.2~2초이며 한 팀당 동시에 1개만 보인다. 번역은 문자 수가 아니라 실제 2줄 fit으로 검사한다.</li><li>말풍선 tail은 발화 조류를 가리키고 HP·상태·범위·대상·실행 버튼과 겹치면 반대쪽 anchor로 이동한다.</li><li>preview 타이머를 멈추거나 입력을 막지 않는다. 설정에서 전투 대사 ‘전체/중요만/끄기’를 제공한다.</li><li>대사는 각 조류의 성격을 보여주되 전술 결과 설명을 대신하지 않는다. 피해·힐·상태는 UI와 VFX만으로도 이해되어야 한다.</li></ul></div></details>
+        <div class="callout danger-callout"><strong>저작권·브랜드 경계:</strong> “ZZZ 느낌”은 셀셰이딩, 도시 에너지, 그래픽 리듬의 추상적 기준이다. ZZZ/AT/메이플의 캐릭터, 로고, 폰트, UI 프레임, 맵, 스킬 VFX, 음원을 복제하지 않는다.</div>
+      </div>
+    </section>
+
+    <section id="audio" data-searchable data-status="proposed deferred" data-source="house-duck-audio-rules,user-request" data-decision="DS-AUDIO-001,DS-AUDIO-002" data-feature="DS-TC-AUDIO-001,DS-TC-LISTEN-001,DS-TC-HAPTIC-001">
+      <div class="shell"><div class="section-head"><div><div class="index">16 · AUDIO &amp; HAPTICS</div><h2>화면을 보지 않아도 턴과 결과를 구분한다</h2></div></div>
+        <p class="intro">AT의 음원을 가져오지 않는다. 짧은 조류 보이스, 도시 타격, UI 신호를 새로 제작한다. 풀 보이스 연기는 초기 범위가 아니다.</p>
+        <table><thead><tr><th>레이어</th><th>필수 이벤트</th><th>길이/우선순위</th><th>검증</th></tr></thead><tbody>
+          <tr><td>Turn UI</td><td>내 턴, 상대 턴, 남은 5초 경고, 시간 종료</td><td>0.15~0.6초, 경고 우선</td><td>눈 감고 5/5 식별</td></tr>
+          <tr><td>Tile UI</td><td>합법 이동, 위험, 무효, 확정, 취소</td><td>0.05~0.18초</td><td>연타 시 clipping/소음 없음</td></tr>
+          <tr><td>Combat</td><td>준비, swing, contact, shield, heal, DoT, KO</td><td>contact 최고 우선</td><td>원인→결과 순서 식별</td></tr>
+          <tr><td>Bird voice</td><td>선택, 공격, 피격, KO, 승리</td><td>0.2~0.9초, 종별 3변형</td><td>반복 20회 피로 테스트</td></tr>
+          <tr><td>Music</td><td>마을, 판단, 위기, 결과</td><td>layer 전환, 강제 restart 없음</td><td>대사/SFX 마스킹 없음</td></tr>
+          <tr><td>Haptic</td><td>확정 light, contact medium, KO heavy, 오류 warning</td><td>기기 지원 시만</td><td>Android/iOS 실기기 별도</td></tr>
+        </tbody></table>
+        <details><summary>오디오 제작 순서</summary><div class="body"><ol><li>Gate D1: 타일 UI 5종+contact/heal/KO+턴 신호.</li><li>Gate D2: 3 starter 각 5보이스+스킬 9종.</li><li>Gate D3: 마을/전투 2곡과 위기 layer.</li><li>새 영웅 공개 때 3D·2D·VFX·SFX·voice를 한 bundle로 완료.</li></ol><p>FMOD/Wwise 없이 Godot <code>AudioStreamPlayer</code>, bus, <code>AudioStreamRandomizer</code>로 시작한다.</p></div></details>
+      </div>
+    </section>
+
+    <section id="architecture" data-searchable data-status="locked proposed" data-source="repo-audit,godot-4.7-docs,ponytail" data-decision="DS-TECH-001,DS-TECH-002,DS-TECH-003" data-feature="DS-TC-CORE-001,DS-TC-RESET-001,DS-TC-EXPORT-001">
+      <div class="shell"><div class="section-head"><div><div class="index">17 · GODOT 4.7 ARCHITECTURE</div><h2>규칙은 2D 좌표, 화면은 2.5D, 판정은 한 곳</h2></div></div>
+        <p class="intro">AStarGrid2D가 논리 타일을 관리하고 3D 월드는 그 결과를 보여준다. 피해·쿨다운·승패를 물리 충돌이나 애니메이션 callback에 두지 않는다.</p>
+        <div class="flow"><div class="flow-step"><b>Pointer</b>타일/버튼 선택</div><span class="arrow">›</span><div class="flow-step"><b>Preview Command</b>actor·move·skill·target</div><span class="arrow">›</span><div class="flow-step"><b>Validate</b>BattleRules 유일 권위</div><span class="arrow">›</span><div class="flow-step"><b>Apply</b>새 state+event ledger</div><span class="arrow">›</span><div class="flow-step"><b>View</b>3D/VFX/UI 재생</div><span class="arrow">›</span><div class="flow-step"><b>Next</b>순서·봇·결과</div></div>
+        <details open><summary>최소 파일 구조 · 구현 계획 후보</summary><div class="body"><pre><code>data/drumstack/
+  heroes/              # hero_id별 Resource/JSON, 한 파일 한 영웅
+  skills/              # 공용 상태·스킬 수치
+  maps/                # tutorial_11x9, arena_11x9
+  modes/               # tutorial, bot_skirmish, arena
+  localization/        # Godot CSV
+
+scripts/drumstack/core/
+  battle_state.gd      # seed, order, score, units, status, ledger
+  battle_rules.gd      # validate/apply의 유일 권위
+  grid_rules.gd        # path, range, LOS, push
+  bot_policy.gd        # legal plan 평가
+
+scripts/drumstack/game/
+  battle_controller.gd # input → command → core → view
+  battle_board_3d.gd   # logical tile ↔ world transform
+  battle_view.gd       # event ledger → animation/VFX
+
+scenes/drumstack/
+  app/main.tscn
+  battle/battle_screen.tscn
+  battle/battle_board_3d.tscn
+  battle/actors/bird_actor.tscn
+  ui/village.tscn
+  ui/mode_select.tscn
+  ui/team_confirm.tscn
+  ui/result.tscn
+  ui/settings.tscn</code></pre></div></details>
+        <details open><summary>도메인 경계</summary><div class="body"><table><thead><tr><th>구성요소</th><th>책임</th><th>하면 안 되는 일</th></tr></thead><tbody>
+          <tr><td>BattleState</td><td>직렬화 가능한 현재 사실</td><td>Node 참조, Vector3, Tween 저장</td></tr>
+          <tr><td>BattleRules</td><td>command 검증·적용, event 생성</td><td>UI, 오디오, await</td></tr>
+          <tr><td>GridRules</td><td>경로·범위·시야·밀침</td><td>Mesh/Collider 권위 사용</td></tr>
+          <tr><td>BotPolicy</td><td>합법 plan 평가와 선택</td><td>플레이어에게 없는 정보/보정</td></tr>
+          <tr><td>Controller</td><td>입력 상태, command 전달, 전환</td><td>피해 계산 중복</td></tr>
+          <tr><td>View</td><td>event를 화면·소리로 표현</td><td>결과 판정, 보상 지급</td></tr>
+        </tbody></table></div></details>
+        <details><summary>플러그인·기술 선택</summary><div class="body"><ul><li><b>유지:</b> community Godot Asset Library의 <code>godot_mcp</code> v0.7.2 pin. 개발 때만 켠다.</li><li><b>Release:</b> plugin 비활성, MCP autoload 없음, <code>addons/godot_mcp/**</code> export 제외, PCK 검사.</li><li><b>Native:</b> <code>AStarGrid2D</code>, <code>Camera3D</code>, <code>GridMap</code> 또는 수제 tile visuals, <code>AnimationTree</code>, Godot audio bus.</li><li><b>지금 제외:</b> behavior tree, state-chart plugin, Dialogic, Phantom Camera, FMOD/Wwise, GUT/GdUnit, Supabase SDK.</li><li><b>도입 시점:</b> Supabase·AdMob·Billing·StoreKit은 Gate A~C와 외부 재미 테스트 통과 뒤.</li></ul></div></details>
+        <div class="callout"><strong>Ponytail 기준:</strong> Gate A 로컬 core command는 <code>{kind, actor_id, move_tile, skill_id, target_tile}</code> Dictionary면 충분하다. Gate F에서 이 payload를 서버 envelope에 넣는다. ECS·ability framework·factory interface는 두 번째 실제 소비자가 생기기 전 만들지 않는다.</div>
+      </div>
+    </section>
+
+    <section id="legacy" data-searchable data-status="locked deferred" data-source="repo-audit" data-decision="DS-MIGRATE-001,DS-MIGRATE-002" data-feature="DS-TC-MIGRATE-001">
+      <div class="shell"><div class="section-head"><div><div class="index">18 · QUIRKY TOWER LEGACY MAP</div><h2>살릴 기반, 이름을 바꿀 셸, 버릴 게임</h2></div></div>
+        <p class="intro">현재 <code>main</code>의 사용자 미커밋 파일과 Godot 생성물이 있으므로 지금 이동·삭제하지 않는다. 새 이름·폴더·저장소 전환은 본 명세 승인과 tag 뒤에 한다.</p>
+        <table><thead><tr><th>판정</th><th>대상</th><th>처리</th></tr></thead><tbody>
+          <tr><td>KEEP</td><td><code>.editorconfig</code>, <code>.gitattributes</code>, <code>.gitignore</code>, fonts+license, <code>addons/godot_mcp/**</code>, affiliation data, <code>qa_output/.gitkeep</code></td><td>그대로 재사용, export 규칙 유지</td></tr>
+          <tr><td>KEEP DOC RULES</td><td><code>docs/canonical/README.md</code>, <code>design_policy.md</code>, <code>qa.md</code>, shared <code>house_duck_test_case_standard.md</code></td><td>새 repo 경로에 복사하고 Drumstack 우선순위만 갱신</td></tr>
+          <tr><td>RETARGET</td><td><code>project.godot</code>, icon, app main, splash, settings, DesignTokens/AppTheme</td><td>이름·가로 20:9·새 팔레트·새 흐름으로 수정</td></tr>
+          <tr><td>REUSE PATTERN</td><td>세로 popup, 중복 입력 잠금, locale fallback, 프로세스 종료 QA</td><td>타워 문구·마스코트 제거 후 공통 구조만 사용</td></tr>
+          <tr><td>ARCHIVE DOCS</td><td><code>docs/reboot/**</code>, old canonical gameplay/product/story/economy/work state</td><td>기존 repo의 <code>quirky-tower-gate-a-final</code> tag로 보존; 새 repo에는 필요한 회고 링크만 기록</td></tr>
+          <tr><td>DO NOT COPY</td><td><code>scenes/game/reboot/**</code>, <code>scripts/core/reboot/**</code>, <code>scripts/game/reboot/**</code>, <code>scenes/game/run_screen.tscn</code>, <code>scripts/game/run_controller.gd</code>, <code>scenes/ui/components/run_hud.tscn</code>, <code>scripts/ui/run_hud.gd</code>, <code>scripts_dev/qa/headless/flock_*.gd</code>, <code>scripts_dev/qa/run_gate_a_visual.sh</code>, <code>scripts_dev/qa/runtime/capture_gate_a.gd</code>, <code>qa_output/reboot_gate_a/**</code></td><td>기존 repo/tag에는 보존하고 신규 repo에는 복사하지 않음; 삭제 명령 없음</td></tr>
+          <tr><td>NEW</td><td><code>data/drumstack/**</code>, <code>scripts/core/battle/**</code>, <code>scripts/game/battle/**</code>, <code>scenes/battle/**</code></td><td>새 규칙과 P0 화면만 생성</td></tr>
+        </tbody></table>
+        <details open><summary>이름·폴더·저장소 전환 순서</summary><div class="body"><ol><li>본 HTML 승인.</li><li>현재 사용자 변경을 별도 안전 commit으로 정리.</li><li>기존 <code>quirky_tower</code> repo에 <code>quirky-tower-gate-a-final</code> tag 생성.</li><li>GitHub에 신규 <code>drumstack-battle</code> repo와 로컬 <code>drumstack_battle</code> 폴더 생성. 기존 repo rename은 하지 않는다.</li><li>KEEP/RETARGET 파일만 새 repo로 복사하고 첫 commit에 원본 tag를 provenance로 기록한다. ZIP·수동 전달은 쓰지 않는다.</li><li>패키지 ID·앱 ID·save namespace 초안 작성. 실제 Store record는 후속.</li><li>구 runtime은 기존 repo에 그대로 남기며, 새 repo에는 DO NOT COPY 목록을 가져오지 않는다.</li><li>Godot 재import 후 main scene과 P0 public flow 확인.</li></ol></div></details>
+      </div>
+    </section>
+
+    <section id="ops" data-searchable data-status="locked proposed" data-source="user-cloud-local-policy,house-duck-process-rules" data-decision="DS-OPS-001,DS-DOC-002" data-feature="DS-TC-PERF-001,DS-TC-PROCESS-001,DS-TC-DOCSIZE-001">
+      <div class="shell"><div class="section-head"><div><div class="index">19 · PERFORMANCE, FILE SIZE &amp; WORKFLOW</div><h2>MacBook Air M2는 엔진 확인에만 쓴다</h2></div></div>
+        <div class="grid three">
+          <article class="card keep"><div class="kicker">CLOUD</div><h3>코드·분석·테스트</h3><p>다수 파일 구현, 정적 분석, headless 규칙 테스트, 문서, 밸런스 시뮬레이션은 GitHub branch 기준으로 묶어 처리한다.</p></article>
+          <article class="card info"><div class="kicker">LOCAL</div><h3>Godot·화면·기기</h3><p>Editor import, 실제 플레이, 2.5D 가독성, 애니메이션, 오디오, 물리, Android/iOS에 필요한 최소 실행만 한다.</p></article>
+          <article class="card change"><div class="kicker">HANDOFF</div><h3>Git만 사용</h3><p>ZIP과 수동 복사 없이 commit/push/pull로 전달한다. 작은 수정마다 Cloud↔Local을 왕복하지 않는다.</p></article>
+        </div>
+        <details open><summary>성능 예산 · PROPOSED</summary><div class="body"><table><thead><tr><th>항목</th><th>목표</th><th>증거</th></tr></thead><tbody>
+          <tr><td>프레임</td><td>중급 Android 60fps, p95 ≤16.7ms</td><td>실기기 profiler</td></tr>
+          <tr><td>Draw calls</td><td>전투 일반 ≤140, 대표기 peak ≤190</td><td>Godot monitor</td></tr>
+          <tr><td>메모리</td><td>전투 RSS ≤450MB</td><td>Android/iOS</td></tr>
+          <tr><td>첫 전투 로드</td><td>warm ≤2.5초, cold ≤5초</td><td>실기기 5회 중앙값</td></tr>
+          <tr><td>AI 생각</td><td>Normal p95 ≤60ms</td><td>headless 10k turns</td></tr>
+          <tr><td>배터리/발열</td><td>15분 후 thermal throttle 없음</td><td>실기기</td></tr>
+        </tbody></table></div></details>
+        <details open><summary>파일 크기 방지책</summary><div class="body"><table><thead><tr><th>파일</th><th>경고</th><th>실패</th><th>분할 기준</th></tr></thead><tbody>
+          <tr><td>GDScript</td><td>400줄</td><td>700줄</td><td>두 번째 책임이 생기면 domain/view/test로 분리</td></tr>
+          <tr><td>Markdown</td><td>500줄 또는 80KB</td><td>900줄 또는 160KB</td><td>현재 상태와 history 분리</td></tr>
+          <tr><td>JSON/CSV</td><td>100KB</td><td>250KB</td><td>hero/map/domain별 파일</td></tr>
+          <tr><td>HTML master</td><td>140KB</td><td>220KB</td><td>정본 index+chapter HTML+shared CSS/JS로 분리</td></tr>
+          <tr><td>Test</td><td>500줄</td><td>800줄</td><td>도메인별 focused runner</td></tr>
+        </tbody></table><p><span class="badge playtest">SIZE WARNING REACHED</span> 현재 v0.9는 요구 추적표를 포함해 약 152KB이며 220KB 실패선 아래다. 사용자가 이 스냅샷을 승인하면 동결하고, 다음 대형 명세 수정 전 product/battle/content/UI/tech/QA chapter로 분할해 master에는 ID registry만 남긴다. 이번 요청은 단일 초상세 HTML이므로 지금은 파일을 늘려 재구성하지 않는다.</p></div></details>
+        <details open><summary>엔진·프로세스 종료 규칙</summary><div class="body"><ul><li>실행 전 baseline PID·포트 기록.</li><li>agent가 시작한 Godot/서버 PID와 cwd를 기록.</li><li>정상 quit → bounded wait → 정확한 PID/children TERM → 필요 시 exact KILL.</li><li>광범위 <code>pkill Godot</code> 금지. Quirky Ball/다른 프로젝트 프로세스 보존.</li><li>MCP 포트 9200~9215와 프로젝트 포트를 종료 후 확인.</li><li>Godot 생성 <code>.uid/.import</code>는 추적 여부를 확인하고 무단 일괄 삭제하지 않는다.</li><li>테스트하지 않을 때 Editor·debug server를 남기지 않는다.</li></ul></div></details>
+      </div>
+    </section>
+
+    <section id="skills-plugins" data-searchable data-status="locked proposed" data-source="approved-workflow,godot-plugin-audit" data-decision="DS-WORKFLOW-001,DS-PLUGIN-001" data-feature="DS-TC-EXPORT-001">
+      <div class="shell"><div class="section-head"><div><div class="index">20 · DEVELOPMENT SKILLS &amp; PLUGINS</div><h2>무료 로컬 문서와 필요한 순간의 엔진 연결만 쓴다</h2></div></div>
+        <p class="intro">Context7 계정·quota에 의존하지 않는다. Godot 4.7 로컬 문서와 현재 저장소 검색을 먼저 쓰고, Godot MCP는 Editor·씬·런타임 확인이 필요한 순간에만 켠다.</p>
+        <table><thead><tr><th>순서</th><th>스킬/도구</th><th>사용 시점</th><th>산출물/중단 조건</th></tr></thead><tbody>
+          <tr><td>1</td><td><code>brainstorming</code> / <code>spec</code></td><td>제품·규칙 결정</td><td>본 HTML 승인</td></tr>
+          <tr><td>2</td><td><code>plan-ceo-review</code> / <code>plan-eng-review</code></td><td>범위·기술 위험 검토</td><td>P0와 cut 확정</td></tr>
+          <tr><td>3</td><td><code>writing-plans</code></td><td>구현 전</td><td>파일·테스트·Gate별 실행 계획</td></tr>
+          <tr><td>4</td><td><code>using-git-worktrees</code></td><td>dirty main 보호</td><td>독립 <code>codex/*</code> branch</td></tr>
+          <tr><td>5</td><td><code>test-driven-development</code></td><td>BattleRules/Grid/Bot</td><td>RED→GREEN 증거</td></tr>
+          <tr><td>6</td><td><code>ponytail</code></td><td>항상</td><td>native·기존 구조·최소 diff</td></tr>
+          <tr><td>7</td><td><code>godot-local-docs</code></td><td>4.7 API/개념</td><td>공식 로컬 근거</td></tr>
+          <tr><td>8</td><td><code>godot-mcp</code></td><td>Local 씬/입력/런타임 QA</td><td>작업 때만 실행, 종료 검증</td></tr>
+          <tr><td>9</td><td><code>imagegen</code></td><td>Gate D 아트 방향 승인 뒤</td><td>후보 원화, 최종 3D master 아님</td></tr>
+          <tr><td>10</td><td><code>design-review</code> / 화면 QA</td><td>최종 코드의 before/after</td><td>P0/P1 visual finding 0</td></tr>
+          <tr><td>11</td><td><code>verification-before-completion</code></td><td>완료 주장 전</td><td>명세→구현→증거 재대조</td></tr>
+        </tbody></table>
+        <details><summary>Godot MCP 정확한 경계</summary><div class="body"><ul><li>현재 pin은 upstream community addon <code>regiellis/godot-mcp-go v0.7.2</code>. Godot 팀 공식 제작 플러그인이라고 부르지 않는다.</li><li>현재 repo 내용은 upstream v0.7.2와 줄바꿈 외 semantic diff 0이라는 기존 감사 결과를 유지한다.</li><li>CLI <code>--typed=false</code>를 우선해 context와 메모리 사용을 줄인다.</li><li>MCP/Editor는 로컬 화면·ClassDB·scene/runtime 확인에만 사용하고 문서·순수 코드 분석 때 띄우지 않는다.</li><li>모든 release preset에서 addon 제외와 autoload 부재를 검사한다.</li></ul></div></details>
+      </div>
+    </section>
+
+    <section id="qa" data-searchable data-status="locked proposed playtest deferred" data-source="house-duck-test-standard,user-qa-requirement" data-decision="DS-QA-001,DS-QA-002,DS-QA-003" data-feature="DS-TC-CORE-001,DS-TC-VISUAL-001,DS-TC-HUMAN-001,DS-TC-DEVICE-001">
+      <div class="shell"><div class="section-head"><div><div class="index">21 · QA &amp; EVIDENCE GATES</div><h2>코드 PASS가 아니라 플레이어가 보는 상태로 닫는다</h2></div></div>
+        <p class="intro">각 요구는 구현 파일, 실행 가능한 테스트, 최종 코드의 화면을 연결한다. P0 하나라도 부분 완료·차단·미검증이면 해당 Gate 전체를 완료라고 보고하지 않는다.</p>
+        <table><thead><tr><th>층</th><th>검증 대상</th><th>최소 증거</th><th>증명하지 않는 것</th></tr></thead><tbody>
+          <tr><td>STATIC</td><td>파일·ID·문서·parse·export exclude</td><td>link/HTML/check/diff</td><td>규칙 실행, 화면</td></tr>
+          <tr><td>HEADLESS</td><td>턴, 경로, 피해, 상태, 점수, 봇, save</td><td>focused tests+10k sim</td><td>3D·입력 감각·재미</td></tr>
+          <tr><td>RUNTIME</td><td>public input→scene→state→result</td><td>한 Godot process flow</td><td>실기기·사람 이해</td></tr>
+          <tr><td>VISUAL</td><td>2400×1080 HUD·타일·상태·전환</td><td>동일 상태 before/after PNG</td><td>터치·성능·오디오</td></tr>
+          <tr><td>LISTEN</td><td>턴·접촉·회복·KO 인과</td><td>blind listen 5명</td><td>화면 가독성</td></tr>
+          <tr><td>HUMAN</td><td>이해·재미·재대결</td><td>외부 5인 관찰</td><td>D1/D7 유지율</td></tr>
+          <tr><td>DEVICE</td><td>터치, safe area, fps, thermal, haptic</td><td>Android+iPhone</td><td>스토어 승인</td></tr>
+          <tr><td>BACKEND</td><td>ledger, idempotency, ranking, purchase</td><td>Supabase staging+store sandbox</td><td>실제 결제 복구</td></tr>
+        </tbody></table>
+        <details open><summary>Headless 필수 회귀</summary><div class="body"><ul><li>같은 seed/state/commands의 이산 state와 event ledger 동일.</li><li>이동 범위·막힘·코너·아군/적 점유·시야 표 테스트.</li><li>기본/액티브/대표/방어 cooldown과 1회 소비.</li><li>피해·회복·보호막·DoT·가속/감속·이동불가·밀침의 시작/종료 순서.</li><li>KO, 24행동, 7분, 항복, 모든 tie-break와 동시 KO.</li><li>봇 10,000판 불법 command·무한전투 0.</li><li>중복 input/result/reward callback 0.</li><li>restart 100회 같은 node와 새 node에서 상태 누수 0.</li></ul></div></details>
+        <details open><summary>2400×1080 스크린샷 상태표</summary><div class="body"><table><thead><tr><th>그룹</th><th>필수 상태</th><th>비교 조건</th></tr></thead><tbody>
+          <tr><td>App</td><td>boot, village, settings_ko, settings_de, popup_ar</td><td>같은 locale/animation settle</td></tr>
+          <tr><td>Prebattle</td><td>mode_select, opponent_brief, team_confirm</td><td>같은 roster/map</td></tr>
+          <tr><td>Turn</td><td>turn_start, move_preview, move_danger, skill_single, skill_aoe, confirm</td><td>seed 424242, 같은 turn</td></tr>
+          <tr><td>Result causality</td><td>damage_before/contact/after, heal_before/after, dot_tick, push_preview/contact</td><td>state freeze 시점 기록</td></tr>
+          <tr><td>Hazard</td><td>barrel_preview, barrel_chain, commotion_warning, commotion_apply</td><td>같은 event ID</td></tr>
+          <tr><td>Outcome</td><td>KO, score_tick, victory, defeat, draw, surrender, result, rematch</td><td>점수 ledger와 PNG 연결</td></tr>
+        </tbody></table><p>각 PNG manifest에 commit, seed, locale, renderer, logical/physical 해상도, public input path, TC/decision ID, SHA-256을 기록한다. 비포가 없으면 임의 생성하지 말고 이유를 쓴다.</p></div></details>
+        <details open><summary>외부 5인 재미·이해 Gate</summary><div class="body"><ol><li>설명 없이 앱을 열어 봇전에 들어가게 한다.</li><li>5명 중 4명이 30초 안에 이동→기술→실행을 완료한다.</li><li>5명 모두 현재 내/상대 턴과 사용한 스킬 대상을 말할 수 있다.</li><li>5명 중 4명이 승리조건을 60초 안에 설명한다.</li><li>5명 중 3명 이상이 요청 없이 재대결을 누른다.</li><li>평균 재미 7/10 미만 또는 “왜 이겼는지 모르겠다” 2명 이상이면 아트·BM 확장을 멈추고 코어를 고친다.</li></ol></div></details>
+      </div>
+    </section>
+
+    <section id="analytics" data-searchable data-status="proposed deferred" data-source="house-duck-metrics" data-decision="DS-ANALYTICS-001" data-feature="DS-TC-ANALYTICS-001">
+      <div class="shell"><div class="section-head"><div><div class="index">22 · ANALYTICS &amp; PRODUCT GATES</div><h2>매출보다 먼저 첫 행동과 재대결을 본다</h2></div></div>
+        <table><thead><tr><th>이벤트</th><th>필수 속성</th><th>질문</th></tr></thead><tbody>
+          <tr><td><code>tutorial_step</code></td><td>step_id, elapsed_ms, retries</td><td>어디서 처음 멈추는가</td></tr>
+          <tr><td><code>first_valid_action</code></td><td>move_ms, skill_ms, confirm_ms</td><td>첫 턴을 스스로 끝내는가</td></tr>
+          <tr><td><code>match_start</code></td><td>mode, seed, team, map, power</td><td>무엇을 선택하는가</td></tr>
+          <tr><td><code>turn_resolved</code></td><td>actor, skill, targets, duration, result</td><td>긴 턴·죽은 스킬은 무엇인가</td></tr>
+          <tr><td><code>match_end</code></td><td>reason, score, turns, seconds, team, rematch</td><td>교착·항복·역전이 있는가</td></tr>
+          <tr><td><code>hero_unlock</code></td><td>hero, route, egg/gem/ad</td><td>무료/유료 해금 균형</td></tr>
+          <tr><td><code>rewarded_ad</code></td><td>placement, result, reward</td><td>자발 광고가 어디서 먹히는가</td></tr>
+          <tr><td><code>purchase</code></td><td>product, price, currency, result</td><td>BM 전환·실패·복구</td></tr>
+        </tbody></table>
+        <details open><summary>출시 판단 지표 · 목표값은 soft launch 뒤 재설정</summary><div class="body"><ul><li>튜토리얼 완료 ≥75%.</li><li>첫 봇전 완주 ≥70%.</li><li>첫 세션 재대결 ≥35%.</li><li>중앙 경기시간 4~7분, p90 ≤9분.</li><li>항복률 ≤12%, 시간 종료 ≤15%.</li><li>starter 미러 선공 승률 47~53%; 5영웅부터 영웅별 포함 승률 45~55%.</li><li>payer/non-payer와 팀 성장 차이 구간별 승률 45~55%.</li><li>D1 ≥30%, D7 ≥10%를 초기 soft target으로 두되 표본 500 설치 전 광고비 확대 금지.</li><li>Crash-free sessions ≥99.5%, Android ANR ≤0.47%보다 낮게 유지.</li><li>보상광고 opt-in과 매출은 재미·완주·재대결을 통과한 뒤 해석한다.</li></ul></div></details>
+      </div>
+    </section>
+
+    <section id="roadmap" data-searchable data-status="locked proposed deferred" data-source="user-one-month-goal,gate-planning" data-decision="DS-ROADMAP-001" data-feature="DS-TC-GATE-001">
+      <div class="shell"><div class="section-head"><div><div class="index">23 · ROADMAP &amp; STOP GATES</div><h2>한 달은 캐시카우 출시가 아니라 검증 가능한 프로토타입</h2></div></div>
+        <p class="intro">드럼스택은 기존 타워보다 규모가 크다. 한 달 안에는 3 starter·1맵·봇·한 경기·결과까지 검증하고, 10영웅·마을·BM·서버는 Gate 뒤에 순서대로 붙인다.</p>
+        <table><thead><tr><th>Gate</th><th>범위</th><th>완료 조건</th><th>실패 시</th></tr></thead><tbody>
+          <tr><td>0 · Spec</td><td>본 HTML, 제품/수치/cut/증거</td><td>사용자 승인+추적표 모순 0</td><td>구현 시작 금지</td></tr>
+          <tr><td>A · Pure Core</td><td>3starter, 11×9, turn/range/damage/status/score, Easy bot</td><td>focused tests+10k sim</td><td>3D/UI 만들지 않고 규칙 수정</td></tr>
+          <tr><td>B · Greybox Match</td><td>재생→마을→봇전→결과→재대결</td><td>public input 완주, runtime/visual P1 0</td><td>outgame·BM 중단</td></tr>
+          <tr><td>C · Human Fun</td><td>외부 5인</td><td>30초 행동 4/5, 재대결 3/5, 7/10</td><td>아트 대신 턴·목표·연출 수정</td></tr>
+          <tr><td>D · Vertical Art/Audio</td><td>3starter cel3D, map, VFX, core audio</td><td>최종 코드 2400×1080+listen Gate</td><td>7영웅 선제작 금지</td></tr>
+          <tr><td>E · Outgame</td><td>마을, 스토리 1장, 진행2영웅, 경제 placeholder</td><td>fresh save 전체 흐름+save migration</td><td>상점·스케줄 축소</td></tr>
+          <tr><td>F · Backend/BM/Device</td><td>Supabase, arena, ads, purchase, Android/iOS</td><td>staging+store sandbox+실기기</td><td>출시 주장 금지</td></tr>
+        </tbody></table>
+        <details open><summary>첫 4주 실행 후보</summary><div class="body"><table><thead><tr><th>주</th><th>Cloud 중심</th><th>Local 최소 검증</th><th>산출물</th></tr></thead><tbody>
+          <tr><td>Week 1</td><td>BattleState/Rules/Grid/Bot TDD, 10k sim</td><td>Godot parse 1회</td><td>Gate A core</td></tr>
+          <tr><td>Week 2</td><td>Controller, data, app shell, tests</td><td>Greybox map·입력·카메라</td><td>한 경기 시작~결과</td></tr>
+          <tr><td>Week 3</td><td>HUD/전환/리셋/visual runner</td><td>2400×1080 before/after, 외부 5인</td><td>Gate B/C 판정</td></tr>
+          <tr><td>Week 4</td><td>실패 수정, 문서 reconciliation</td><td>Android 1대+iPhone 1대 최소 확인</td><td>프로토타입 승인/폐기 결정</td></tr>
+        </tbody></table><p class="subtle">Gate C 사람 가독성·재대결 검증 전에는 최종 아트·오디오 Gate D로 넘어가지 않는다. 10영웅 최종 리깅, 스토리 다장, 상점 SDK, Supabase, 길드, 협동 보스는 각각의 후속 Gate 전 만들지 않는다.</p></div></details>
+      </div>
+    </section>
+
+    <section id="risk" data-searchable data-status="proposed playtest deferred" data-source="self-review,reference-analysis" data-decision="DS-RISK-001" data-feature="DS-TC-RISK-001">
+      <div class="shell"><div class="section-head"><div><div class="index">24 · RISKS &amp; FALLBACKS</div><h2>망할 수 있는 이유를 먼저 잠근다</h2></div></div>
+        <table><thead><tr><th>위험</th><th>조기 신호</th><th>예방</th><th>Fallback</th></tr></thead><tbody>
+          <tr><td>AT 직접복제로 보임</td><td>UI·카메라·스킬이 reference와 1:1 비교됨</td><td>조류 실루엣, Spotlight, 도시 소동, 새 IA·아트·오디오</td><td>유사 화면/연출 삭제</td></tr>
+          <tr><td>턴 순서가 어렵다</td><td>5명 중 2명 이상 NEXT를 설명 못함</td><td>다음 6행동+효과 preview</td><td>라운드당 각 유닛 1회 큐로 단순화</td></tr>
+          <tr><td>경기가 길다</td><td>중앙값 7분 초과, 항복 12% 초과</td><td>24행동/7분, 연출 상한</td><td>18행동으로 축소</td></tr>
+          <tr><td>Spotlight 변형이 강제됨</td><td>중앙 고정 조합 승률 55% 초과</td><td>Gate C에서만 별도 시험</td><td>기본 모드에 넣지 않음</td></tr>
+          <tr><td>가벼운 P2W가 전략을 가림</td><td>+8% 팀 승률 55% 초과</td><td>전투력 매칭, 무료 경로</td><td>랭크 스탯 보정 없이 level bonus 축소</td></tr>
+          <tr><td>10영웅 아트 과부하</td><td>3starter rig가 Week3 미완</td><td>Gate D 전 후속 제작 금지</td><td>격주 일정 연기, starter polish 우선</td></tr>
+          <tr><td>영어 제목 오해</td><td>테스터가 리듬게임이라 답함</td><td>subtitle <i>3v3 Bird Tactics</i>, 조류 아이콘</td><td>글로벌명 재검토</td></tr>
+          <tr><td>초기 PvP 인구 부족</td><td>15초 내 적합 snapshot 없음</td><td>Easy bot/defense AI 즉시 fill</td><td>봇 표시 후 정상 보상</td></tr>
+        </tbody></table>
+        <div class="callout"><strong>핵심 fallback:</strong> 연속 게이지가 어렵다면 프로젝트를 다시 갈아엎지 않는다. 동일 영웅·맵·스킬을 유지하고 행동 순서만 “라운드마다 생존 유닛 1회, SPD는 순서만 결정”으로 단순화한다.</div>
+      </div>
+    </section>
+
+    <section id="name" data-searchable data-status="locked proposed" data-source="apple-search,google-play-search,trademark-guidance" data-decision="DS-NAME-001" data-feature="DS-TC-NAME-001">
+      <div class="shell"><div class="section-head"><div><div class="index">25 · NAME &amp; STORE POSITIONING</div><h2>드럼스택 배틀은 작업명으로 진행한다</h2></div></div>
+        <div class="grid two">
+          <article class="card keep"><div class="kicker">WORKING TITLE</div><h3>드럼스택 배틀</h3><p>치킨 부위 drumstick 말장난을 노린 작업명이다. 실제로 그렇게 읽히는지는 한국어·영어 각 5인 이름 인지 테스트 전까지 가설이다. 글로벌명은 <b>Drumstack Battle</b>, 설명은 <b>3v3 Bird Tactics</b>를 붙인다.</p></article>
+          <article class="card play"><div class="kicker">RISK</div><h3>영어권은 드럼/리듬으로 오해할 수 있음</h3><p>아이콘과 첫 스크린샷에 조류 3마리와 타일 전장을 크게 보여준다. subtitle/short description에서 장르를 즉시 보완한다.</p></article>
+        </div>
+        <details open><summary>2026-08-11 quick availability check</summary><div class="body"><ul><li>Apple 공식 Search API US/KR/DE에서 exact-title <code>Drumstack Battle</code> 결과 0.</li><li>Google Play 공식 검색과 일반 웹에서 exact 게임·앱 페이지를 찾지 못함.</li><li>이는 App Store Connect 예약 가능, Google 심사 통과, 상표 사용 가능을 뜻하지 않는다.</li><li>출시 자산 확정 전 EUIPO/DPMA/WIPO의 Nice 9/28/41 동일·유사표장을 다시 확인한다.</li></ul></div></details>
+      </div>
+    </section>
+
+    <section id="traceability" data-searchable data-status="locked deferred" data-source="house-duck-html-gate" data-decision="DS-DOC-003,DS-QA-004" data-feature="DS-TC-SPEC-001">
+      <div class="shell"><div class="section-head"><div><div class="index">26 · REQUIREMENT TRACEABILITY</div><h2>명세 → 구현 → 테스트 → 화면</h2></div></div>
+        <p class="intro">아래는 구현 전 계약이다. 현재는 HTML 섹션만 완료되었고 코드·테스트·스크린샷은 미착수다. 따라서 게임 기능 전체를 완료라고 판단하지 않는다.</p>
+        <table><thead><tr><th>범위·우선</th><th>요구 결정 ID</th><th>시험 ID·합격선</th><th>구현 경계</th><th>화면·기기 증거</th><th>현재</th></tr></thead><tbody>
+          <tr><td><a href="#document-status">00 문서 · P0</a></td><td><span id="DS-DOC-001">DS-DOC-001</span> · 방향 합의와 HTML 승인 상태 분리</td><td><b>DS-TC-SPEC-001</b>: 선언된 결정·시험 ID 100%가 이 표에 있고 중복 DOM ID 0</td><td>master HTML metadata/registry</td><td>STATIC만; 게임 화면 해당 없음</td><td>HTML 승인 대기</td></tr>
+          <tr><td><a href="#executive">01 제품 · P0</a></td><td><span id="DS-PROD-001">DS-PROD-001</span>, <span id="DS-PROD-002">DS-PROD-002</span>, <span id="DS-POLICY-001">DS-POLICY-001</span> · 3v3 약속/재대결/13+</td><td><b>DS-TC-ENTRY-001</b>: 신규 5명 중 4명이 60초 안에 첫 command 완료<br><b>DS-TC-MATCH-001</b>: 5명 중 4명이 목표·턴·재대결 이유 설명<br><b>DS-TC-POLICY-001</b>: 스토어 target 13+, Kids/Family off</td><td>product copy, onboarding, store metadata</td><td>HUMAN 5인+Play/App Store console</td><td>방향 합의 / 구현·콘솔 차단</td></tr>
+          <tr><td><a href="#reference">02 참고 · P0</a></td><td><span id="DS-REF-001">DS-REF-001</span>, <span id="DS-REF-002">DS-REF-002</span> · AT 근거와 복제 금지선</td><td><b>DS-TC-REF-001</b>: 0:00~23:21 타임라인과 타일·카메라·VFX KEEP/CHANGE/CUT 출처 누락 0</td><td>reference audit/change boundary</td><td>STATIC; 영상에 없는 UI를 근거로 주장 0</td><td>문서 완료</td></tr>
+          <tr><td><a href="#battle-rules">03 전투 · P0</a></td><td><span id="DS-GAME-001">DS-GAME-001</span>, <span id="DS-GAME-002">DS-GAME-002</span>, <span id="DS-GAME-003">DS-GAME-003</span>, <span id="DS-GAME-004">DS-GAME-004</span> · 이동→스킬/방어·게이지·승패</td><td><b>DS-TC-TURN-001</b>: 동일 seed/command의 actor·gauge·ledger hash 일치<br><b>DS-TC-RANGE-001</b>: 모든 starter 스킬의 min/max/shape/target legality와 preview/apply 불일치 0<br><b>DS-TC-VICTORY-001</b>: 15초·7분·24행동·전멸·점수·tie·항복·동시KO 기대값 일치</td><td>battle_state/rules/controller</td><td>HEADLESS+현재/다음 큐·결과 2400×1080</td><td>수치 playtest 전 / 구현 차단</td></tr>
+          <tr><td><a href="#board">04 보드 · P0</a></td><td><span id="DS-MAP-001">DS-MAP-001</span>, <span id="DS-MAP-002">DS-MAP-002</span>, <span id="DS-MAP-003">DS-MAP-003</span> · 11×9·카메라·장애물</td><td><b>DS-TC-PATH-001</b>: 합법 경로/코너/점유 표 100%<br><b>DS-TC-LOS-001</b>: 벽/상자/범위 LOS 표 100%<br><b>DS-TC-HAZARD-001</b>: 배럴·충돌·사건 연쇄 1회와 preview 일치</td><td>grid_rules/map data/board view</td><td>HEADLESS+path/LOS/hazard before-after PNG</td><td>구조 합의 / 구현 차단</td></tr>
+          <tr><td><a href="#skills-status">05 스킬 · P0</a></td><td><span id="DS-SKILL-001">DS-SKILL-001</span>, <span id="DS-SKILL-002">DS-SKILL-002</span>, <span id="DS-BAL-001">DS-BAL-001</span> · 3스킬·상태·산식</td><td><b>DS-TC-DAMAGE-001</b>: formula golden vector 불일치 0<br><b>DS-TC-STATUS-001</b>: 9상태/정화/DoT stack 수명·귀속 일치<br><b>DS-TC-COOLDOWN-001</b>: CD 0/2/4와 KO freeze 경계 일치</td><td>skill data+pure battle rules</td><td>HEADLESS+damage/heal/DoT/status preview PNG</td><td>수치 playtest 전</td></tr>
+          <tr><td><a href="#roster">06 영웅 · P0/P1</a></td><td><span id="DS-HERO-001">DS-HERO-001</span>, <span id="DS-HERO-002">DS-HERO-002</span>, <span id="DS-HERO-003">DS-HERO-003</span> · 3지급·2진행·5격주</td><td><b>DS-TC-ROSTER-001</b>: 지급/해금/격주 목록 10명 exact<br><b>DS-TC-HERO-001</b>: starter skill target/CD/상태 data 누락 0<br><b>DS-TC-BALANCE-001</b>: mirror 선공 47~53%, 5영웅 포함승률 45~55%</td><td>hero/skill resources; Gate A는 starter 3명만</td><td>HEADLESS sim+hero gallery/rig은 Gate D</td><td>역할 합의 / 수치·아트 차단</td></tr>
+          <tr><td><a href="#bot">07 봇 · P0</a></td><td><span id="DS-AI-001">DS-AI-001</span>, <span id="DS-AI-002">DS-AI-002</span> · 같은 규칙 Easy/Normal</td><td><b>DS-TC-AI-001</b>: 10,000판 illegal command 0<br><b>DS-TC-AI-002</b>: 같은 state/seed 선택 hash 일치<br><b>DS-TC-SIM-001</b>: 무한전투 0, p95 계산 60ms 이하</td><td>legal generator+bot policy</td><td>HEADLESS; 봇 행동 skill/target/result runtime 식별</td><td>구현 차단</td></tr>
+          <tr><td><a href="#modes">08 모드 · P0/P1</a></td><td><span id="DS-MODE-001">DS-MODE-001</span>, <span id="DS-MODE-002">DS-MODE-002</span>, <span id="DS-MODE-003">DS-MODE-003</span> · 봇/스토리/비동기 모드 경계</td><td><b>DS-TC-FLOW-001</b>: Play→마을→봇전→결과→재대결/Home public input 완주<br><b>DS-TC-MODE-001</b>: 모드별 stamina/rank/clock 계약 일치</td><td>mode data+public app flow</td><td>RUNTIME sequence+각 모드 briefing PNG</td><td>봇 P0 구현 차단 / 서버 후속</td></tr>
+          <tr><td><a href="#village-story">09 마을 · P1</a></td><td><span id="DS-HOME-001">DS-HOME-001</span>, <span id="DS-STORY-001">DS-STORY-001</span> · 허브/IA/서브 스토리</td><td><b>DS-TC-VILLAGE-001</b>: 모든 P1 화면 CTA·Back dead-end 0<br><b>DS-TC-STORY-001</b>: skip/replay/result-first와 PvP 잠금 0</td><td>village/outgame/story screens</td><td>VISUAL state matrix+public Back flow</td><td>Gate E까지 차단</td></tr>
+          <tr><td><a href="#ui-flow">10 UI · P0</a></td><td><span id="DS-UI-001">DS-UI-001</span>, <span id="DS-UI-002">DS-UI-002</span>, <span id="DS-UI-003">DS-UI-003</span> · 20:9 HUD/인과/공통 popup</td><td><b>DS-TC-UI-001</b>: 2400×1080에서 큐·전장·HP·행동 겹침 0<br><b>DS-TC-I18N-001</b>: KO/DE/AR 잘림·가로 CTA·말풍선 overflow 0<br><b>DS-TC-VISUAL-001</b>: 판단/대시/contact/원거리/AoE/대표기/표정/말풍선 before-after P0/P1 0; Reduce Motion은 정보 동일·Camera3D transform 변화 0</td><td>root safe frame+shared UI/action camera/VFX</td><td>VISUAL 2400×1080 normal/reduced; DEVICE는 Android/iOS 별도</td><td>명세 완료 / 화면 차단</td></tr>
+          <tr><td><a href="#results-rematch">11 결과 · P0</a></td><td><span id="DS-UI-004">DS-UI-004</span>, <span id="DS-UX-001">DS-UX-001</span> · 승패 근거/재대결</td><td><b>DS-TC-RESULT-001</b>: 마지막 resolve 뒤 1초 내 점수·tie 근거 표시<br><b>DS-TC-REMATCH-001</b>: 1탭 재대결과 Home 후 stale state 0</td><td>result screen+ledger summary</td><td>RUNTIME+5인 중 4명 10초 내 승패 설명</td><td>구현·human 차단</td></tr>
+          <tr><td><a href="#progression">12 성장 · P1</a></td><td><span id="DS-PROG-001">DS-PROG-001</span>, <span id="DS-PROG-002">DS-PROG-002</span> · Lv1~10/+8%/해금</td><td><b>DS-TC-PROG-001</b>: HP/ATK/DEF 상한 각각 +8%, SPD/MOV 변화 0<br><b>DS-TC-ECON-001</b>: 3지급·2미션·5직접 해금 경로 단절 0</td><td>profile progression+unlock ledger</td><td>HEADLESS economy; profile UI Gate E</td><td>수치 playtest 전</td></tr>
+          <tr><td><a href="#economy-bm">13 BM · P1</a></td><td><span id="DS-BM-001">DS-BM-001</span>, <span id="DS-BM-002">DS-BM-002</span>, <span id="DS-BM-003">DS-BM-003</span>, <span id="DS-BM-004">DS-BM-004</span> · 알/보석/모이/광고·구매</td><td><b>DS-TC-BM-001</b>: earn/spend 환율 역전 0<br><b>DS-TC-AD-001</b>: reward/forced/remove-ad 계약 일치<br><b>DS-TC-PURCHASE-001</b>: pending/cancel/refund/restore/idempotency 전부 통과<br><b>DS-TC-STAMINA-001</b>: 60/108/120 경계·PvP 차감 0</td><td>economy ledger+store services</td><td>HEADLESS 후 store sandbox/DEVICE 별도</td><td>명세 수치 후보 / SDK 차단</td></tr>
+          <tr><td><a href="#ranking-social">14 랭킹 · P1</a></td><td><span id="DS-RANK-001">DS-RANK-001</span>, <span id="DS-SOCIAL-001">DS-SOCIAL-001</span>, <span id="DS-SERVER-001">DS-SERVER-001</span> · 단일 랭킹/소속/실제 비동기</td><td><b>DS-TC-RANK-001</b>: result/reward 중복 0, 성장차 4%p 초과 match 0<br><b>DS-TC-AFFIL-001</b>: 국가·유머소속 단일 code/filter 일치<br><b>DS-TC-ASYNC-001</b>: conflict/retry/reconnect/24h timeout과 1,000 golden vector drift 0</td><td>Supabase Edge Function+match/command ledger</td><td>STAGING+push/reconnect DEVICE; 봇 증거 대체 불가</td><td>Gate F까지 차단</td></tr>
+          <tr><td><a href="#art">15 아트 · P1</a></td><td><span id="DS-ART-001">DS-ART-001</span>, <span id="DS-ART-002">DS-ART-002</span>, <span id="DS-ART-003">DS-ART-003</span> · cel3D 조류/도시/표정/VFX/파생 asset</td><td><b>DS-TC-ART-001</b>: 종·역할·6표정 blind 판독 5/5<br><b>DS-TC-RIG-001</b>: 6 facial pose+필수 동작 clipping/foot slide P1 0<br><b>DS-TC-ASSET-001</b>: hero_id/source hash/2D·3D·표정 파생 누락 0</td><td>3D master+face/body rig+VFX+asset manifest</td><td>Gate D gallery/action-camera in-game before-after; final art 전 claim 금지</td><td>방향 합의 / Gate D 차단</td></tr>
+          <tr><td><a href="#audio">16 오디오 · P1</a></td><td><span id="DS-AUDIO-001">DS-AUDIO-001</span>, <span id="DS-AUDIO-002">DS-AUDIO-002</span> · 행동 인과/조류 테마</td><td><b>DS-TC-AUDIO-001</b>: turn/skill/contact/status/KO event 누락 0<br><b>DS-TC-LISTEN-001</b>: 화면 없이 5/5가 내·상대 턴과 hit 식별<br><b>DS-TC-HAPTIC-001</b>: reduced/disable과 platform mapping 일치</td><td>event map+native buses+haptic map</td><td>Gate D listen test; speaker/headphone/DEVICE 분리</td><td>Gate D 차단</td></tr>
+          <tr><td><a href="#architecture">17 기술 · P0</a></td><td><span id="DS-TECH-001">DS-TECH-001</span>, <span id="DS-TECH-002">DS-TECH-002</span>, <span id="DS-TECH-003">DS-TECH-003</span> · pure rules/view 분리/reset/export</td><td><b>DS-TC-CORE-001</b>: same input state/event hash 일치<br><b>DS-TC-RESET-001</b>: same/new node restart 100회 누수 0<br><b>DS-TC-EXPORT-001</b>: MCP plugin/autoload/PCK 포함 0</td><td>BattleState/Rules/Grid/Bot/Controller/View</td><td>HEADLESS+Godot import; release preset 검사</td><td>설계 완료 / 구현 차단</td></tr>
+          <tr><td><a href="#legacy">18 이전 · P0</a></td><td><span id="DS-MIGRATE-001">DS-MIGRATE-001</span>, <span id="DS-MIGRATE-002">DS-MIGRATE-002</span> · old repo 보존/new repo 전환</td><td><b>DS-TC-MIGRATE-001</b>: tag 존재, KEEP exact, legacy runtime 유입 0, dirty loss 0</td><td>quirky_tower tag→new drumstack-battle repo</td><td>Git evidence; Godot import는 새 repo 이후</td><td>HTML 승인 전 차단</td></tr>
+          <tr><td><a href="#ops">19 운영 · P0</a></td><td><span id="DS-OPS-001">DS-OPS-001</span>, <span id="DS-DOC-002">DS-DOC-002</span> · Cloud/Local·PID·파일상한</td><td><b>DS-TC-PERF-001</b>: target device frame/memory budget 통과<br><b>DS-TC-PROCESS-001</b>: agent-owned PID/listener 잔존 0, 타 프로젝트 영향 0<br><b>DS-TC-DOCSIZE-001</b>: 140KB warning/220KB fail fixture 일치</td><td>QA scripts+project checks+workflow docs</td><td>STATIC/HEADLESS/LOCAL/DEVICE 구분</td><td>공통규칙 반영 / 자동화 후속</td></tr>
+          <tr><td><a href="#skills-plugins">20 도구 · P0</a></td><td><span id="DS-WORKFLOW-001">DS-WORKFLOW-001</span>, <span id="DS-PLUGIN-001">DS-PLUGIN-001</span> · 최소 skill/plugin 흐름</td><td><b>DS-TC-EXPORT-001</b>: release export에서 godot_mcp plugin/autoload/files 0</td><td>기존 MCP 1개 dev-only; native Godot 우선</td><td>STATIC+export PCK scan</td><td>도구 결정 완료 / export 차단</td></tr>
+          <tr><td><a href="#qa">21 QA · P0</a></td><td><span id="DS-QA-001">DS-QA-001</span>, <span id="DS-QA-002">DS-QA-002</span>, <span id="DS-QA-003">DS-QA-003</span> · 자동/화면/사람/기기 증거 분리</td><td><b>DS-TC-CORE-001</b>: core 회귀 전체 PASS<br><b>DS-TC-VISUAL-001</b>: 요구 상태 exact-size P0/P1 0<br><b>DS-TC-HUMAN-001</b>: 첫 행동 4/5·턴 인지 5/5·재대결 관찰<br><b>DS-TC-DEVICE-001</b>: Android/iOS input/perf/audio 별도 PASS</td><td>House Duck test case+feature map</td><td>증거 종류를 서로 대체하지 않음</td><td>계약 완료 / 실행 차단</td></tr>
+          <tr><td><a href="#analytics">22 분석 · P1</a></td><td><span id="DS-ANALYTICS-001">DS-ANALYTICS-001</span> · 재미/밸런스/BM 지표</td><td><b>DS-TC-ANALYTICS-001</b>: event schema 필수 field 누락·중복·PII 0, funnel sample 재현</td><td>event catalog+dashboard 후속</td><td>staging payload+live console은 출시 Gate</td><td>지표 후보 / SDK 차단</td></tr>
+          <tr><td><a href="#roadmap">23 로드맵 · P0</a></td><td><span id="DS-ROADMAP-001">DS-ROADMAP-001</span> · Spec→Core→Greybox→Human→Art→Outgame→Backend</td><td><b>DS-TC-GATE-001</b>: 이전 Gate 필수 Partial/Blocked 0일 때만 다음 Gate 진입</td><td>implementation plan/checkpoints</td><td>각 Gate의 요구 증거만 인정</td><td>HTML 승인 뒤 계획 작성</td></tr>
+          <tr><td><a href="#risk">24 위험 · P0</a></td><td><span id="DS-RISK-001">DS-RISK-001</span> · 수치 trigger와 축소안</td><td><b>DS-TC-RISK-001</b>: trigger 발생 시 owner/action/재검증 기록 100%</td><td>risk register+work state</td><td>STATIC+실측 metric</td><td>문서 완료</td></tr>
+          <tr><td><a href="#name">25 이름 · P1</a></td><td><span id="DS-NAME-001">DS-NAME-001</span> · Drumstack Battle 작업명</td><td><b>DS-TC-NAME-001</b>: KO/EN 각 5명 중 4명이 조류/전술 장르 연상, 유사표장 재검색</td><td>store title/subtitle/icon brief</td><td>HUMAN+App Store Connect/Play/trademark search</td><td>작업명 사용 / art lock 전 검증</td></tr>
+          <tr><td><a href="#traceability">26 추적 · P0</a></td><td><span id="DS-DOC-003">DS-DOC-003</span>, <span id="DS-QA-004">DS-QA-004</span> · 요구→구현→시험→증거</td><td><b>DS-TC-SPEC-001</b>: metadata decisions/tests orphan 0, broken internal link 0</td><td>이 registry+후속 FEATURE_TEST_MAP</td><td>STATIC; 구현 뒤 행별 Complete/Partial/Blocked/Excluded</td><td>문서 registry 완료</td></tr>
+          <tr><td><a href="#sources">27 근거 · P0</a></td><td><span id="DS-DOC-004">DS-DOC-004</span> · 출처/추정/미검증 분리</td><td><b>DS-TC-LINK-001</b>: 내부 링크 0 broken, 외부 미확인은 명시, 로컬 이식성 없는 href 0</td><td>source list+change boundary</td><td>STATIC link audit</td><td>문서 완료</td></tr>
+        </tbody></table>
+        <details open><summary>이번 HTML 작업 자체의 완료 판정</summary><div class="body"><table><thead><tr><th>요구</th><th>근거</th><th>판정</th></tr></thead><tbody>
+          <tr><td>AT 기반 초상세 제품·전투 기획</td><td>Sections 01~08, video timeline, keep/change/cut</td><td>완료</td></tr>
+          <tr><td>전투 전 UI·마을·서브 스토리</td><td>Sections 09~11</td><td>완료</td></tr>
+          <tr><td>10영웅·해금 일정</td><td>Section 06</td><td>완료, 수치 검증 전</td></tr>
+          <tr><td>무가챠·무장비 BM, 알/보석/스태미나</td><td>Sections 12~13</td><td>완료, 경제 검증 전</td></tr>
+          <tr><td>아트·오디오·기술·플러그인·운영</td><td>Sections 15~20</td><td>완료</td></tr>
+          <tr><td>명세→구현→증거 게이트</td><td>Sections 21~23, 26</td><td>완료</td></tr>
+          <tr><td>실제 Godot 구현·플레이 재미</td><td>코드/화면/HUMAN 증거 없음</td><td>차단</td></tr>
+          <tr><td>Android/iOS·광고·결제·Supabase</td><td>실기기/SDK 미실행</td><td>적용 제외</td></tr>
+        </tbody></table></div></details>
+      </div>
+    </section>
+
+    <section id="sources" data-searchable data-status="locked" data-source="public-links,local-canonical" data-decision="DS-DOC-004" data-feature="DS-TC-LINK-001">
+      <div class="shell"><div class="section-head"><div><div class="index">27 · SOURCES, DECISIONS &amp; CHANGE BOUNDARY</div><h2>근거와 미검증을 섞지 않는다</h2></div></div>
+        <div class="grid two">
+          <article class="card info"><div class="kicker">PRIMARY VISUAL EVIDENCE</div><h3>사용자 제공 AT 영상</h3><ul class="source-list"><li><a href="https://www.youtube.com/watch?v=gTykjge8AJA">Argent Twilight (NEXON) Soft Launch Gameplay</a> · 0:00~23:21 화면 분석.</li><li>사용자 제공 UI 참고 이미지 4장 · 레이아웃 밀도와 전투 정보 위계 참고.</li><li>영상에 없는 홈·상점·소환·성장 UI는 영상 근거라고 주장하지 않는다.</li></ul></article>
+          <article class="card keep"><div class="kicker">LOCAL SOURCE</div><h3>House Duck·Project K</h3><ul class="source-list"><li><code>quirky_tower@quirky-tower-gate-a-final:docs/reboot/QUIRKY_TOWER_REBOOT_MASTER_SPEC.html</code> · 기존 repo tag의 공통 UI/QA/운영 패턴만 참고.</li><li><code>Project K/docs/canonical/ASSET_ART_DIRECTION.md</code> · 다른 저장소의 cel 3D 방향 후보. 이 HTML에는 이식성 없는 로컬 링크를 넣지 않는다.</li><li>Quirky Ball의 popup, ranking, locale, ad/purchase 구조는 새 앱 ID·backend에서 독립 재구현.</li></ul></article>
+        </div>
+        <details open><summary>공개 교차 근거</summary><div class="body"><ul class="source-list">
+          <li><a href="https://www.fandomspot.com/argent-twilight-beginners-guide/">Argent Twilight beginner guide archive</a> · movement, turn order, formation, modes의 2차 자료.</li>
+          <li><a href="https://news.qoo-app.com/en/post/107634/argent-twilight-review">QooApp review archive</a> · 전투/연출 강점과 grind/performance 비판의 2차 자료.</li>
+          <li><a href="https://www.bluestacks.com/blog/game-guides/argent-twilight/agt-beginner-guide-en.html">BlueStacks beginner guide archive</a> · 구 성장·소환 구조의 2차 자료. 드럼스택 CUT 근거.</li>
+          <li><a href="https://docs.godotengine.org/en/4.7/classes/class_astargrid2d.html">Godot 4.7 AStarGrid2D</a> · 논리 경로 후보.</li>
+          <li><a href="https://docs.godotengine.org/en/4.7/classes/class_gridmap.html">Godot 4.7 GridMap</a> · 3D tile visuals/collision 후보.</li>
+          <li><a href="https://developer.apple.com/app-store/review/guidelines/">Apple App Review Guidelines</a> · IAP/랜덤 아이템/광고 검토.</li>
+          <li><a href="https://support.google.com/googleplay/android-developer/answer/9858738">Google Play Payments policy</a>.</li>
+          <li><a href="https://support.google.com/googleplay/android-developer/answer/17122218">Google Play Families Policy Requirements</a> · 이 제품은 아동 타깃에서 제외하되 target audience를 정확히 선언.</li>
+          <li><a href="https://support.google.com/googleplay/android-developer/answer/2741495">Google Play order/refund states</a> · pending/cancel/refund 원장 계약 참고.</li>
+          <li><a href="https://itunes.apple.com/search?term=Drumstack%20Battle&amp;country=us&amp;entity=software">Apple exact-title search</a> · 2026-08-11 snapshot.</li>
+          <li><a href="https://play.google.com/store/search?q=Drumstack%20Battle&amp;c=apps">Google Play exact-title search</a> · 2026-08-11 snapshot.</li>
+          <li><a href="https://www.euipo.europa.eu/uk/trade-marks/before-applying/availability">EUIPO availability guidance</a>와 <a href="https://www.wipo.int/en/web/global-brand-database">WIPO Global Brand Database</a> · 정식 유사표장 검토는 미완.</li>
+        </ul></div></details>
+        <details open><summary>명시적 CUT / DEFERRED</summary><div class="body grid two"><div><h4>CUT</h4><ul><li>Quirky Tower 3막 flock gameplay</li><li>공용 3액션 턴</li><li>하단 5카드 loadout</li><li>세로 고정</li><li>메인 스토리 강제 진행</li><li>가챠·희귀도·중복</li><li>장비·룬·아티팩트</li><li>300영웅</li><li>긴 필살기·강제 컷신</li></ul></div><div><h4>DEFERRED</h4><ul><li>Supabase와 실제 랭킹·턴 교환</li><li>즉시 AI 방어전</li><li>협동 보스</li><li>길드·채팅</li><li>10영웅 최종 아트 일괄 제작</li><li>battle pass</li><li>실시간 PvP</li><li>추가 상태·속성 상성</li><li>13×11 이상 맵</li></ul></div></div></details>
+        <details><summary>남은 승인 포인트</summary><div class="body"><ol><li><b>연속 Turn Gauge:</b> Gate A 기본으로 진행. 5인 중 2명 이상 순서를 이해 못하면 round queue fallback.</li><li><b>Spotlight:</b> 중앙 점수 목표를 Gate C 변형 모드로 시험할지 결정.</li><li><b>가벼운 +8% 성장:</b> 단일 랭킹 유지와 전략성을 함께 만족하는지 시뮬레이션·사람 Gate 필요.</li><li><b>Drumstack 이름:</b> art lock 전 유사표장과 한국어·영어 각 5인 인지 테스트.</li><li><b>모이 패배 차감:</b> 스토리 패배 시 절반 환급 후보.</li></ol></div></details>
+        <div class="callout success-callout"><strong>다음 문서:</strong> 사용자가 이 HTML을 승인하면 <code>writing-plans</code>로 Gate A의 정확한 파일·RED/GREEN 테스트·삭제 금지선·스크린샷 상태를 실행 계획으로 분리한다. 승인 전에는 구현하지 않는다.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer><div class="shell"><p><strong>Drumstack Battle Master Product &amp; Game Specification v0.9</strong></p><p>작성일 2026-08-11 · Europe/Berlin · HTML 자체는 구현·기기·재미 증거가 아니다.</p><p class="subtle">Search는 한국어·English·DS 결정/테스트 ID를 찾는다. 인쇄 시 모든 details가 펼쳐진다.</p></div></footer>
+
+  <script>
+    (()=>{
+      const sections=[...document.querySelectorAll('main>section')];
+      const toc=document.querySelector('#toc .shell');
+      const search=document.querySelector('#search');
+      const filter=document.querySelector('#status-filter');
+      const count=document.querySelector('#search-count');
+      const allDetails=[...document.querySelectorAll('details')];
+      for(const section of sections){
+        const heading=section.querySelector('h2');if(!heading)continue;
+        const link=document.createElement('a');link.href=`#${section.id}`;link.textContent=heading.textContent;link.dataset.target=section.id;toc.append(link);
+        const copy=document.createElement('button');copy.type='button';copy.className='anchor';copy.textContent='#';copy.title='이 섹션 링크 복사';copy.setAttribute('aria-label',`${heading.textContent} 링크 복사`);
+        copy.addEventListener('click',async()=>{const url=`${location.href.split('#')[0]}#${section.id}`;try{await navigator.clipboard.writeText(url);copy.textContent='✓'}catch(_){location.hash=section.id;copy.textContent='↗'}setTimeout(()=>copy.textContent='#',1200)});
+        section.querySelector('.section-head')?.append(copy);
+      }
+      const links=[...toc.querySelectorAll('a')];
+      const setActive=id=>links.forEach(link=>{const active=link.dataset.target===id;link.classList.toggle('active',active);active?link.setAttribute('aria-current','location'):link.removeAttribute('aria-current')});
+      if('IntersectionObserver'in window){const observer=new IntersectionObserver(entries=>{const visible=entries.filter(x=>x.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top);if(visible[0])setActive(visible[0].target.id)},{rootMargin:'-28% 0px -62% 0px'});sections.forEach(s=>observer.observe(s))}
+      const normalize=value=>value.normalize('NFKC').toLocaleLowerCase();
+      const apply=()=>{const query=normalize(search.value.trim());const status=filter.value;let shown=0;for(const section of sections){const haystack=normalize([section.textContent,section.dataset.source||'',section.dataset.decision||'',section.dataset.feature||''].join(' '));const textMatch=!query||haystack.includes(query);const statusMatch=status==='all'||(section.dataset.status||'').split(/\s+/).includes(status);const visible=textMatch&&statusMatch;section.classList.toggle('search-hidden',!textMatch);section.classList.toggle('status-hidden',!statusMatch);links.find(x=>x.dataset.target===section.id)?.classList.toggle('search-hidden',!visible);if(visible){shown++;if(query)section.querySelectorAll('details').forEach(d=>{if(normalize(d.textContent).includes(query))d.open=true})}}count.textContent=query||status!=='all'?`${shown}/${sections.length} 섹션`:'전체 표시'};
+      search.addEventListener('input',apply);filter.addEventListener('change',apply);search.addEventListener('keydown',event=>{if(event.key==='Escape'){search.value='';filter.value='all';apply();search.blur()}});
+      document.querySelector('#expand-all').addEventListener('click',()=>allDetails.forEach(d=>d.open=true));document.querySelector('#collapse-all').addEventListener('click',()=>allDetails.forEach(d=>d.open=false));
+      let printState=[];addEventListener('beforeprint',()=>{printState=allDetails.map(d=>d.open);allDetails.forEach(d=>d.open=true)});addEventListener('afterprint',()=>allDetails.forEach((d,i)=>d.open=printState[i]));
+      if(location.hash){const target=document.querySelector(location.hash);target?.closest('details')?.setAttribute('open','')}
+    })();
+  </script>
+</body>
+</html>
