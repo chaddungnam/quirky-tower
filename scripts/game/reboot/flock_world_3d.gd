@@ -118,7 +118,7 @@ func release_swipe(screen_position: Vector2, velocity: Vector2) -> void:
 	_dash_direction = Vector3(velocity.x, 0.0, velocity.y).normalized()
 	_dash_remaining = DASH_DURATION
 	_dash_active = true
-	_dash_collision.disabled = false
+	_dash_collision.set_deferred("disabled", false)
 	set_physics_process(true)
 
 func cancel_gesture() -> void:
@@ -127,7 +127,7 @@ func cancel_gesture() -> void:
 	_dash_active = false
 	_dash_remaining = 0.0
 	if _dash_collision != null:
-		_dash_collision.disabled = true
+		_dash_collision.set_deferred("disabled", true)
 	if _leader != null:
 		_leader.velocity = Vector3.ZERO
 
@@ -194,8 +194,8 @@ func trigger_collapse(target_id: String, force_direction: Vector3) -> bool:
 	_collapsed_targets[target_id] = true
 	var releases_reward := not _reward_claimed
 	_reward_claimed = true
-	collapse_stage.emit("contact")
 	_set_target_color(Color(1.0, 0.93, 0.72))
+	collapse_stage.emit("contact")
 	_collapse_tween = create_tween()
 	_collapse_tween.tween_interval(0.12)
 	_collapse_tween.tween_callback(_show_collapse_crack)
@@ -209,8 +209,8 @@ func trigger_collapse(target_id: String, force_direction: Vector3) -> bool:
 	return true
 
 func _show_collapse_crack() -> void:
-	collapse_stage.emit("crack")
 	_set_target_color(Color(0.27, 0.29, 0.34))
+	collapse_stage.emit("crack")
 
 func _release_collapse_pieces(force_direction: Vector3) -> void:
 	for index in range(_detached_pieces.size()):
@@ -338,18 +338,23 @@ func _reset_brawl_encounter() -> void:
 		_collapse_tween.kill()
 	_collapsed_targets.clear()
 	_reward_claimed = false
-	_brawl_target.position = Vector3(0.0, 0.9, 0.0)
-	_weak_point.position = Vector3(0.0, FLOOR_Y, 1.35)
+	_weak_point.freeze = true
+	for piece in _detached_pieces:
+		piece.freeze = true
+	_brawl_target.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, 0.9, 0.0))
+	_weak_point.transform = Transform3D(Basis.IDENTITY, Vector3(0.0, FLOOR_Y, 1.35))
 	_weak_point.linear_velocity = Vector3.ZERO
 	_weak_point.angular_velocity = Vector3.ZERO
-	_weak_point.freeze = false
 	for index in range(_detached_pieces.size()):
 		var piece := _detached_pieces[index]
-		piece.position = Vector3((index - 1) * 0.7, 1.45 + index * 0.25, 0.0)
+		piece.transform = Transform3D(
+			Basis.IDENTITY,
+			Vector3((index - 1) * 0.7, 1.45 + index * 0.25, 0.0)
+		)
 		piece.linear_velocity = Vector3.ZERO
 		piece.angular_velocity = Vector3.ZERO
-		piece.freeze = true
 		piece.visible = false
+	_weak_point.freeze = false
 	_set_target_color(Color(0.98, 0.67, 0.16))
 
 func _set_target_color(color: Color) -> void:

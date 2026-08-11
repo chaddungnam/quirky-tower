@@ -88,10 +88,31 @@ func _run() -> void:
 
 	var weak_point := world.get_node("Encounter/BrawlWeakPoint") as RigidBody3D
 	var dash_collision := world.get_node("Actors/Leader/DashHitbox/Collision") as CollisionShape3D
+	var brawl_target := world.get_node("Encounter/BrawlTarget") as Node3D
+	var target_visual := brawl_target.get_child(0) as MeshInstance3D
+	var target_material := target_visual.mesh.material as StandardMaterial3D
+	var detached_pieces := world.get_node("Encounter/DetachedPieces") as Node3D
 	var collapse_stages: Array[String] = []
+	var stage_records: Array[Dictionary] = []
 	var rewards: Array[int] = []
 	var dash_contacts: Array[Vector3] = []
-	world.collapse_stage.connect(func(stage: String) -> void: collapse_stages.append(stage))
+	world.collapse_stage.connect(
+		func(stage: String) -> void:
+			var visible_pieces := 0
+			for piece in detached_pieces.get_children():
+				if piece.visible:
+					visible_pieces += 1
+			collapse_stages.append(stage)
+			stage_records.append({
+				"stage": stage,
+				"process_frame": Engine.get_process_frames(),
+				"physics_frame": Engine.get_physics_frames(),
+				"color": target_material.albedo_color,
+				"visible_pieces": visible_pieces,
+				"target_y": brawl_target.position.y,
+				"reward_count": rewards.size(),
+			})
+	)
 	world.reward_released.connect(func(value: int) -> void: rewards.append(value))
 	world.impact.connect(
 		func(kind: String, world_point: Vector3) -> void:
@@ -100,20 +121,43 @@ func _run() -> void:
 	)
 	world.start_act("brawl")
 	assert(collapse_stages == ["warning"], "Brawl warns before any contact feedback")
+	assert(stage_records[0].color == Color(0.98, 0.67, 0.16), "warning exposes the warning color")
+	assert(stage_records[0].visible_pieces == 0, "warning keeps debris hidden")
+	assert(stage_records[0].reward_count == 0, "warning cannot reward")
+
+	world.set_drag_target(Vector2(100.0, 100.0))
+	world.release_swipe(Vector2(150.0, 100.0), Vector2(2000.0, 0.0))
+	await process_frame
+	assert(not world.get("_dash_active"), "a high-velocity swipe below minimum distance does not dash")
+	assert(dash_collision.disabled, "a short high-velocity release keeps the deferred hitbox disabled")
 	world.set_drag_target(Vector2(100.0, 100.0))
 	world.release_swipe(Vector2(300.0, 100.0), Vector2(80.0, 0.0))
+	await process_frame
 	assert(not world.get("_dash_active"), "a slow release does not start a dash")
 	assert(dash_collision.disabled, "a slow release keeps the dash collider disabled")
 	assert(rewards.is_empty(), "a release without contact cannot reward")
 
-	weak_point.global_position = leader.global_position + Vector3(0.0, 0.0, -1.5)
+	weak_point.global_position = leader.global_position + Vector3(0.0, 0.0, -10.0)
+	world.set_drag_target(Vector2(300.0, 300.0))
+	world.release_swipe(Vector2(300.0, 100.0), Vector2(0.0, -2000.0))
+	assert(dash_collision.disabled, "dash hitbox enable is deferred until a frame boundary")
+	await process_frame
+	assert(not dash_collision.disabled, "a valid dash enables its hitbox after deferred processing")
+	world.cancel_gesture()
+	assert(not dash_collision.disabled, "dash hitbox disable is deferred until a frame boundary")
+	await process_frame
+	assert(dash_collision.disabled, "gesture cancellation disables the hitbox after deferred processing")
+
+	weak_point.global_position = leader.global_position + Vector3(0.0, 0.0, -1.8)
 	weak_point.linear_velocity = Vector3.ZERO
 	weak_point.angular_velocity = Vector3.ZERO
 	world.set_drag_target(Vector2(300.0, 300.0))
 	world.release_swipe(Vector2(300.0, 100.0), Vector2(0.0, -2000.0))
 	assert(world.get("_dash_active"), "a long high-velocity swipe starts one dash")
-	assert(not dash_collision.disabled, "a valid dash enables the leader hitbox")
-	for _frame in range(90):
+	assert(dash_collision.disabled, "the real-contact dash also waits for deferred hitbox enable")
+	await process_frame
+	assert(not dash_collision.disabled, "the real-contact dash enables the leader hitbox")
+	for _frame in range(120):
 		await physics_frame
 		if not rewards.is_empty():
 			break
@@ -123,18 +167,56 @@ func _run() -> void:
 		collapse_stages == ["warning", "contact", "crack", "pieces", "collapse", "reward"],
 		"authored collapse stages preserve causal order"
 	)
+	for index in range(1, stage_records.size()):
+		assert(
+			stage_records[index].process_frame > stage_records[index - 1].process_frame,
+			"each post-contact stage advances to a later process frame"
+		)
+		assert(
+			stage_records[index].physics_frame > stage_records[index - 1].physics_frame,
+			"each post-contact stage advances to a later physics frame"
+		)
+	assert(stage_records[1].color == Color(1.0, 0.93, 0.72), "contact exposes the flash color")
+	assert(stage_records[1].visible_pieces == 0, "contact keeps debris hidden")
+	assert(stage_records[2].color == Color(0.27, 0.29, 0.34), "crack exposes the cracked color")
+	assert(stage_records[3].visible_pieces == 3, "pieces stage exposes all authored debris")
+	assert(stage_records[4].target_y < 0.0, "collapse stage exposes the lowered target")
+	for index in range(5):
+		assert(stage_records[index].reward_count == 0, "reward is absent before the reward stage")
+	assert(stage_records[5].reward_count == 1, "reward appears only after collapse")
 	assert(rewards == [1], "one collider-triggered collapse releases one reward")
 	assert(not world.trigger_collapse("antenna_a", Vector3.FORWARD), "a repeated trigger is rejected")
 	world.call("_on_dash_body_entered", weak_point)
 	assert(rewards == [1], "repeated trigger and callback cannot release a second reward")
+	for index in range(detached_pieces.get_child_count()):
+		var piece := detached_pieces.get_child(index) as RigidBody3D
+		piece.freeze = false
+		piece.position = Vector3(4.0 + index, 5.0, -3.0)
+		piece.rotation = Vector3(0.2 + index, 0.4, 0.6)
+		piece.linear_velocity = Vector3.ONE * 3.0
+		piece.angular_velocity = Vector3.ONE * 2.0
+	weak_point.rotation = Vector3(0.4, 0.5, 0.6)
+	weak_point.linear_velocity = Vector3.ONE * 4.0
+	weak_point.angular_velocity = Vector3.ONE * 3.0
 	world.setup(FlockRunState.new_run(424243))
 	world.start_act("brawl")
+	assert(not weak_point.freeze, "only the intended weak point is reactivated for Brawl")
+	assert(weak_point.rotation.is_zero_approx(), "a reused weak point restores zero rotation")
+	assert(weak_point.linear_velocity.is_zero_approx(), "a reused weak point clears linear velocity")
+	assert(weak_point.angular_velocity.is_zero_approx(), "a reused weak point clears angular velocity")
+	await physics_frame
 	assert(
-		is_equal_approx(world.get_node("Encounter/BrawlTarget").position.y, 0.9),
+		is_equal_approx(brawl_target.position.y, 0.9),
 		"a reused world restores the authored target position"
 	)
-	for piece in world.get_node("Encounter/DetachedPieces").get_children():
+	for index in range(detached_pieces.get_child_count()):
+		var piece := detached_pieces.get_child(index) as RigidBody3D
+		var authored_position := Vector3((index - 1) * 0.7, 1.45 + index * 0.25, 0.0)
 		assert(not piece.visible and piece.freeze, "a reused world hides and freezes detached pieces")
+		assert(piece.position.is_equal_approx(authored_position), "a reused piece restores authored position")
+		assert(piece.rotation.is_zero_approx(), "a reused piece restores zero rotation")
+		assert(piece.linear_velocity.is_zero_approx(), "a reused piece clears linear velocity")
+		assert(piece.angular_velocity.is_zero_approx(), "a reused piece clears angular velocity")
 	assert(world.trigger_collapse("antenna_a", Vector3.FORWARD), "a new Brawl can accept its own collapse")
 
 	world.cancel_gesture()
