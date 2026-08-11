@@ -1,8 +1,8 @@
 # Quirky Tower Reboot Feature → Test Map
 
-상태: **Review Candidate / 아직 실행되지 않음**
+상태: **Approved for Gate A implementation / 아직 실행되지 않음**
 기준일: **2026-08-11**
-결정 정본 후보: [`DECISION_REGISTER.md`](DECISION_REGISTER.md)
+결정 정본: [`DECISION_REGISTER.md`](DECISION_REGISTER.md)
 
 이 표는 “코드가 있다”와 “게임이 된다”를 구분한다. 모든 행의 현재 결과는 `Not Tested`이다. 기존 15층 프로토타입 PASS를 새 코어의 PASS로 이월하지 않는다.
 
@@ -89,6 +89,7 @@
 | TC ID | 관련 결정 | 증거 | 검증 행동 | 통과 기준 | 단계 | 현재 |
 |---|---|---|---|---|---|---|
 | `QT-RB-TC-DOC-001` | `QT-RB-DOC-001`, `QT-RB-DOC-002`, `QT-RB-DOC-003`, `QT-RB-DOC-004`, `QT-RB-DOC-005`, `QT-RB-DOC-006` | `STATIC` | 문서 ID·링크·크기·legacy 경계와 WORK_STATE를 검사한다. | 중복·누락 ID/링크 0, 기준 파일이 후보 한도 안이며 구 15층 canonical을 새 정본으로 읽지 않는다. | Every task | `Not Tested` |
+| `QT-RB-TC-VISUAL-001` | `QT-RB-QA-007` | `VISUAL` | 화면 결과가 바뀌는 구현의 비포·애프터를 최종 코드에서 캡처하고 명세→구현→증거를 대조한다. | 같은 상태·범위의 최종 코드 1080×2400 PNG 비포·애프터가 있으며, 실제 기기와 외부 사람 검증은 별도 증거로 기록한다. | Every visual task | `Not Tested` |
 | `QT-RB-TC-PROCESS-001` | `QT-RB-OPS-001`, `QT-RB-OPS-003`, `QT-RB-QA-006` | `STATIC+RUNTIME` | Local 작업 전후 PID·포트·Git 상태를 비교한다. | baseline 대비 새 agent-owned Godot·MCP·debug 잔존 0, 사용자 프로세스 종료 0, 의도하지 않은 Git 변경 0이다. | Every Local gate | `Not Tested` |
 
 ## 사람 재미 게이트

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Quirky Tower Reboot Master Spec · Review Candidate · 2026-08-11</title>
+  <title>Quirky Tower Reboot Master Spec · Approved for Gate A implementation · 2026-08-11</title>
   <link rel="stylesheet" href="reboot_spec.css">
 </head>
 <body>
@@ -13,7 +13,7 @@
   <header class="hero" data-searchable data-source="user-approval,quirky-tower-audit" data-decision="QT-RB-PROD-001,QT-RB-GAME-001">
     <div class="shell hero-grid">
       <div>
-        <div class="eyebrow">HOUSE DUCK · QUIRKY TOWER REBOOT · REVIEW CANDIDATE · 2026-08-11</div>
+        <div class="eyebrow">HOUSE DUCK · QUIRKY TOWER REBOOT · APPROVED FOR GATE A IMPLEMENTATION · 2026-08-11</div>
         <h1>같은 조류단으로<br>피하고, 들이받고, 무너뜨린다</h1>
         <p class="lead">오리 리더 한 마리와 이름 있는 동료 최대 다섯 마리를 직접 움직여 방송탑에 잠입한다. 한 구역에서 진입, 옥상 난투, 깃털 사슬 습격이 끊기지 않고 이어지고, 구역 사이 랜덤 3택이 매 런 다른 조류단을 만든다.</p>
         <div class="hero-quote"><strong>이번 리부트의 약속:</strong> 설명을 읽어서 이해하는 게임이 아니라, 손가락을 움직이면 원인과 결과가 곧바로 보이고 마지막 붕괴에서 도파민이 터지는 20:9 세로 5분 액션을 만든다.</div>
@@ -26,7 +26,7 @@
         </div>
         <div class="trace"><b>문서 기준:</b> source master SHA-256 <code title="a9cedc409ca2e669e18628da97967a34c06095f069fb44926d02463eda717f3f">a9cedc409ca2…717f3f</code> · code base <code>0717db2</code></div>
       </div>
-      <div class="phone" role="img" aria-label="검토 후보인 20대9 게임 방향 축약 모형. 삐약 PD는 가칭이다.">
+      <div class="phone" role="img" aria-label="Gate A 구현 승인된 20대9 게임 방향 축약 모형. 삐약 PD는 가칭이다.">
         <div class="phone-hud"><span>♥ 82%</span><span>조류단 3/5</span><span>구역 2</span></div>
         <div class="tower"><span class="weak one"></span><span class="weak two"></span><span class="path"></span></div>
         <span class="bird leader">D</span><span class="bird goose">G</span><span class="bird pigeon">P</span>
@@ -49,7 +49,7 @@
     <section id="document-status" data-searchable data-source="DECISION_REGISTER.md,WORK_STATE.md" data-decision="QT-RB-DOC-001" data-feature="QT-RB-TC-BAT-001">
       <div class="shell">
         <div class="section-head"><div><div class="section-index">00 · DOCUMENT STATUS</div><h2>문서의 역할과 증거 경계</h2></div></div>
-        <p class="section-intro">이 HTML은 Project K 수준의 상세 승인·시각 검토본이다. 승인 전에는 리부트 결정표가 새 코어의 정본 후보이며 기존 <code>docs/canonical/*</code>의 15층 도메인은 legacy 근거다. 이 파일만 보고 “구현 완료”를 주장할 수 없다.</p>
+        <p class="section-intro">이 HTML은 Gate A 구현 승인을 받은 상세 시각 명세다. 리부트 결정표가 새 코어의 정본이며 기존 <code>docs/canonical/*</code>의 15층 도메인은 legacy 근거다. 이 파일만 보고 “구현 완료”를 주장할 수 없다.</p>
         <div class="status-strip" aria-label="상태 배지 설명">
           <span class="approved">LOCKED / 승인</span>
           <span class="proposed">PROPOSED / 검토 후보</span>
@@ -854,10 +854,11 @@ assets/reboot/
       </div>
     </section>
 
-    <section id="qa-analytics" data-searchable data-source="FEATURE_TEST_MAP.md,house_duck_test_case_standard" data-decision="QT-RB-QA-001,QT-RB-QA-002,QT-RB-QA-003,QT-RB-QA-004,QT-RB-ANALYTICS-001,QT-RB-ANALYTICS-002,QT-RB-ANALYTICS-003" data-feature="QT-RB-TC-BAT-001,QT-RB-TC-CORE-001,QT-RB-TC-COLLAPSE-001,QT-RB-TC-PERF-001,QT-RB-TC-ANALYTICS-001">
+    <section id="qa-analytics" data-searchable data-source="FEATURE_TEST_MAP.md,house_duck_test_case_standard" data-decision="QT-RB-QA-001,QT-RB-QA-002,QT-RB-QA-003,QT-RB-QA-004,QT-RB-QA-007,QT-RB-ANALYTICS-001,QT-RB-ANALYTICS-002,QT-RB-ANALYTICS-003" data-feature="QT-RB-TC-BAT-001,QT-RB-TC-CORE-001,QT-RB-TC-COLLAPSE-001,QT-RB-TC-PERF-001,QT-RB-TC-VISUAL-001,QT-RB-TC-ANALYTICS-001">
       <div class="shell">
         <div class="section-head"><div><div class="section-index">17 · QA, ANALYTICS &amp; FUN GATES</div><h2>자동 PASS와 재미 PASS를 섞지 않는다</h2></div></div>
         <p class="section-intro">상세 TC와 현재 상태는 <a href="FEATURE_TEST_MAP.md">FEATURE_TEST_MAP.md</a>에 있다. 여기서는 어떤 순서로 무엇을 증명해야 다음 투자를 허용하는지 고정한다.</p>
+        <div class="callout"><strong>화면 완료 증거:</strong> 화면 결과가 바뀌면 최종 코드에서 만든 같은 상태·범위의 1080×2400 PNG 비포·애프터와 명세→구현→증거 대조표가 필요하다. 코드 파싱·headless PASS는 Visual 또는 Human PASS가 아니며, 실기기·외부 사람 증거는 별도로 기록한다.</div>
         <div class="grid three">
           <article class="card keep" data-searchable><div class="number">A</div><h3>90초 Greybox</h3><p>오리·거위·비둘기, 한 구역, 세 막, 3택 한 번. 5명 중 3명 이상이 자발적으로 재도전해야 한다.</p></article>
           <article class="card new" data-searchable><div class="number">B</div><h3>5분 Run</h3><p>외부 10명 이상, 세 구역+송출실, 닭·까마귀, 3택 세 번. pause·광고·background 제외 wall time 4:30~5:30 후보와 빌드 설명률을 함께 본다.</p></article>
@@ -981,14 +982,14 @@ assets/reboot/
             </ul>
           </div>
         </details>
-        <div class="callout success-callout"><strong>다음 승인 게이트:</strong> 이 파일과 <a href="DECISION_REGISTER.md">DECISION_REGISTER.md</a>의 <code>PROPOSED</code> 항목을 사용자가 검토한다. 승인 뒤에만 <code>writing-plans</code>로 90초 greybox 구현 계획을 작성한다.</div>
+        <div class="callout success-callout"><strong>구현 시작:</strong> 이 파일과 <a href="DECISION_REGISTER.md">DECISION_REGISTER.md</a>는 Gate A 구현 승인 정본이다. <code>PROPOSED</code>와 <code>NEEDS PLAYTEST</code> 항목은 후보 상태를 유지하며, 90초 greybox는 관련 결정·테스트 ID와 화면 증거 규칙을 따라 구현한다.</div>
       </div>
     </section>
   </main>
 
   <footer>
     <div class="shell">
-      <p><strong>Quirky Tower Reboot Master Spec</strong> · Review Candidate · 2026-08-11</p>
+      <p><strong>Quirky Tower Reboot Master Spec</strong> · Approved for Gate A implementation · 2026-08-11</p>
       <p>이 HTML은 외부 라이브러리 없이 동작한다. 구현 상태는 <a href="WORK_STATE.md">WORK_STATE.md</a>, 결정은 <a href="DECISION_REGISTER.md">DECISION_REGISTER.md</a>, 검증은 <a href="FEATURE_TEST_MAP.md">FEATURE_TEST_MAP.md</a>를 우선한다.</p>
     </div>
   </footer>

@@ -1,21 +1,21 @@
 # Quirky Tower Reboot Work State
 
 갱신일: **2026-08-11**
-현재 단계: **리부트 명세 Review Candidate 작성**
-현재 브랜치: `main`
+현재 단계: **Gate A implementation**
+현재 브랜치: `codex/reboot-vertical-slice`
 기준 코드: `0717db2` (`origin/main`과 동일했던 작성 시작 시점)
 
 ## 지금 무엇인가
 
 Quirky Tower의 기존 15층·세 미니게임 코어를 폐기하고, 리더 1마리와 동료 최대 5마리가 같은 구역에서 `진입 → 난투 → 사슬 습격 → 랜덤 3택`을 이어가는 20:9 세로 로그라이트 액션으로 재설계한 상태다.
 
-이번 작업은 **명세와 작업 운영 기준만 작성**한다. Godot 씬, GDScript, 에셋, 플러그인, 광고·결제, Supabase는 변경하지 않는다.
+Gate A 승인 정본에 따라 90초 greybox를 구현한다. Godot 씬, GDScript, 에셋, 플러그인, 광고·결제, Supabase의 범위는 구현 계획과 관련 결정 ID로 제한한다.
 
 ## 이번 결과물
 
 - [`QUIRKY_TOWER_REBOOT_MASTER_SPEC.html`](QUIRKY_TOWER_REBOOT_MASTER_SPEC.html): 사람이 검토하는 상세 시각 명세
 - [`reboot_spec.css`](reboot_spec.css), [`reboot_spec.js`](reboot_spec.js): Master HTML의 로컬 공용 표현·탐색 자산. 외부 CDN·빌드 없음
-- [`DECISION_REGISTER.md`](DECISION_REGISTER.md): 짧은 결정 정본 후보
+- [`DECISION_REGISTER.md`](DECISION_REGISTER.md): 짧은 결정 정본
 - [`FEATURE_TEST_MAP.md`](FEATURE_TEST_MAP.md): 요구사항과 검증 종류의 연결표
 - 이 파일: 현재·다음·미검증만 유지하는 재개 지점
 
@@ -44,13 +44,11 @@ Quirky Tower의 기존 15층·세 미니게임 코어를 폐기하고, 리더 1�
 - 현재 upstream 일치 v0.7.2를 유지하고 upstream v0.8.0은 별도 diff·Godot 4.7 QA 뒤 갱신 여부를 판단하는 안
 - 파일 크기 경고·차단 수치
 
-세부 항목은 [`DECISION_REGISTER.md`](DECISION_REGISTER.md)의 `PROPOSED`와 `NEEDS_PLAYTEST` 상태로 표시했다. 사용자 검토 전 `LOCKED`로 올리지 않는다.
+세부 항목은 [`DECISION_REGISTER.md`](DECISION_REGISTER.md)의 `PROPOSED`와 `NEEDS_PLAYTEST` 상태로 표시했다. Gate A 구현 승인도 후보 수치나 손맛 판단을 `LOCKED`로 바꾸지 않는다.
 
 ## 다음 P0
 
-사용자가 작성된 명세를 검토하고 수정 또는 승인을 준다.
-
-승인 뒤에만 `writing-plans`를 사용해 다음 하나의 구현 계획을 만든다.
+[`Gate A 90초 greybox 계획`](../../.superpowers/sdd/2026-08-11-gate-a-90s-greybox/)을 실행한다.
 
 > 오리·거위·비둘기, 한 구역, 세 막, 랜덤 3택 한 번을 포함한 90초 greybox.
 

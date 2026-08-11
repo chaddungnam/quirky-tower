@@ -1,11 +1,11 @@
 # Quirky Tower Reboot Decision Register
 
-상태: **Review Candidate**
+상태: **Approved for Gate A implementation**
 기준일: **2026-08-11**
 대상: 기존 15층 미니게임 프로토타입을 조류단 3막 로그라이트 액션으로 교체하는 리부트
 시각 검토본: [`QUIRKY_TOWER_REBOOT_MASTER_SPEC.html`](QUIRKY_TOWER_REBOOT_MASTER_SPEC.html)
 
-이 파일은 리부트 작업의 짧은 결정 정본 후보다. 채팅 기억이나 HTML 설명이 이 표와 충돌하면 구현을 멈추고 이 표를 먼저 고친다. `LOCKED`는 사용자가 대화에서 승인한 범위, `PROPOSED`는 이번 검토본의 구체화, `NEEDS_PLAYTEST`는 사람 손맛 검증 전 확정 금지, `DEFERRED`는 후속 마일스톤, `CUT`은 새 코어에서 제거할 범위다.
+이 파일은 리부트 작업의 짧은 결정 정본이다. 채팅 기억이나 HTML 설명이 이 표와 충돌하면 구현을 멈추고 이 표를 먼저 고친다. `LOCKED`는 사용자가 대화에서 승인한 범위, `PROPOSED`는 이번 검토본의 구체화, `NEEDS_PLAYTEST`는 사람 손맛 검증 전 확정 금지, `DEFERRED`는 후속 마일스톤, `CUT`은 새 코어에서 제거할 범위다.
 
 ## 읽기 순서
 
@@ -147,7 +147,7 @@
 | `QT-RB-DOC-003` | `PROPOSED` | `.gd`는 500줄 경고·800줄 차단, `.md/.json`은 600줄 또는 60KiB(61,440 bytes) 경고·1,200줄 또는 120KiB(122,880 bytes) 차단, HTML은 120KiB 경고·180KiB 차단을 기본 gate로 둔다. 현재 검사기는 이 전체 규칙을 아직 강제하지 않는다. | 숫자만으로 기계 분리하지 않되 구현 전후 성장 신호를 자동으로 잡는다. |
 | `QT-RB-DOC-004` | `LOCKED` | 기능은 결정 ID와 테스트 ID를 함께 가져야 하고, 계획은 전체 명세 복사 대신 필요한 ID와 파일만 참조한다. | 저토큰으로도 요구와 검증을 잃지 않는다. |
 | `QT-RB-DOC-005` | `PROPOSED` | HTML이 120KiB를 넘으면 공유 CSS/JS, 섹션 HTML, `index.html`로 분리한다. 빌드 도구 없이 정적 파일로 열 수 있어야 한다. | 문서 로직을 복제하지 않고 단순 파일 구조를 유지한다. |
-| `QT-RB-DOC-006` | `LOCKED` | 이 리부트 4개 문서는 승인 전 candidate다. 기존 `docs/canonical/*`의 15층·Timing Ring 도메인은 legacy 근거이며 새 코어 정본이 아니다. 승인 뒤 관련 canonical만 결정 ID 기준으로 갱신한다. | 구정본을 새 구현 요구로 잘못 읽는 일을 막는다. |
+| `QT-RB-DOC-006` | `LOCKED` | 이 리부트 4개 문서는 Gate A 구현 승인 정본이다. 기존 `docs/canonical/*`의 15층·Timing Ring 도메인은 legacy 근거이며 새 코어 정본이 아니다. 관련 canonical은 결정 ID 기준으로 갱신한다. | 구정본을 새 구현 요구로 잘못 읽는 일을 막는다. |
 
 ## 분석과 측정
 
@@ -167,6 +167,7 @@
 | `QT-RB-QA-004` | `PROPOSED` | 다음 게이트는 세 구역+최종 송출실 5분 런, 그다음 오리 마스터 2D/3D+4스템, 그다음 outgame mock, 마지막 SDK/backend다. | Local 검증과 자산 투자를 묶어서 진행한다. |
 | `QT-RB-QA-005` | `LOCKED` | 기존 앱 셸·공통 UI·메인 씬·종료 정리 테스트는 유지하고 기존 15층 도메인 결합 테스트는 새 3막 테스트로 교체한다. | 재사용 가능한 기반만 살린다. |
 | `QT-RB-QA-006` | `LOCKED` | 완료 보고에는 변경 파일, 검증 종류, 미검증, Godot/실기기 필요 여부, branch, commit, push, 잔존 프로세스를 적는다. | 다음 작업자가 추측 없이 재개할 수 있게 한다. |
+| `QT-RB-QA-007` | `LOCKED` | 화면 결과가 바뀌는 구현은 최종 코드에서 새로 만든 1080×2400 비포·애프터 캡처와 명세→구현→증거 대조표가 있어야 완료 후보가 된다. 코드 파싱·headless PASS만으로 Visual 또는 Human PASS를 선언하지 않는다. | House Duck 공통 검증 규칙과 사용자의 명세 승인 조건을 프로젝트 정본에 고정한다. |
 
 ## 명시적 폐기와 보류
 
