@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Quirky Tower Reboot Master Spec · Review Candidate · 2026-08-11</title>
+  <link rel="stylesheet" href="reboot_spec.css">
+</head>
+<body>
+  <noscript><div class="no-script">검색·자동 목차·링크 복사는 JavaScript가 필요하지만 모든 명세 내용은 그대로 읽고 인쇄할 수 있습니다.</div></noscript>
+
+  <header class="hero" data-searchable data-source="user-approval,quirky-tower-audit" data-decision="QT-RB-PROD-001,QT-RB-GAME-001">
+    <div class="shell hero-grid">
+      <div>
+        <div class="eyebrow">HOUSE DUCK · QUIRKY TOWER REBOOT · REVIEW CANDIDATE · 2026-08-11</div>
+        <h1>같은 조류단으로<br>피하고, 들이받고, 무너뜨린다</h1>
+        <p class="lead">오리 리더 한 마리와 이름 있는 동료 최대 다섯 마리를 직접 움직여 방송탑에 잠입한다. 한 구역에서 진입, 옥상 난투, 깃털 사슬 습격이 끊기지 않고 이어지고, 구역 사이 랜덤 3택이 매 런 다른 조류단을 만든다.</p>
+        <div class="hero-quote"><strong>이번 리부트의 약속:</strong> 설명을 읽어서 이해하는 게임이 아니라, 손가락을 움직이면 원인과 결과가 곧바로 보이고 마지막 붕괴에서 도파민이 터지는 20:9 세로 5분 액션을 만든다.</div>
+        <div class="status-row">
+          <span class="badge approved">큰 방향 승인</span>
+          <span class="badge proposed">세부 수치 검토 후보</span>
+          <span class="badge playtest">손맛은 미검증</span>
+          <span class="badge evidence">Godot 실행 안 함</span>
+          <span class="badge evidence">코드 변경 안 함</span>
+        </div>
+        <div class="trace"><b>문서 기준:</b> source master SHA-256 <code title="a9cedc409ca2e669e18628da97967a34c06095f069fb44926d02463eda717f3f">a9cedc409ca2…717f3f</code> · code base <code>0717db2</code></div>
+      </div>
+      <div class="phone" role="img" aria-label="검토 후보인 20대9 게임 방향 축약 모형. 삐약 PD는 가칭이다.">
+        <div class="phone-hud"><span>♥ 82%</span><span>조류단 3/5</span><span>구역 2</span></div>
+        <div class="tower"><span class="weak one"></span><span class="weak two"></span><span class="path"></span></div>
+        <span class="bird leader">D</span><span class="bird goose">G</span><span class="bird pigeon">P</span>
+        <div class="mascot"><strong>삐약 PD · 가칭</strong> · 저 약점을 잇고 손을 떼!</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="toolbar-wrap">
+    <div class="shell toolbar" role="search">
+      <input id="search" class="search" type="search" placeholder="한국어, English, 결정 ID, 기능 ID 검색" aria-label="명세 검색">
+      <button id="expand-all" class="tool-button" type="button">모두 펼치기</button>
+      <button id="collapse-all" class="tool-button" type="button">모두 접기</button>
+      <span id="search-count" class="search-count" aria-live="polite">전체 표시</span>
+    </div>
+  </div>
+  <nav id="toc" class="toc" aria-label="자동 생성 목차"><div class="shell"></div></nav>
+
+  <main>
+    <section id="document-status" data-searchable data-source="DECISION_REGISTER.md,WORK_STATE.md" data-decision="QT-RB-DOC-001" data-feature="QT-RB-TC-BAT-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">00 · DOCUMENT STATUS</div><h2>문서의 역할과 증거 경계</h2></div></div>
+        <p class="section-intro">이 HTML은 Project K 수준의 상세 승인·시각 검토본이다. 승인 전에는 리부트 결정표가 새 코어의 정본 후보이며 기존 <code>docs/canonical/*</code>의 15층 도메인은 legacy 근거다. 이 파일만 보고 “구현 완료”를 주장할 수 없다.</p>
+        <div class="status-strip" aria-label="상태 배지 설명">
+          <span class="approved">LOCKED / 승인</span>
+          <span class="proposed">PROPOSED / 검토 후보</span>
+          <span class="playtest">NEEDS PLAYTEST</span>
+          <span class="deferred">DEFERRED / 후속</span>
+          <span class="cut">CUT / 폐기</span>
+        </div>
+        <div class="grid three">
+          <article class="card keep" data-searchable>
+            <div class="kicker">SOURCE OF TRUTH</div><h3>읽기 우선순위</h3>
+            <ol><li>House Duck 공통 규칙</li><li>리부트 <code>DECISION_REGISTER.md</code></li><li>리부트 <code>WORK_STATE.md</code></li><li>관련 HTML 섹션</li><li><code>FEATURE_TEST_MAP.md</code></li><li>승인 뒤 계획·코드</li></ol>
+          </article>
+          <article class="card info" data-searchable>
+            <div class="kicker">EVIDENCE</div><h3>PASS는 종류별로 분리</h3>
+            <p><code>HEADLESS</code>는 동일 Godot 4.7 CLI의 이산 규칙, <code>RUNTIME</code>은 노드·물리 관찰, <code>VISUAL</code>은 화면, <code>DEVICE</code>는 기기, <code>HUMAN</code>은 재미를 증명한다.</p>
+          </article>
+          <article class="card remove" data-searchable>
+            <div class="kicker">NOT PROOF</div><h3>현재 증명하지 않은 것</h3>
+            <p>새 3막 플레이, 손가락 감각, 조류 아트, 오디오, 햅틱, 모바일 성능, 광고, 결제, Supabase, 실제 랭킹은 모두 미검증이다.</p>
+          </article>
+        </div>
+        <div class="callout danger-callout"><strong>중요:</strong> 기존 15층 프로토타입의 PASS는 재사용 가능한 앱 셸·UI·테스트 기법의 회귀 증거다. 새 게임 코어의 재미나 완주 가능성을 증명하지 않는다.</div>
+      </div>
+    </section>
+
+    <section id="verdict" data-searchable data-source="user-feedback,salvage-audit" data-decision="QT-RB-PROD-001" data-feature="QT-RB-TC-CORE-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">01 · VERDICT</div><h2>살릴 기반과 갈아엎을 게임</h2></div></div>
+        <p class="section-intro">기존 프로토타입은 시작부터 끝까지 실행되지만, 서로 단절된 세 미니게임이 반복되어 무엇을 잘한 것인지, 왜 다음 라운드를 해야 하는지, 어디서 카타르시스를 느껴야 하는지 읽히지 않았다.</p>
+        <div class="grid three">
+          <article class="card keep" data-searchable>
+            <div class="number">KEEP</div><h3>이미 검증된 기반</h3>
+            <ul><li>메인 씬과 20:9 기본 실행</li><li>시작 배너·홈·설정·뒤로가기</li><li>AppTheme·DesignTokens·세로 선택</li><li>10개 locale와 영어 fallback</li><li>1회 입력 잠금·팝업 freeze·등장 모션</li><li>마스코트 말풍선·프로세스 종료 규칙</li><li>고정 시드·대량 시뮬레이션 기법</li></ul>
+          </article>
+          <article class="card remove" data-searchable>
+            <div class="number">CUT</div><h3>새 코어에서 폐기</h3>
+            <ul><li>Timing Ring·Tap Panic·Drag Dodge 순환</li><li>15층과 5·10·15층 고정 이야기</li><li>기존 Quirk 4종과 도메인 JSON</li><li>미니게임별 제목·점수·결과 초기화</li><li>Sponsor Boost 하트 +1 구체 효과</li><li>원인을 문장으로 대신 설명하는 충돌</li><li>복도·픽셀 진행자를 최종 에셋으로 간주</li></ul>
+          </article>
+          <article class="card new" data-searchable>
+            <div class="number">NEW</div><h3>새로 만드는 재미</h3>
+            <ul><li>같은 조류단을 세 막에서 계속 조작</li><li>구조·중복 합성·랜덤 3택 누적 빌드</li><li>대시와 실제 환경 충돌</li><li>경로 그리기 후 일제 돌진</li><li>authored destruction 연쇄 붕괴</li><li>방송 조작을 폭로하는 짧은 이야기</li><li>Project K 계열 애니풍 2D·3D 짝</li></ul>
+          </article>
+        </div>
+        <div class="callout success-callout"><strong>유지 판단 기준:</strong> 90초 greybox에서 임시 도형만으로도 “무슨 일이 일어났는지 알겠다”와 “한 번 더 하고 싶다”가 함께 나오지 않으면 아트·상점·SDK를 만들지 않고 코어를 다시 고친다.</div>
+      </div>
+    </section>
+
+    <section id="product-promise" data-searchable data-source="user-approval,market-scan" data-decision="QT-RB-PROD-002,QT-RB-GAME-001" data-feature="QT-RB-TC-ENTRY-001,QT-RB-TC-COLLAPSE-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">02 · PRODUCT &amp; MARKET</div><h2>플레이어 약속과 검증작 모티브</h2></div></div>
+        <p class="section-intro">가져올 것은 특정 게임의 테마가 아니라 검증된 감각이다. 쉬운 한 손 입력, 즉시 읽히는 결과, 운이 만든 새 판단, 마스코트가 만든 짧은 사건을 Quirky Tower만의 3막 물리 액션으로 다시 조합한다.</p>
+        <div class="grid two">
+          <article class="card new" data-searchable>
+            <div class="kicker">PLAYER PROMISE</div><h3>처음 10초</h3>
+            <ul><li>한 손가락으로 리더를 옮긴다.</li><li>동료가 따라오는 이유가 보인다.</li><li>위험, 구조, 보상 경로가 색과 실루엣으로 구분된다.</li><li>충돌하면 무엇에 부딪혔는지 보인다.</li><li>설명서를 읽지 않아도 다음 행동을 시도한다.</li></ul>
+          </article>
+          <article class="card info" data-searchable>
+            <div class="kicker">SESSION PROMISE</div><h3>첫 5분</h3>
+            <ul><li>같은 조류단으로 세 구역의 3막을 통과한다.</li><li>랜덤 3택 세 번으로 한 빌드가 완성된다.</li><li>최종 송출실에서 세 행동을 압축해 크게 사용한다.</li><li>실패해도 2탭·4초 안에 다시 시작한다.</li><li>긴 텍스트 없이 한 가지 방송 비밀을 이해한다.</li></ul>
+          </article>
+        </div>
+        <details open data-searchable>
+          <summary>2026-08-11 시장 스냅샷과 가져올 패턴</summary>
+          <div class="details-body">
+            <p class="subtle">설치 구간은 2026-08-11 공식 스토어 스냅샷이다. 실시간 순위는 같은 날에도 바뀌므로 고정 숫자를 명세에 잠그지 않는다. 내부 목표와 시장 사실도 섞지 않는다.</p>
+            <table>
+              <thead><tr><th>검증작</th><th>현재 확인 근거</th><th>가져올 패턴</th><th>복제 금지</th></tr></thead>
+              <tbody>
+                <tr><td><a href="https://play.google.com/store/apps/details?id=com.block.juggle&amp;hl=en_US">Block Blast</a></td><td>Google Play 500M+; Apple US 실시간 차트 등재</td><td>입력과 연쇄 결과의 즉시 가독성</td><td>8×8 보드, 줄 삭제, 블록 외형</td></tr>
+                <tr><td><a href="https://play.google.com/store/apps/details?id=com.dxx.firenow">Survivor.io</a></td><td>Google Play 50M+</td><td>한 손 능동 조작 + 구간 사이 랜덤 3택</td><td>자동 공격 중심 불릿헤븐</td></tr>
+                <tr><td><a href="https://play.google.com/store/apps/details?id=com.percent.aos.luckydefense&amp;hl=en-US">Lucky Defense</a></td><td>Google Play 5M+</td><td>강한 운 뒤 배치·보존 판단</td><td>랜덤 소환·합성 타워디펜스</td></tr>
+                <tr><td><a href="https://play.google.com/store/apps/details?id=com.habby.capybara&amp;hl=en-US">Capybara Go</a></td><td>Google Play 10M+</td><td>마스코트 반응이 사건을 이야기로 바꾸는 방식</td><td>텍스트 선택 뒤 자동전투</td></tr>
+                <tr><td><a href="https://play.google.com/store/apps/details?id=com.RedNexusGamesInc.Peglin&amp;hl=en-US">Peglin</a></td><td>Google Play 500K+</td><td>한 번의 조작 뒤 결과를 끝까지 기대하는 연출</td><td>공·핀·파친코 핵심 조작</td></tr>
+                <tr><td>MONOPOLY GO!</td><td>Apple US 실시간 차트 등재; 순위 미고정</td><td>작은 보상과 게이지 중첩, 캐릭터 반응</td><td>주사위 보드, IP, 에너지 경제</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <div class="callout danger-callout"><strong>복제 금지선:</strong> 단일 경쟁작에서 테마와 핵심 루프를 함께 가져오지 않는다. 사각 보드, 주사위 이동, 슬롯 릴, 자동전투, 랜덤 소환 TD, 공·벽돌, 참조작의 캐릭터·UI 배치·경제 수치·정확한 애니메이션 타이밍은 사용하지 않는다.</div>
+      </div>
+    </section>
+
+    <section id="core-loop" data-searchable data-source="user-approval,DECISION_REGISTER.md" data-decision="QT-RB-GAME-001,QT-RB-GAME-007,QT-RB-GAME-008" data-feature="QT-RB-TC-CORE-001,QT-RB-TC-ENTRY-001,QT-RB-TC-BRAWL-001,QT-RB-TC-CHAIN-001,QT-RB-TC-TRANSITION-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">03 · THREE-ACT CORE</div><h2>한 구역, 한 무리, 세 가지 카타르시스</h2></div></div>
+        <p class="section-intro">세 막은 서로 다른 미니게임이 아니다. 1막에서 모은 동료와 위치가 2막의 전력이 되고, 2막에서 만든 균열과 배치가 3막의 경로와 붕괴로 이어진다.</p>
+        <div class="phase-board">
+          <article class="phase entry" data-searchable>
+            <div class="kicker">ACT 1 · APPROACH</div><div class="phase-title">우당탕 조류단 진입</div><span class="time">목표 20~25초</span>
+            <ul><li>연속 전진 중 드래그로 리더와 무리를 옮긴다.</li><li>위험·구조·보상 경로 중 하나를 고른다.</li><li>알·우리에서 이름 있는 동료를 구조한다.</li><li>중복은 합성 후보가 되고 최대 5칸을 넘지 않는다.</li><li>근접 회피와 정확한 경로는 Feather Meter를 채운다.</li></ul>
+          </article>
+          <article class="phase brawl" data-searchable>
+            <div class="kicker">ACT 2 · BRAWL</div><div class="phase-title">옥상 조류 난투</div><span class="time">목표 30~35초</span>
+            <ul><li>같은 드래그로 움직이고 짧은 스와이프로 대시한다.</li><li>동료는 역할별 기본 행동을 하지만 방향·위치는 플레이어가 만든다.</li><li>적을 벽, 간판, 물탱크, 다른 적에 날린다.</li><li>예고→회피→충돌→피해→반동이 눈으로 분리된다.</li><li>막 끝의 적 위치와 구조물 균열이 그대로 남는다.</li></ul>
+          </article>
+          <article class="phase chain" data-searchable>
+            <div class="kicker">ACT 3 · CHAIN RAID</div><div class="phase-title">깃털 사슬 습격</div><span class="time">목표 12~18초</span>
+            <ul><li>시간이 느려지고 동료와 구조물 약점을 한 경로로 잇는다.</li><li>손을 떼면 연결 순서대로 무리가 돌진한다.</li><li>거위는 중량 약점, 까마귀는 희귀 약점처럼 역할이 보인다.</li><li>균열→부품→층→적→보상이 순서대로 터진다.</li><li>잘못된 경로는 끊긴 지점과 이유가 표시된다.</li></ul>
+          </article>
+        </div>
+        <div class="flow" aria-label="구역 상태 흐름">
+          <div class="flow-step"><b>진입 결과</b>동료·체력·콤보·난투 시작 위치</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>난투 결과</b>적 위치·균열·Feather Meter</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>사슬 결과</b>붕괴·보상·스토리 증거</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>랜덤 3택</b>리더·편대·붕괴 빌드</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>다음 구역</b>같은 무리와 상태로 연속 진입</div>
+        </div>
+        <details open data-searchable>
+          <summary>막 사이 전환 계약</summary>
+          <div class="details-body grid two">
+            <div><h4>반드시 유지</h4><ul><li>리더 ID와 체력</li><li>동료 최대 5명의 ID·등급·현재 상태</li><li>빌드·Quirk·합성</li><li>콤보·Feather Meter</li><li>시드와 RNG draw count</li><li>스토리 증거와 구역 번호</li></ul></div>
+            <div><h4>금지</h4><ul><li>미니게임 제목 카드로 흐름 중단</li><li>점수·체력·무리 초기화</li><li>새 로딩 화면</li><li>막마다 다른 가상 버튼</li><li>결과 설명을 읽어야만 다음 행동 이해</li><li>카메라가 원인을 놓친 자동 붕괴</li></ul></div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="input-camera" data-searchable data-source="godot-4.7-local-docs,mobile-touch-contract" data-decision="QT-RB-GAME-004,QT-RB-GAME-012,QT-RB-TECH-001,QT-RB-UI-001" data-feature="QT-RB-TC-BAT-001,QT-RB-TC-ENTRY-001,QT-RB-TC-BRAWL-001,QT-RB-TC-TRANSITION-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">04 · PORTRAIT INPUT &amp; CAMERA</div><h2>20:9 한 손 조작과 고정 사선 월드</h2></div></div>
+        <p class="section-intro">조작법을 phase마다 다시 배우지 않는다. 같은 손가락 문법이 상황에 따라 이동, 대시, 경로 확정으로 자연스럽게 해석된다.</p>
+        <div class="grid three">
+          <article class="card new" data-searchable><div class="kicker">DRAG</div><h3>누르고 끌기</h3><p>화면 아래 플레이 영역 어디서든 리더의 목표점을 갱신한다. 리더가 손가락 아래에 가려지지 않도록 입력 위치보다 위쪽 월드 포인트에 매핑한다.</p></article>
+          <article class="card info" data-searchable><div class="kicker">SWIPE</div><h3>짧고 빠른 긋기</h3><p>난투의 방향 대시다. 거리·속도 문턱은 하나의 공통 설정값으로 두고 작은 떨림과 의도한 스와이프를 구분한다.</p></article>
+          <article class="card keep" data-searchable><div class="kicker">RELEASE</div><h3>손 떼기</h3><p>사슬 습격 경로를 확정한다. 경로가 유효하지 않으면 돌진을 소비하지 않고 끊긴 지점을 즉시 보여준다.</p></article>
+        </div>
+        <details open data-searchable>
+          <summary>입력 안전 계약</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>상황</th><th>처리</th><th>실패 조건</th></tr></thead>
+              <tbody>
+                <tr><td>멀티터치</td><td>첫 active finger index만 소유하고 나머지는 무시한다.</td><td>두 손가락으로 중복 대시·선택 발생</td></tr>
+                <tr><td>팝업·일시정지</td><td>gameplay input을 즉시 취소하고 release를 소비하지 않는다.</td><td>팝업 뒤 캐릭터가 계속 이동</td></tr>
+                <tr><td>focus loss·광고</td><td>현재 gesture를 취소하고 복귀 후 새 touch부터 받는다.</td><td>복귀 직후 유령 대시·보상</td></tr>
+                <tr><td>막 전환</td><td>현재 router의 pointer 소유권을 해제하고 사슬은 새 touch부터 경로를 받는다.</td><td>진입·난투 drag의 release가 사슬 공격으로 실행</td></tr>
+                <tr><td>에디터 QA</td><td>mouse-to-touch emulation은 실제 touch와 같은 router를 지난다.</td><td>마우스 경로만 따로 구현</td></tr>
+                <tr><td>연타</td><td>3택·결과 callback은 첫 입력 뒤 즉시 잠긴다.</td><td>상태 전이·보상 두 번</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <div class="grid two">
+          <article class="card info" data-searchable>
+            <div class="kicker">CAMERA3D</div><h3>고정 직교 사선</h3>
+            <ul><li>Godot 기본 <code>Camera3D</code> 한 대</li><li>리더·동료·위험을 한 프레임 안에 유지</li><li>회전보다 제한된 punch·zoom만 사용</li><li>Reduce Motion은 punch를 줄이고 outline으로 대체</li><li>Phantom Camera 플러그인 미사용</li></ul>
+          </article>
+          <article class="card keep" data-searchable>
+            <div class="kicker">FHD+ &amp; SAFE AREA</div><h3>720×1280 논리 기준, 20:9 추가 영역</h3>
+            <ul><li>데스크톱 기본 창·캡처 override 1080×2400</li><li>stretch <code>canvas_items/expand</code></li><li>20:9에서는 effective area가 720×1600이지만 새 자산 기준으로 삼지 않음</li><li>720×1280 safe frame은 root layout·camera에서 명시적으로 가운데 정렬</li><li>추가 영역은 배경·월드·보조 HUD, CTA는 실제 safe rect 안에 clamp</li><li>모바일은 override가 아니라 기기 native viewport로 별도 확인</li></ul>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="run-build" data-searchable data-source="user-approval,market-patterns" data-decision="QT-RB-GAME-005,QT-RB-GAME-006,QT-RB-GAME-010,QT-RB-TECH-007" data-feature="QT-RB-TC-RNG-001,QT-RB-TC-MERGE-001,QT-RB-TC-REWARD-001,QT-RB-TC-PACING-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">05 · RUN, LUCK &amp; BUILD</div><h2>5분 안에 운이 빌드가 되는 구조</h2></div></div>
+        <p class="section-intro">운은 승패를 대신하지 않고 새로운 판단 재료를 준다. 구조할 새, 중복 합성, 3택 제안은 시드로 바뀌지만 경로, 대시 방향, 연결 순서는 플레이어가 결정한다.</p>
+        <div class="mini-map" aria-label="5분 런 구성">
+          <div><b>구역 1</b>예선·비둘기 구조<br><span class="subtle">70~80초</span></div>
+          <div><b>3택 1</b>첫 빌드 축<br><span class="subtle">목표 5초</span></div>
+          <div><b>구역 2</b>가공 무대·거위 충돌<br><span class="subtle">70~80초</span></div>
+          <div><b>3택 2</b>시너지 완성<br><span class="subtle">목표 5초</span></div>
+          <div><b>구역 3</b>기록보관소·까마귀<br><span class="subtle">70~80초</span></div>
+          <div><b>3택 3</b>최종 강화<br><span class="subtle">목표 5초</span></div>
+          <div><b>송출실</b>세 막 압축 피날레<br><span class="subtle">45~60초</span></div>
+        </div>
+        <div class="grid two">
+          <article class="card new" data-searchable>
+            <div class="kicker">LUCK INPUTS</div><h3>런마다 달라지는 것</h3>
+            <ul><li>구조 가능한 동료와 위치</li><li>중복 합성 기회</li><li>적·약점·붕괴 구조 배치</li><li>구역 종료 강화 3개</li><li>희귀 방송 사고 Quirk</li><li>보상과 짧은 story prop</li></ul>
+          </article>
+          <article class="card keep" data-searchable>
+            <div class="kicker">PLAYER AGENCY</div><h3>손으로 결정하는 것</h3>
+            <ul><li>어느 경로의 새를 구조할지</li><li>누구를 지킬지·어디로 대시할지</li><li>어떤 환경물에 적을 부딪힐지</li><li>누구와 어떤 약점을 연결할지</li><li>어느 강화로 빌드를 좁힐지</li><li>Sponsor Ticket을 언제 쓸지</li></ul>
+          </article>
+        </div>
+        <details open data-searchable>
+          <summary>랜덤 3택 카드 계약</summary>
+          <div class="details-body grid two">
+            <div class="phone-choice" aria-label="세로 강화 선택 모형">
+              <div class="subtle">구역 1 완료 · 하나를 고르세요</div>
+              <div class="choice-card"><b>무거운 첫 날개</b>첫 대시가 적과 약점을 함께 관통한다.<div class="choice-icons">진입 · 난투 · 사슬</div></div>
+              <div class="choice-card"><b>비둘기 지름길</b>위험 경로 한 곳을 안전 경로로 다시 표시한다.<div class="choice-icons">진입 · 사슬</div></div>
+              <div class="choice-card"><b>깃털 도미노</b>세 번째 연결마다 주변 약점 하나를 추가한다.<div class="choice-icons">난투 · 사슬</div></div>
+            </div>
+            <div>
+              <h4>카드 한 장에 보이는 것</h4>
+              <ul><li>고유 아이콘</li><li>짧은 이름</li><li>기본 최대 두 줄 효과</li><li>영향받는 세 막 아이콘</li><li>현재 보유 시너지 한 개</li></ul>
+              <h4>보이지 않는 것</h4>
+              <ul><li>장문의 확률표</li><li>시뮬레이션처럼 보이는 다중 스탯</li><li>가로 버튼 열</li><li>이미 선택 불가능한 가짜 옵션</li><li>유료 전용 네 번째 선택지</li></ul>
+            </div>
+          </div>
+        </details>
+        <details data-searchable>
+          <summary>시드와 운빨 안전장치</summary>
+          <div class="details-body">
+            <ul><li>gameplay RNG, cosmetic RNG, audiovisual variation RNG를 분리한다.</li><li>같은 gameplay seed는 조우·구조 후보·3택·지원 효과·이산 event ledger가 같다.</li><li>Godot physics는 deterministic하지 않으므로 접촉점·trajectory·RigidBody timing·최종 위치는 checksum에서 제외한다.</li><li>광고 callback 시점은 RNG draw count를 바꾸지 않는다.</li><li>다른 seed 다양성은 한 쌍 비교가 아니라 다수 seed 분포로 본다.</li><li>현재 무리와 관련 있는 3택 최소 한 장 보장, pity·합성 수·등급 상한은 <span class="badge playtest">NEEDS PLAYTEST</span>다.</li></ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="bird-cast" data-searchable data-source="user-approval,Project-K-art-direction" data-decision="QT-RB-CAST-001,QT-RB-CAST-002,QT-RB-CAST-003,QT-RB-CAST-005" data-feature="QT-RB-TC-MERGE-001,QT-RB-TC-CAST-001,QT-RB-TC-ART-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">06 · LEADER &amp; FLOCK</div><h2>리더 한 마리, 이름 있는 동료 다섯</h2></div></div>
+        <p class="section-intro">새는 색만 다른 능력치 카드가 아니다. 실루엣, 이동, 충돌 소리, 사슬 역할이 달라서 이름을 가려도 종과 기능을 짐작할 수 있어야 한다.</p>
+        <div class="grid three">
+          <article class="card new" data-searchable>
+            <div class="kicker">DUCK · LEADER</div><h3>오리 · 지휘와 균형</h3>
+            <p>리더의 경로를 가장 정확히 따라가며 편대 방향을 바꾼다.</p>
+            <ul><li><b>진입:</b> 손가락 경로 보정</li><li><b>난투:</b> 동료 대시 방향 정렬</li><li><b>사슬:</b> 항상 첫 연결점</li></ul>
+          </article>
+          <article class="card keep" data-searchable>
+            <div class="kicker">GOOSE · WEIGHT</div><h3>거위 · 방어와 중량</h3>
+            <p>큰 목과 넓은 날개 실루엣. 앞에서 한 번 버티고 무거운 물체를 민다.</p>
+            <ul><li><b>진입:</b> 첫 충돌 보호</li><li><b>난투:</b> 강한 넉백·벽 충돌</li><li><b>사슬:</b> 중량 약점 파괴</li></ul>
+          </article>
+          <article class="card info" data-searchable>
+            <div class="kicker">PIGEON · ROUTE</div><h3>비둘기 · 경로와 와일드카드</h3>
+            <p>도시 지름길을 찾고 빈 역할을 잠깐 보충한다.</p>
+            <ul><li><b>진입:</b> 위험 경로 재표시</li><li><b>난투:</b> 떨어진 보상 회수</li><li><b>사슬:</b> 끊긴 링크 한 번 연결</li></ul>
+          </article>
+          <article class="card new" data-searchable>
+            <div class="kicker">CHICKEN · TEMPO</div><h3>닭 · 속도와 연속</h3>
+            <p>빠른 발과 날개 연타로 combo를 이어 간다.</p>
+            <ul><li><b>진입:</b> 알·구조 보상 강화</li><li><b>난투:</b> 빠른 연속 타격</li><li><b>사슬:</b> 돌진 횟수 증가</li></ul>
+          </article>
+          <article class="card info" data-searchable>
+            <div class="kicker">CROW · RISK</div><h3>까마귀 · 약점과 위험 보상</h3>
+            <p>검은 실루엣과 반짝이는 수집품. 위험한 선택을 큰 보상으로 바꾼다.</p>
+            <ul><li><b>진입:</b> 위험 경로 희귀 보상</li><li><b>난투:</b> 약점 표식·치명타</li><li><b>사슬:</b> 희귀 약점 복제</li></ul>
+          </article>
+          <article class="card playtest" data-searchable>
+            <div class="kicker">CRISPY CHICKEN · LEGEND</div><h3>치킨 · 닭의 전설 각성</h3>
+            <p>독립 종족이 아니라 닭의 과장된 크리스피 갑옷·각성 계열로 우선 검토한다.</p>
+            <ul><li>화염보다 바삭한 파편·김 연출</li><li>세 막 모두에 닭 능력 확장</li><li>정확한 획득 방식은 재미 게이트 이후</li></ul>
+          </article>
+        </div>
+        <details open data-searchable>
+          <summary>캐릭터 데이터 최소 계약</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>필드</th><th>역할</th><th>규칙</th></tr></thead>
+              <tbody>
+                <tr><td><code>character_id</code></td><td>2D·3D·UI·save 공통 안정 ID</td><td>출시 뒤 이름이 바뀌어도 변경하지 않는다.</td></tr>
+                <tr><td><code>species</code></td><td>duck/goose/chicken/crow/pigeon</td><td>치킨은 초기에는 chicken의 evolution이다.</td></tr>
+                <tr><td><code>display_name_key</code></td><td>이름 locale key</td><td>이미지에 텍스트를 굽지 않는다.</td></tr>
+                <tr><td><code>personality_tags</code></td><td>성격·대표색·소품 ID</td><td>Gate B 전 기본 종의 첫 이름 있는 동료 한 명을 승인한다.</td></tr>
+                <tr><td><code>role_tags</code></td><td>route/weight/tempo/risk/support</td><td>한 구현만 위한 인터페이스는 만들지 않는다.</td></tr>
+                <tr><td><code>act_effects</code></td><td>세 막 효과 ID</td><td>최소 두 막에서 의미가 있어야 한다.</td></tr>
+                <tr><td><code>reaction_set</code></td><td>구조·충돌·성공·실패 반응</td><td>표정·몸짓·짧은 소리를 같은 ID로 연결한다.</td></tr>
+                <tr><td><code>merge_tier</code></td><td>합성 등급</td><td>필요 중복 수와 상한은 playtest 전 미확정이다.</td></tr>
+                <tr><td><code>asset_id</code></td><td>manifest의 2D·3D 묶음</td><td>캐릭터 파일 경로를 코드에 직접 쓰지 않는다.</td></tr>
+                <tr><td><code>voice_profile</code></td><td>짧은 non-verbal 음성군</td><td>장문 풀 보이스는 초기 범위가 아니다.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <div class="callout"><strong>첫 제작 순서:</strong> greybox는 오리·거위·비둘기만 사용한다. 닭·까마귀·치킨은 역할과 원화 계약을 먼저 고정하되, 전체 캐릭터·상점 에셋 양산은 Gate A 통과 뒤로 미룬다.</div>
+      </div>
+    </section>
+
+    <section id="story-mascot" data-searchable data-source="original-master-story,user-feedback" data-decision="QT-RB-STORY-001,QT-RB-STORY-002,QT-RB-STORY-004,QT-RB-MASCOT-001" data-feature="QT-RB-TC-STORY-001,QT-RB-TC-MASCOT-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">07 · STORY &amp; MASCOT</div><h2>방송을 타러 왔다가 방송을 훔친다</h2></div></div>
+        <p class="section-intro">이야기는 전투 사이 보상이 아니라 전투의 이유다. 플레이어는 “행운의 새를 뽑는 생방송”에 참가하지만, 구조한 동료와 방송 기록을 통해 타워가 조류 집단을 경쟁시키고 응원 에너지를 빼앗고 있음을 알아낸다. <span class="badge proposed">전체 이야기·구역·마스코트 PROPOSED</span></p>
+        <div class="flow" aria-label="이야기 진행">
+          <div class="flow-step"><b>오프닝</b>실종 동료가 마지막으로 나온 생방송에 오리 리더가 참가한다.</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>구역 1 · 예선</b>비둘기 배달층에서 탈락자가 사라지는 경로를 발견한다.</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>구역 2 · 가공 무대</b>닭 캐릭터를 상품화하는 무대와 망설이는 거위 경비를 뚫는다.</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>구역 3 · 기록보관소</b>까마귀가 숨긴 조작 순위와 응원 에너지 장부를 회수한다.</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>최종 송출실</b>생방송을 탈취해 모든 조류가 같은 편임을 공개하고 타워를 붕괴시킨다.</div>
+        </div>
+        <div class="callout"><strong>반복 런:</strong> 재도전은 시간 되감기가 아니라 다음 생방송 회차다. 실패·완주 뒤 구조 후보와 편성이 바뀌고, 확보한 방송 증거와 구조 명단만 메타 진행으로 남는다.</div>
+        <div class="grid two">
+          <article class="card new" data-searchable>
+            <div class="kicker">MASCOT PROPOSAL</div><h3>삐약 PD</h3>
+            <p>타워의 카메라 조수였던 작은 병아리. 제작진 명령을 어기고 플레이어에게 카메라 사각, 약점, 조작된 자막을 알려 준다.</p>
+            <ul><li>튜토리얼·story·감정 반응을 한 캐릭터가 담당</li><li>작은 카메라 렌즈 소품으로 실루엣 구분</li><li>위험 중 화면 가장자리에서 몸짓만 사용</li><li>최종 송출실에서 카메라 권한을 플레이어에게 넘김</li></ul>
+            <span class="badge proposed">이름·외형은 검토 후보</span>
+          </article>
+          <article class="card keep" data-searchable>
+            <div class="kicker">DIALOGUE CONTRACT</div><h3>한 번에 다음 행동 하나</h3>
+            <table>
+              <tbody>
+                <tr><th>첫 드래그</th><td>“오리를 끌어. 나머진 따라와!”</td></tr>
+                <tr><th>첫 대시</th><td>“벽 쪽으로 날려!”</td></tr>
+                <tr><th>첫 사슬</th><td>“약점을 잇고 손을 떼!”</td></tr>
+                <tr><th>성공</th><td>“방송에 아주 잘 나갔어.”</td></tr>
+                <tr><th>실패</th><td>“부딪힌 건 저 빨간 간판이야.”</td></tr>
+                <tr><th>비밀</th><td>“이 점수표, 처음부터 정해져 있어.”</td></tr>
+              </tbody>
+            </table>
+          </article>
+        </div>
+        <details open data-searchable>
+          <summary>스토리 전달 예산</summary>
+          <div class="details-body grid three">
+            <div><h4>플레이 중</h4><p>말풍선 최대 한 문장·두 줄. 시스템 배너와 같은 내용을 말하지 않는다.</p></div>
+            <div><h4>구역 종료</h4><p>환경 prop 한 개, 방송 자막 한 줄, 마스코트 반응 한 번. 총 3초 안에 다음 3택으로 연결한다.</p></div>
+            <div><h4>런 결과</h4><p>획득한 증거와 구조한 동료를 먼저 보여 주고, 이야기 요약은 접힌 선택 정보로 둔다.</p></div>
+          </div>
+        </details>
+        <div class="callout danger-callout"><strong>금지:</strong> 자동전투를 설명하는 장문 소설, 한 화면 세 명 이상의 대화, 같은 결과를 배너·말풍선·결과창이 반복하는 것, 위험 중 중앙 말풍선, 플레이어를 모욕하는 실패 대사.</div>
+      </div>
+    </section>
+
+    <section id="combat-collapse" data-searchable data-source="user-feedback,godot-native-3d" data-decision="QT-RB-GAME-008,QT-RB-TECH-004,QT-RB-TECH-007" data-feature="QT-RB-TC-BRAWL-001,QT-RB-TC-CHAIN-001,QT-RB-TC-COLLAPSE-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">08 · COMBAT &amp; CATHARSIS</div><h2>원인이 보이는 충돌, 단계가 보이는 붕괴</h2></div></div>
+        <p class="section-intro">“벽이 사라졌는지 내가 부딪혔는지 모르겠다”는 기존 문제를 규칙으로 막는다. 위험 예고, 접촉, 힘의 방향, 피해 대상, 붕괴 결과를 같은 카메라 프레임 안에서 순서대로 보여 준다.</p>
+        <div class="grid four">
+          <article class="card info" data-searchable><div class="number">1</div><h3>예고</h3><p>위험물의 실루엣·바닥 그림자·색이 먼저 나타난다. 빨간 flash만으로 경고하지 않는다.</p></article>
+          <article class="card new" data-searchable><div class="number">2</div><h3>접촉</h3><p>실제 collider가 맞는 순간 40~70ms hit stop, 접촉점 spark, 방향성 SFX를 낸다.</p></article>
+          <article class="card keep" data-searchable><div class="number">3</div><h3>전달</h3><p>적·구조물이 힘 방향으로 이동하고 균열 decal·조각 분리가 이어진다.</p></article>
+          <article class="card new" data-searchable><div class="number">4</div><h3>보상</h3><p>붕괴가 끝난 위치에서 보상과 score burst가 나온다. 원인보다 먼저 숫자가 뜨지 않는다.</p></article>
+        </div>
+        <details open data-searchable>
+          <summary>authored destruction 기술 계약</summary>
+          <div class="details-body grid two">
+            <div>
+              <h4>사용</h4>
+              <ul><li>미리 나눈 구조물 조각</li><li><code>StaticBody3D</code>와 약점 <code>Area3D</code></li><li>충돌 순간 필요한 소수의 <code>RigidBody3D</code></li><li><code>AnimationPlayer</code>로 균열·분리 타이밍 제어</li><li>실제 접촉점과 힘 방향을 붕괴 preset에 전달</li><li>조각 sleep/freeze와 pool 재사용</li></ul>
+            </div>
+            <div>
+              <h4>사용하지 않음</h4>
+              <ul><li>모든 메시를 실시간 voxel 파괴</li><li>화면 밖 물리를 계속 계산</li><li>원인 없는 시간 기반 자동 붕괴</li><li>다중 custom shader로만 보이는 균열</li><li>카메라 밖 보상 지급</li><li>파티클이 위험·동료·약점을 가리는 연출</li></ul>
+            </div>
+          </div>
+        </details>
+        <table>
+          <thead><tr><th>판정</th><th>화면</th><th>소리·햅틱</th><th>게임 결과</th></tr></thead>
+          <tbody>
+            <tr><td>근접 회피</td><td>위험 외곽선이 흰색으로 끊기고 바람선이 뒤로 흐름</td><td>짧은 whoosh + light</td><td>Feather Meter 증가, 피해 없음</td></tr>
+            <tr><td>리더 충돌</td><td>접촉점 고정, 리더 squash, 위험은 남음</td><td>낮은 bonk + medium</td><td>체력 감소·combo 보호 여부 판정</td></tr>
+            <tr><td>적의 벽 충돌</td><td>힘 방향으로 적이 날아가 벽 균열</td><td>재질별 impact</td><td>추가 피해·사슬 약점 생성</td></tr>
+            <tr><td>사슬 성공</td><td>연결선이 순서대로 켜지고 각 동료가 같은 순서로 돌진</td><td>준비음 밀도 상승→60~90ms 정적→연쇄 impact</td><td>대상당 한 번만 파괴·보상</td></tr>
+            <tr><td>사슬 실패</td><td>유효 마지막 노드에서 선이 끊기고 이유 아이콘 표시</td><td>짧은 muted snap</td><td>돌진 미소비 또는 부분 실행을 playtest로 결정</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="meta-ranking" data-searchable data-source="user-approval,quirky-ball-ranking-rules" data-decision="QT-RB-BM-004,QT-RB-BM-005,QT-RB-BM-006,QT-RB-BM-011,QT-RB-BM-012" data-feature="QT-RB-TC-RANK-001,QT-RB-TC-AFFIL-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">09 · META, RANKING &amp; AFFILIATION</div><h2>하나의 기록, 여러 경쟁 보기</h2></div></div>
+        <p class="section-intro">광고·티켓·무지원 사용자를 공식·비공식으로 나누지 않는다. 정상 런은 하나의 기록 풀에 들어가고 글로벌, 친구, 타임어택, 국가/소속은 같은 기록을 서로 다른 정렬·필터로 보는 경쟁 보기다.</p>
+        <div class="grid three">
+          <article class="card keep" data-searchable><div class="kicker">ONE POOL</div><h3>통합 랭킹</h3><p>부스트를 썼다는 이유로 별도 리그를 만들지 않는다. 획득 출처는 분석과 부정행위 검증에만 사용한다.</p></article>
+          <article class="card info" data-searchable><div class="kicker">VIEWS</div><h3>경쟁 방식</h3><p>점수 보기는 score 내림차순, 타임어택은 완주 기록의 active time 오름차순이다. 친구·국가/소속은 같은 record를 거르는 필터다.</p></article>
+          <article class="card new" data-searchable><div class="kicker">USER CHOICE</div><h3>국가/소속</h3><p>실제 국가와 “옥상 비둘기회” 같은 유머 소속을 한 목록에서 고른다. GPS·IP·언어로 자동 추정하지 않으며 변경은 새 기록부터 적용한다.</p></article>
+        </div>
+        <details open data-searchable>
+          <summary>로컬 기록과 온라인 랭킹 경계</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>단계</th><th>구현</th><th>제출 데이터</th><th>증거</th></tr></thead>
+              <tbody>
+                <tr><td>Greybox</td><td>로컬 이산 규칙 record</td><td>seed, ruleset, choices, support effect, event ledger, score breakdown, active time, integrity hash</td><td>HEADLESS</td></tr>
+                <tr><td>5분 런</td><td>로컬 전체·친구 mock·국가/소속 filter</td><td>동일 record를 필터링</td><td>HEADLESS+VISUAL</td></tr>
+                <tr><td>Backend</td><td>Supabase validation·dedupe</td><td>run_id, event digest, app/ruleset version, affiliation snapshot</td><td>NETWORK+SECURITY</td></tr>
+                <tr><td>Release</td><td>실제 친구·타임어택·시즌 보기</td><td>최소 개인정보, source는 비노출</td><td>DEVICE+STORE</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <div class="callout"><strong>정렬·시간 원칙:</strong> 점수 보기는 score↓, 타임어택은 완주자의 모든 시도 active gameplay time↑→score↓→run_id 순이다. pause·선택·광고·background는 빼고 재도전 전 실패 시도는 포함한다. integrity hash는 기록 변조 탐지용이며 Godot physics 재시뮬레이션 증거가 아니다. 정확한 점수 수식은 <span class="badge playtest">NEEDS PLAYTEST</span>다.</div>
+      </div>
+    </section>
+
+    <section id="asset-direction" data-searchable data-source="Project-K-ASSET_ART_DIRECTION.md,user-reference-images" data-decision="QT-RB-ART-001,QT-RB-ART-003,QT-RB-ART-005,QT-RB-ART-007,QT-RB-ART-012,QT-RB-ART-013" data-feature="QT-RB-TC-ART-001,QT-RB-TC-ASSET-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">10 · 2D, 3D, PROFILE, FRAME &amp; SHOP</div><h2>한 캐릭터 원형에서 모든 화면으로</h2></div></div>
+        <p class="section-intro">Project K의 최근 애니풍은 “큰 실루엣, 얼굴·복장 판독, 단일 광원, 정리된 경계”를 뜻한다. 정치 선전 팔레트나 현행 절차형 3D를 복사한다는 뜻이 아니다.</p>
+        <div class="grid two">
+          <article class="card keep" data-searchable>
+            <div class="kicker">REUSE THE RULE</div><h3>계승</h3>
+            <ul><li>화면 축소에서도 읽히는 큰 머리·부리·날개·소품</li><li>좌상단 단일 주광원과 한 단계 툰 그림자</li><li>원화 후보→배경 제거→nearest 축소→경계·잡픽셀 정리</li><li>stable ID와 manifest</li><li>같은 전신을 profile·dialogue·card에 crop·scale 재사용</li><li>2D·3D silhouette comparison gate</li></ul>
+          </article>
+          <article class="card remove" data-searchable>
+            <div class="kicker">DO NOT COPY</div><h3>금지</h3>
+            <ul><li>적갈·올리브·금색 선전물 팔레트</li><li>가상 독재국·AI기업·군복 세계관</li><li>Project K 인물 체형·복장·대사</li><li>현재 조잡한 절차형 박스 3D</li><li>2D 이미지를 자동으로 3D라고 부르는 것</li><li>생성 결과를 보정·manifest 없이 런타임에 넣는 것</li></ul>
+          </article>
+        </div>
+        <details open data-searchable>
+          <summary>캐릭터 한 명의 마스터 패키지</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>자산</th><th>제작 계약</th><th>재사용</th><th>승인 증거</th></tr></thead>
+              <tbody>
+                <tr><td>2D 전신</td><td>400×800 투명 캔버스, 정면·3/4·후면 턴어라운드, neutral/reaction/assertive/uneasy</td><td>원본 정본</td><td>실루엣·광원·해부 일치</td></tr>
+                <tr><td>대화·프로필</td><td>전신 원본에서 프로필 1:1·대화·상점 3:4를 비파괴 crop, 별도 얼굴 재생성 금지</td><td>말풍선·프로필·도감·상점</td><td>오리 gate에서 얼굴·부리·소품 safe area 고정</td></tr>
+                <tr><td>인게임 3D</td><td>동일 턴어라운드 기반 저폴리 GLB/TSCN, 공통 rig 우선, 실제 collider 별도</td><td>난투·사슬·관리 preview</td><td>2D/3D 정면·3/4 실루엣 비교</td></tr>
+                <tr><td>픽셀 표면</td><td>nearest, mipmaps off 검토, 제한된 face/feather/material texture</td><td>3D 얼굴·날개·월드 decal</td><td>20:9 캡처에서 번짐·필터링 0</td></tr>
+                <tr><td>상점 카드</td><td>3:4 캐릭터 layer·대표 pose·공용 NinePatch frame 조합, locale text는 별도 UI</td><td>상점·획득·결과</td><td>희귀도와 캐릭터 역할 동시 판독</td></tr>
+                <tr><td>공용 frame</td><td>공용 set 재사용; common/rare/epic/legendary 4종은 후보</td><td>모든 profile·item</td><td>캐릭터별 복제 0</td></tr>
+              </tbody>
+            </table>
+            <p class="subtle">공통 animation ID 후보: <code>idle/locomotion/dash/hit/rescued/chain_windup/chain_attack/success/failure/shop_pose</code>. 2D·3D가 같은 ID를 쓰며 누락 동작을 임의 대체하지 않는다.</p>
+          </div>
+        </details>
+        <details data-searchable>
+          <summary>asset manifest 필드</summary>
+          <div class="details-body">
+<pre><code>{
+  "character_id": "bird_duck_leader_01",
+  "species": "duck",
+  "role": ["leader", "route"],
+  "master_2d": "res://assets/reboot/characters/...",
+  "profile": "res://assets/reboot/profiles/...",
+  "shop_card": "res://assets/reboot/shop/...",
+  "model_3d": "res://assets/reboot/models/...",
+  "rig": "bird_common_v1",
+  "animation_set": "bird_biped_v1",
+  "frame_set": "rarity_frames_v1",
+  "palette": "tower_broadcast_v1",
+  "license": "house_duck_original",
+  "source_hash": "sha256:...",
+  "approval_status": "candidate|approved|rejected"
+}</code></pre>
+            <p class="subtle">위 예시는 계약 형식을 설명한다. 실제 경로와 ID는 구현 계획에서 존재하는 폴더에 맞춰 확정하며, 빈 파일을 미리 scaffold하지 않는다.</p>
+          </div>
+        </details>
+        <div class="grid three">
+          <article class="card new" data-searchable><div class="kicker">PALETTE</div><h3>방송 사고의 밤</h3><p>남청 배경, 망고 리더, 청록 성공·경로, 코럴 충돌, 라일락 비밀을 역할색으로 사용한다.</p></article>
+          <article class="card info" data-searchable><div class="kicker">MATERIAL</div><h3>저폴리 + 픽셀 표면</h3><p>사진풍 roughness 노이즈와 다중 반사를 빼고 큰 면, 2D 얼굴, 표면 decal, 실제 그림자로 형태를 만든다.</p></article>
+          <article class="card keep" data-searchable><div class="kicker">FIRST GATE</div><h3>오리 하나를 끝까지</h3><p>2D·3D·프로필·상점·frame 조합을 한 번 승인한 뒤 같은 파이프라인으로 다른 조류를 확장한다.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="ui-motion" data-searchable data-source="Quirky-Ball-common-rules,current-app-shell" data-decision="QT-RB-UI-002,QT-RB-UI-003,QT-RB-UI-004,QT-RB-UI-006,QT-RB-UI-011,QT-RB-UI-012,QT-RB-UI-013" data-feature="QT-RB-TC-UI-001,QT-RB-TC-SCREEN-001,QT-RB-TC-I18N-001,QT-RB-TC-MASCOT-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">11 · UI, MOTION &amp; LOCALIZATION</div><h2>하나를 바꾸면 전 화면이 바뀌는 UI</h2></div></div>
+        <p class="section-intro">UI 공통화는 거대한 프레임워크가 아니라 세 층만 사용한다. <code>AppTheme.tres</code>, 역할 기반 <code>DesignTokens</code>, 실제 두 화면 이상에서 쓰는 작은 공통 컴포넌트다.</p>
+        <div class="grid three">
+          <article class="card keep" data-searchable><div class="kicker">LAYER 1</div><h3>AppTheme</h3><p>폰트, Control 기본 스타일, focus, disabled, scrollbar, tooltip처럼 Godot Theme가 원래 해결하는 값을 맡는다.</p></article>
+          <article class="card new" data-searchable><div class="kicker">LAYER 2</div><h3>DesignTokens</h3><p>색 역할, 간격, 반경, 글자 단계, 터치 높이, 모션 시간을 한 곳에서 제공한다. 화면에 hex와 magic number를 흩뿌리지 않는다.</p></article>
+          <article class="card info" data-searchable><div class="kicker">LAYER 3</div><h3>공통 컴포넌트</h3><p>버튼, 세로 선택 카드, 팝업, 칩, 랭킹 행처럼 이미 반복된 것만 만든다. 한 화면 전용 wrapper는 공용화하지 않는다.</p></article>
+        </div>
+        <details open data-searchable>
+          <summary>색 역할 후보 · Tower Broadcast v1</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>Token</th><th>후보색</th><th>역할</th><th>금지</th></tr></thead>
+              <tbody>
+                <tr><td><code>BACKGROUND</code></td><td>#08111F</td><td>밤 옥상·문서·홈 배경</td><td>모든 화면을 순수 검정으로 눌러 정보층 제거</td></tr>
+                <tr><td><code>SURFACE</code></td><td>#10243A</td><td>카드·HUD·팝업</td><td>상점마다 다른 남색</td></tr>
+                <tr><td><code>PRIMARY</code></td><td>#FFD84A</td><td>리더·주 행동·연결 확정</td><td>모든 장식에 사용</td></tr>
+                <tr><td><code>SECONDARY</code></td><td>#36D6C5</td><td>경로·성공·탐색</td><td>참고 SF UI의 청록 테두리 복제</td></tr>
+                <tr><td><code>ACTION</code></td><td>#FF6B5F</td><td>충돌·대시·강한 CTA</td><td>위험과 성공 동시 표현</td></tr>
+                <tr><td><code>SUCCESS</code></td><td>#83E36B</td><td>구조·회복·확정</td><td>텍스트만 색으로 구분</td></tr>
+                <tr><td><code>MYSTERY</code></td><td>#B78CFF</td><td>방송 오류·비밀·희귀</td><td>일반 선택 카드 남용</td></tr>
+                <tr><td><code>DANGER</code></td><td>#FF4D6D</td><td>피해·파괴 직전 위험</td><td>화면 전체 지속 flash</td></tr>
+                <tr><td><code>TEXT</code></td><td>#FFF5D6</td><td>주 텍스트</td><td>본문을 Do Hyeon 하나로 고정</td></tr>
+              </tbody>
+            </table>
+            <p class="subtle">팔레트는 <span class="badge proposed">PROPOSED</span>다. 원화와 흑백 가독성 캡처를 함께 본 뒤 승인한다.</p>
+          </div>
+        </details>
+        <details open data-searchable>
+          <summary>앱 시작에서 인게임까지</summary>
+          <div class="details-body">
+            <div class="flow">
+              <div class="flow-step"><b>앱 시작 배너</b>House Duck → Quirky Tower. 1.5초 이내, 탭 스킵 가능.</div><span class="flow-arrow">›</span>
+              <div class="flow-step"><b>홈</b>현재 리더·무리, 큰 PLAY, 설정. 상점·도감·랭킹은 하단 탭.</div><span class="flow-arrow">›</span>
+              <div class="flow-step"><b>런 준비</b>리더, 국가/소속, Sponsor 지원 선택. 가로 옵션 금지.</div><span class="flow-arrow">›</span>
+              <div class="flow-step"><b>짧은 출동</b>마스코트 한 문장, 배경이 위로 이동하며 진입으로 연결.</div><span class="flow-arrow">›</span>
+              <div class="flow-step"><b>플레이</b>별도 “Round 1” 정지 화면 없이 첫 의미 있는 조작 6초 이내.</div>
+            </div>
+          </div>
+        </details>
+        <details open data-searchable>
+          <summary>필수 화면 계약</summary>
+          <div class="details-body">
+            <table aria-label="프로토타입 필수 화면 계약">
+              <thead><tr><th>화면</th><th>진입·표시</th><th>주/보조 행동</th><th>Back</th><th>상태·출처</th><th>Safe area</th></tr></thead>
+              <tbody>
+                <tr><td>앱 배너</td><td>cold boot; House Duck→title</td><td>탭 skip / 없음</td><td>무시</td><td>local; 오류 시 홈</td><td>전체 배경, 로고는 safe frame</td></tr>
+                <tr><td>홈</td><td>boot·런 종료; 리더·조류단·PLAY</td><td>PLAY / 설정·하단 탭</td><td>세로 종료 확인</td><td>prototype local, backend 없음</td><td>PLAY·탭은 safe rect</td></tr>
+                <tr><td>런 준비</td><td>PLAY; 리더·소속·지원</td><td>출동 / 뒤로</td><td>홈</td><td>mock inventory; 빈 slot 표시</td><td>세로 선택, 하단 CTA clamp</td></tr>
+                <tr><td>HUD·일시정지</td><td>런; HP·동료·구역·meter</td><td>pause / 없음</td><td>pause popup</td><td>RunState; 오류는 안전 종료</td><td>손가락·노치 밖, 월드 비가림</td></tr>
+                <tr><td>3택</td><td>구역 완료; 카드 3개·시너지</td><td>카드 선택 / reroll</td><td>닫기 불가</td><td>seeded local offer</td><td>본문만 scroll, CTA 고정</td></tr>
+                <tr><td>결과</td><td>성공·실패; 원인·보상·증거</td><td>재도전 / 지원·홈</td><td>홈 확인</td><td>one-shot result ledger</td><td>세로 행동, 보상 뒤 CTA</td></tr>
+                <tr><td>설정</td><td>홈·pause; audio·언어·motion</td><td>적용 / 초기화</td><td>이전 화면</td><td>local settings; 저장 실패 알림</td><td>본문 scroll, 제목·back 고정</td></tr>
+                <tr><td>도감</td><td>홈 탭; 구조·미발견 동료</td><td>프로필 / 필터</td><td>홈</td><td>mock unlock; empty·unknown fallback</td><td>카드 grid, 상세는 세로 popup</td></tr>
+                <tr><td>프로필</td><td>도감·상점; 1:1 crop·역할</td><td>장착 / 닫기</td><td>이전 화면</td><td>manifest; 누락 asset fallback</td><td>얼굴·부리·소품 safe crop</td></tr>
+                <tr><td>상점</td><td>홈 탭; 상품·가격·보유</td><td>구매 / 상세</td><td>홈</td><td>prototype mock; loading/error/owned</td><td>번역은 UI, 구매는 세로 확인</td></tr>
+                <tr><td>랭킹</td><td>홈 탭; score·time·친구·소속</td><td>보기 변경 / 내 기록</td><td>홈</td><td>local mock; empty·offline</td><td>행 scroll, 필터·내 기록 고정</td></tr>
+                <tr><td>국가/소속</td><td>준비·랭킹; 한 선택 목록</td><td>확정 / 취소</td><td>취소</td><td>user choice; GPS 추정 없음</td><td>검색+세로 목록, CTA 고정</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <table>
+          <thead><tr><th>전환</th><th>등장 순서</th><th>첫 후보 시간</th><th>Reduce Motion</th></tr></thead>
+          <tbody>
+            <tr><td>화면 진입</td><td>배경 → 주체 → 맥락 → 행동</td><td>각 70~120ms, 전체 420ms 이내</td><td>이동 없이 opacity·outline 순서만 유지</td></tr>
+            <tr><td>3택</td><td>dim → 카드 컨테이너 → 카드 1·2·3 → 선택 가능</td><td>카드 사이 80ms</td><td>세 카드 동시 표시, focus outline 유지</td></tr>
+            <tr><td>강한 충돌</td><td>접촉 고정 → squash → 파편 → 반동</td><td>hit stop 40~70ms</td><td>카메라 punch 축소, 접촉 outline 강화</td></tr>
+            <tr><td>결과</td><td>붕괴 → 보상 count → 마스코트 → 다음 행동</td><td>0.3초 뒤 탭 가속 가능</td><td>빠른 scale과 색 변화</td></tr>
+            <tr><td>실패</td><td>원인 아이콘 → 한 문장 → 다시/지원/홈</td><td>2탭·4초 이내 재시작</td><td>shake 제거, danger frame 유지</td></tr>
+          </tbody>
+        </table>
+        <details data-searchable>
+          <summary>필수 화면과 공통 규칙</summary>
+          <div class="details-body grid three">
+            <div><h4>Modal owner</h4><ul><li>popup 한 개만 최상위 소유</li><li>gameplay freeze·gesture 취소</li><li>첫 유효 입력 뒤 잠금</li><li>back은 최상단 popup 하나만 닫음</li><li>dismiss 가능 여부 화면별 명시</li></ul></div>
+            <div><h4>세로·긴 언어</h4><ul><li>선택은 항상 VBox</li><li>최소 96 logical px 후보</li><li>word wrap 후 font shrink</li><li>CTA ellipsis·가로 scroll 금지</li><li>본문만 scroll, 제목·CTA 고정</li></ul></div>
+            <div><h4>상태·RTL</h4><ul><li>locale 변경 callback 중복 0</li><li>empty/loading/error 필수</li><li>아랍어 layout direction RTL</li><li>숫자·방향 고정 아이콘은 비미러링</li><li>mock/local/backend 출처 표시</li></ul></div>
+          </div>
+        </details>
+        <div class="callout"><strong>다국어:</strong> <code>ko/en/de/ja/fr/es/it/zh_CN/zh_TW/ar</code>와 영어 fallback을 유지한다. KO·EN·DE·JA·AR로 홈·설정·3택·결과·상점을 stress test하고, 독일어 compound word와 아랍어 RTL에서도 CTA가 잘리지 않아야 한다.</div>
+      </div>
+    </section>
+
+    <section id="audio-haptics" data-searchable data-source="house_duck_audio_taste_profile.md,godot-audio-native" data-decision="QT-RB-AUDIO-001,QT-RB-AUDIO-002,QT-RB-AUDIO-003,QT-RB-HAPTIC-001" data-feature="QT-RB-TC-AUDIO-001,QT-RB-TC-LISTEN-001,QT-RB-TC-HAPTIC-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">12 · AUDIO &amp; HAPTICS</div><h2>한 곡이 세 막과 함께 커진다</h2></div></div>
+        <p class="section-intro">막마다 BGM을 끊어 갈아 끼우지 않는다. 베이스·킥이 잡은 한 곡 위에서 동기화된 스템을 더하고 빼며, 행동 즉시는 SFX, 구역 완료는 짧은 스팅어가 담당한다.</p>
+        <div class="grid four">
+          <article class="card keep" data-searchable><div class="kicker">CORE</div><h3>베이스·킥</h3><p>홈을 떠난 순간부터 끝까지 그루브를 유지한다. 이것만 20초 들어도 곡이 서야 한다.</p></article>
+          <article class="card info" data-searchable><div class="kicker">MOVEMENT</div><h3>진입</h3><p>가벼운 퍼커션과 이동 펄스. 리더보다 앞에서 삑삑거리는 멜로디를 금지한다.</p></article>
+          <article class="card new" data-searchable><div class="kicker">DANGER</div><h3>난투</h3><p>낮은 타격·리듬층을 추가하고 강한 충돌 때 짧게 music ducking한다.</p></article>
+          <article class="card playtest" data-searchable><div class="kicker">JACKPOT</div><h3>사슬·붕괴</h3><p>상승 레이어와 연쇄 리듬을 더하되 독립적인 고음 팡파르로 카타르시스를 대신하지 않는다.</p></article>
+        </div>
+        <details open data-searchable>
+          <summary>오디오 버스와 전환</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>Bus</th><th>내용</th><th>설정</th><th>복귀 규칙</th></tr></thead>
+              <tbody>
+                <tr><td><code>Master</code></td><td>전체 limiter·최종 출력</td><td>전체 mute</td><td>focus 복귀 뒤 한 번만 resume</td></tr>
+                <tr><td><code>Music</code></td><td>4 synchronized stems와 stinger</td><td>선형 slider를 dB로 변환</td><td>광고 중 pause, dismiss 후 다음 safe beat</td></tr>
+                <tr><td><code>SFX</code></td><td>충돌·구조·사슬·붕괴·보상</td><td>category volume</td><td>중복 impact rate limit 유지</td></tr>
+                <tr><td><code>UI</code></td><td>tap·back·popup·choice</td><td>별도 on/off 가능</td><td>stale screen callback 차단</td></tr>
+                <tr><td><code>Voice</code></td><td>조류 non-verbal·마스코트 chirp</td><td>SFX와 함께 또는 별도</td><td>말풍선 queue와 ID 동기</td></tr>
+              </tbody>
+            </table>
+            <p>Godot 기본 <code>AudioStreamSynchronized</code>, <code>AudioStreamRandomizer</code>, bus effect를 우선한다. FMOD·Wwise는 사용하지 않는다.</p>
+          </div>
+        </details>
+        <details open data-searchable>
+          <summary>첫 오디오 제작 명세</summary>
+          <div class="details-body grid two">
+            <div>
+              <h4>음악 후보 기준</h4>
+              <ul><li>112 BPM, 4/4, 16마디 loop를 첫 기준으로 사용</li><li>베이스·킥 → 코드톤 반주 → 이동·위험·jackpot 순 제작</li><li>스템 길이·시작 샘플·loop point 완전 일치</li><li>7~8초 패턴 한 개를 30초 이상 그대로 반복하지 않음</li><li>고정 음정 샘플은 key·BPM·시작점 확인</li><li>높은 합성 금관·GM 리드 기본 금지</li></ul>
+            </div>
+            <div>
+              <h4>파일과 수치 후보</h4>
+              <ul><li>Music: OGG Vorbis, 48kHz stereo</li><li>짧은 SFX: WAV, 48kHz mono 우선</li><li>전체 loop 구간 믹스 목표 약 -16 LUFS-I, true peak -1 dBTP 이하</li><li>짧은 SFX 동시 재생 최대 12개</li><li>동일 impact 최소 60ms 간격, 재질별 4변형</li><li>자동 수치는 경보이며 채택 증거는 실기기 청음</li></ul>
+            </div>
+          </div>
+        </details>
+        <table>
+          <thead><tr><th>사건</th><th>오디오</th><th>햅틱 후보</th><th>시각 동기</th></tr></thead>
+          <tbody>
+            <tr><td>동료 구조</td><td>짧은 상승 chirp + 종별 voice</td><td>light 12ms</td><td>동료 slot 착지 순간</td></tr>
+            <tr><td>합성</td><td>저음 hit + 두 단계 sparkle</td><td>light→medium</td><td>두 silhouette가 하나로 겹칠 때</td></tr>
+            <tr><td>대시 강타</td><td>방향성 whoosh + 재질 impact</td><td>medium 24ms</td><td>실제 contact frame</td></tr>
+            <tr><td>사슬 확정</td><td>동료 수에 따라 준비음 밀도 증가</td><td>light 12ms</td><td>release 후 연결선 lock</td></tr>
+            <tr><td>대형 붕괴</td><td>60~90ms 정적 뒤 30~60ms 간격 연쇄 impact</td><td>heavy 40ms, cooldown 적용</td><td>첫 큰 조각 이탈</td></tr>
+            <tr><td>성공</td><td>곡의 key와 맞는 짧은 stinger</td><td>15ms→30ms gap→35ms</td><td>보상 count 시작</td></tr>
+          </tbody>
+        </table>
+        <div class="callout danger-callout"><strong>House Duck 공통 금지:</strong> 베이스와 따로 노는 고음 리드, 같은 길이·세기의 반복음, 값싼 아케이드 삑삑음, key가 맞지 않는 고정 루프, 7~8초 패턴 무변화 반복, loop 끝을 fade로 숨기는 방식.</div>
+      </div>
+    </section>
+
+    <section id="bm-economy" data-searchable data-source="user-approval,quirky-ball-BM-rules" data-decision="QT-RB-BM-001,QT-RB-BM-002,QT-RB-BM-004,QT-RB-BM-006,QT-RB-BM-008" data-feature="QT-RB-TC-BM-001,QT-RB-TC-ECONOMY-001,QT-RB-TC-RANK-001,QT-RB-TC-RETRY-001,QT-RB-TC-AD-001,QT-RB-TC-PURCHASE-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">13 · BM, ADS &amp; ECONOMY</div><h2>강한 효과를 팔되 광고도 같은 효과를 준다</h2></div></div>
+        <p class="section-intro">Pay-to-win은 허용한다. 광고 완료와 구매가 주는 티켓 한 단위는 같은 inventory item, effect ID, 확률, seed 처리, 이산 event ledger를 사용한다. 단위 효과 동등은 일일 획득량 동등을 뜻하지 않으며 광고 상한·판매량은 별도 후보다.</p>
+        <div class="grid three">
+          <article class="card new" data-searchable><div class="kicker">ONE ITEM</div><h3>Sponsor Ticket</h3><p>광고와 결제가 모두 지급하는 하나의 소모품. source는 원장에만 있고 게임 규칙은 source를 보지 않는다.</p></article>
+          <article class="card keep" data-searchable><div class="kicker">SAME UNIT</div><h3>단위 효과 동등성</h3><p>같은 seed와 입력에서 광고·결제 티켓은 같은 이산 규칙 원장을 만든다. Godot 물리 trajectory는 비교하지 않는다.</p></article>
+          <article class="card info" data-searchable><div class="kicker">ONE RANK</div><h3>랭킹 통합</h3><p>지원 사용자를 별도 공식·비공식 랭킹으로 보내지 않는다. 정상 런은 같은 기록 풀에 제출한다.</p></article>
+        </div>
+        <details open data-searchable>
+          <summary>Sponsor Ticket 사용처 후보</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>사용 시점</th><th>효과 후보</th><th>제한 후보</th><th>동등성 게이트</th></tr></thead>
+              <tbody>
+                <tr><td>런 준비</td><td>티어 1 동료 알 1개와 작은 Feather Guard</td><td>시작 지원 1칸</td><td>광고/티켓이 같은 알 pool·seed 사용</td></tr>
+                <tr><td>구역 3택</td><td>현재 세 장을 버리고 같은 규칙으로 세 장 재추첨</td><td>비상 지원 1칸과 공유 검토</td><td>유료 전용 네 번째 카드 없음</td></tr>
+                <tr><td>막 실패</td><td>막 시작의 체력·조류단·빌드·적 배치·붕괴 원장·RNG snapshot 복원</td><td>첫 실패 한 번 후보</td><td>callback은 RNG를 진행하지 않고 retry_count·모든 시도 active time은 누적</td></tr>
+              </tbody>
+            </table>
+            <p class="subtle">정확한 체력, 동료 티어, 런당·일일 횟수는 <span class="badge playtest">NEEDS PLAYTEST</span>다. 한 효과의 지원으로 절대 클리어율이 15%p 넘게 오르면 하향 검토한다.</p>
+          </div>
+        </details>
+        <div class="grid two">
+          <article class="card keep" data-searchable>
+            <div class="kicker">FIRST SHOP</div><h3>첫 판매 범위</h3>
+            <ul><li>Sponsor Ticket 묶음</li><li>광고 제거</li><li>오리·동료 스킨</li><li>프로필 이미지</li><li>공용 희귀도 frame</li><li>티켓+확정 코스메틱 스타터 팩</li></ul>
+          </article>
+          <article class="card remove" data-searchable>
+            <div class="kicker">DEFER / CUT</div><h3>지표 전에는 만들지 않음</h3>
+            <ul><li>유료 전용 스탯·네 번째 선택지</li><li>광고보다 강한 유료 부활</li><li>유료 사용자의 지원 slot 추가</li><li>유료 랜덤 상자·캐릭터 가챠</li><li>시즌 패스·복잡한 premium 재화</li><li>Supabase 기반 라이브 상점</li></ul>
+          </article>
+        </div>
+        <details data-searchable>
+          <summary>광고 배치 후보</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>광고</th><th>허용</th><th>금지</th><th>초기 gate</th></tr></thead>
+              <tbody>
+                <tr><td>Rewarded</td><td>런 준비, 멈춘 3택, 실패 정지 화면</td><td>진입·난투·사슬 중</td><td>런당 최대 2회 후보</td></tr>
+                <tr><td>Interstitial</td><td>결과 뒤 홈 이동 전 자연스러운 지점</td><td>첫 2런, Rewarded 직후, phase 사이</td><td>최소 8분 간격 후보</td></tr>
+                <tr><td>Banner</td><td>상점·랭킹·설정 같은 체류 outgame</td><td>인게임·3택·결과 CTA 가림</td><td>safe bottom padding 동적 반영</td></tr>
+                <tr><td>Remove Ads</td><td>전면·배너 제거</td><td>게임 규칙 자동 강화</td><td>Rewarded 선택은 유지</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <div class="callout"><strong>SDK 순서:</strong> Gate A~C에서 mock Sponsor Ticket과 동등성 테스트를 먼저 만든다. 이후 AdMob, Play Billing, StoreKit을 한 번에 하나씩 넣고 실제 sandbox·기기 증거를 별도로 남긴다.</div>
+      </div>
+    </section>
+
+    <section id="architecture" data-searchable data-source="current-architecture,godot-4.7-local-docs,ponytail" data-decision="QT-RB-TECH-001,QT-RB-TECH-002,QT-RB-TECH-003,QT-RB-TECH-004,QT-RB-TECH-005,QT-RB-TECH-007" data-feature="QT-RB-TC-CORE-001,QT-RB-TC-RNG-001,QT-RB-TC-SAVE-001,QT-RB-TC-RESET-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">14 · GODOT 4.7 ARCHITECTURE</div><h2>순수 규칙과 실제 월드를 작게 분리</h2></div></div>
+        <p class="section-intro">기존 앱 셸은 유지하고 리부트 코어는 <code>reboot</code> 영역에 격리해 90초 슬라이스가 통과할 때까지 비교 가능하게 둔다. 한 구현을 위한 interface, service factory, 범용 파괴 엔진은 만들지 않는다.</p>
+        <div class="flow" aria-label="데이터 흐름">
+          <div class="flow-step"><b>JSON/Resources</b>birds · upgrades · encounters</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>Pure Core</b>SeededRng · RunState · RunRules</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>RunController</b>APPROACH→BRAWL→CHAIN→REWARD</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>Godot World</b>actors · collider · collapse preset</div><span class="flow-arrow">›</span>
+          <div class="flow-step"><b>UI</b>HUD · choice · mascot · result</div>
+        </div>
+        <details open data-searchable>
+          <summary>목표 폴더 구조 · 필요한 시점에만 생성</summary>
+          <div class="details-body">
+<pre><code>scripts/
+  core/reboot/          # Node 비의존: RunState, SeededRng, 합성·선택·보상 규칙
+  game/reboot/          # RunController, 입력 router, phase 연결, 물리 결과 변환
+  ui/reboot/            # HUD, 3택, 마스코트, 결과 화면
+scenes/game/reboot/
+  run_root.tscn
+  phases/               # approach, brawl, chain
+  actors/               # bird_actor 공통과 필요한 변형
+  world/                # breakable, hazard, district 조합
+data/reboot/
+  birds/ upgrades/ encounters/
+assets/reboot/
+  characters/ environments/ ui/ audio/</code></pre>
+            <p class="subtle">이 트리는 책임 위치를 정한다. 계획에 필요한 파일만 만들며 빈 디렉터리·base class·registry를 선행 scaffold하지 않는다.</p>
+          </div>
+        </details>
+        <div class="grid two">
+          <article class="card keep" data-searchable>
+            <div class="kicker">PURE CORE</div><h3>Cloud 작성·Godot CLI 검증</h3>
+            <ul><li>RunState: 리더·동료≤5·체력·빌드·콤보·seed</li><li>Seeded RNG stream 분리</li><li>합성·3택·보상·지원 단위 동등성</li><li>phase 이산 결과를 state에 한 번 반영</li><li>save schema·순차 migration·one-shot ledger</li><li>10,000 seed 불가능 상태 검사</li></ul>
+            <p class="subtle">Cloud에 동일 Godot 4.7 CLI가 없으면 작성·정적 검사까지만 하고 HEADLESS는 Local CLI에서 묶어 실행한다.</p>
+          </article>
+          <article class="card new" data-searchable>
+            <div class="kicker">GODOT WORLD</div><h3>Local에서 확인할 것</h3>
+            <ul><li>CharacterBody3D 리더와 단순 추종 동료</li><li>Area3D·StaticBody3D·소수 RigidBody3D</li><li>고정 Camera3D와 screen-to-world 입력</li><li>실제 접촉점·힘 방향 readback</li><li>AnimationPlayer 기반 붕괴 preset</li><li>HUD·말풍선·20:9 safe area</li></ul>
+          </article>
+        </div>
+        <details open data-searchable>
+          <summary>RunController 상태와 오류 처리</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>상태</th><th>입력</th><th>종료 조건</th><th>오류 시</th></tr></thead>
+              <tbody>
+                <tr><td><code>APPROACH</code></td><td>drag</td><td>진입 goal 또는 timeout</td><td>안전 종료 결과로 state 한 번 반영</td></tr>
+                <tr><td><code>BRAWL</code></td><td>drag + swipe</td><td>목표 제거·생존·timeout</td><td>임시 enemy signal 해제 후 fail reason</td></tr>
+                <tr><td><code>CHAIN</code></td><td>draw + release</td><td>경로 실행과 collapse settle</td><td>중복 보상 ledger 차단, 유효 마지막 노드 표시</td></tr>
+                <tr><td><code>REWARD</code></td><td>vertical choice</td><td>첫 유효 선택</td><td>locked input 유지, 안전 기본 선택은 timeout을 쓰지 않음</td></tr>
+                <tr><td><code>PAUSED/POPUP</code></td><td>UI only</td><td>닫기·복귀</td><td>gesture 취소, gameplay callback 거부</td></tr>
+                <tr><td><code>RUN_END</code></td><td>retry/support/home</td><td>한 navigation</td><td>scene·signal·pool cleanup 뒤 이동</td></tr>
+              </tbody>
+            </table>
+            <p>상태 수가 이 정도인 동안 enum+signal을 사용한다. State Charts나 behavior tree는 실제 상태 폭증이 측정될 때만 재검토한다.</p>
+          </div>
+        </details>
+        <div class="callout"><strong>결정론 경계:</strong> Godot 3D physics는 deterministic하지 않다. replay·랭킹 integrity hash는 조우·3택·지원 효과·합성·이산 event ledger만 포함하고 접촉점·trajectory·RigidBody timing·최종 위치는 제외한다.</div>
+        <div class="callout danger-callout"><strong>직접 참조 금지:</strong> 순수 core는 Node·UI·AdMob·Billing·Supabase를 모른다. phase는 상점이나 광고를 열지 않는다. 화면은 Supabase를 직접 호출하지 않는다. brittle <code>../../</code> node path 대신 exported reference와 signal을 쓴다.</div>
+      </div>
+    </section>
+
+    <section id="plugins-skills" data-searchable data-source="plugin-audit,Superpowers,Ponytail,godot-local-docs" data-decision="QT-RB-PLUGIN-001,QT-RB-PLUGIN-002,QT-RB-SKILL-001,QT-RB-SKILL-003" data-feature="QT-RB-TC-EXPORT-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">15 · PLUGINS &amp; SKILLS</div><h2>플러그인은 하나, 역할은 정확히</h2></div></div>
+        <p class="section-intro">Context7는 사용하지 않는다. 무료 로컬 Godot 4.7 문서와 실행 중 ClassDB를 우선하고, 엔진을 실제로 봐야 할 때만 Godot MCP를 켠다.</p>
+        <details open data-searchable>
+          <summary>Godot 4.7 플러그인 결정</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>플러그인</th><th>결정</th><th>시점</th><th>이유·출시 처리</th></tr></thead>
+              <tbody>
+                <tr><td>Godot MCP/CLI</td><td><span class="badge approved">유일한 현재 개발 플러그인</span></td><td>Local 엔진 작업</td><td>MIT v0.7.2는 upstream과 EOL 정규화 뒤 의미상 차이 0. 평소 종료, 낮은 tool surface 우선, release export에서 완전 제외.</td></tr>
+                <tr><td>upstream v0.8.0</td><td><span class="badge proposed">별도 diff·QA 후 판단</span></td><td>구현 Phase 0</td><td>live docs·debugger 이점은 있으나 자동 갱신하지 않는다. 실패 시 v0.7.2 유지.</td></tr>
+                <tr><td>AdMob·Play Billing·StoreKit</td><td><span class="badge deferred">후속</span></td><td>Gate D</td><td>각 플랫폼 원본·라이선스·4.7 호환을 재검증하고 한 번에 하나만 도입.</td></tr>
+                <tr><td>Supabase·Analytics SDK</td><td><span class="badge deferred">후속</span></td><td>이벤트·schema 확정 뒤</td><td>사용자 지시대로 backend는 나중에 판다.</td></tr>
+                <tr><td>GUT/GdUnit4</td><td><span class="badge cut">현재 제외</span></td><td>기존 runner가 실제 한계일 때만</td><td>headless 테스트 기반이 이미 있어 runner 중복을 피한다.</td></tr>
+                <tr><td>Phantom Camera·State Charts·Dialogic</td><td><span class="badge cut">제외</span></td><td>요구가 실제로 폭증할 때만</td><td>고정 카메라, enum+signal, 한 문장 말풍선으로 충분하다.</td></tr>
+                <tr><td>Terrain·Scatter·DebugDraw·FMOD·Wwise</td><td><span class="badge cut">제외</span></td><td>대형 월드·전문 오디오 팀이 생길 때만</td><td>작은 수제 구역과 Godot 기본 3D·Audio로 충분하다.</td></tr>
+              </tbody>
+            </table>
+            <div class="callout"><strong>채널 표현:</strong> Godot MCP는 Godot 엔진 팀 제작·공식 지원 기능이 아니라 Godot가 운영하는 Asset Library의 Community 항목이며, 원개발자 upstream은 <code>regiellis/godot-mcp-go</code>다. 현재 로컬 pin은 v0.7.2다.</div>
+          </div>
+        </details>
+        <details open data-searchable>
+          <summary>스킬 사용 순서</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>단계</th><th>스킬</th><th>역할</th><th>금지</th></tr></thead>
+              <tbody>
+                <tr><td>설계</td><td><code>brainstorming</code></td><td>선택지·경계→서면 spec→self-review→사용자 spec 승인</td><td>spec 승인 전 구현</td></tr>
+                <tr><td>상세 계획</td><td><code>writing-plans</code></td><td>승인 뒤 한 vertical slice의 파일·검증·RED/GREEN 순서</td><td>전 프로젝트 미완료 목록 복사</td></tr>
+                <tr><td>항상</td><td><code>ponytail full</code></td><td>기존→표준→Godot 기본→설치 의존성→최소 코드</td><td>미래용 abstraction</td></tr>
+                <tr><td>격리</td><td><code>using-git-worktrees</code></td><td>dirty main 보호, <code>codex/*</code> branch</td><td>main 직접 대규모 구현</td></tr>
+                <tr><td>코어 구현</td><td><code>test-driven-development</code></td><td>규칙 하나에 실패 테스트→최소 구현→정리</td><td>테스트 없는 합성·보상·저장</td></tr>
+                <tr><td>병렬 실행</td><td><code>subagent-driven-development</code></td><td>서로 다른 파일의 독립 task와 리뷰</td><td>같은 scene·controller 동시 편집</td></tr>
+                <tr><td>실패 조사</td><td><code>systematic-debugging</code></td><td>재현→원인→최소 수정→회귀</td><td>증상별 guard 반복</td></tr>
+                <tr><td>Godot 개념</td><td><code>godot-local-docs</code></td><td>무료 로컬 4.7 튜토리얼·architecture 확인</td><td>기억으로 동작 추측·Context7 의존</td></tr>
+                <tr><td>Local 엔진</td><td><code>godot-mcp</code></td><td>정확 ClassDB·editor·scene·input·collider·runtime readback</td><td>Editor 상시 실행·전체 typed surface 상시 노출</td></tr>
+                <tr><td>2D 후보</td><td><code>imagegen</code></td><td>승인된 조류 master 후보와 파생 원본</td><td>첫 시도부터 전체 상점 양산</td></tr>
+                <tr><td>시각 QA</td><td><code>humanize-pixel-game-ui</code></td><td>픽셀 표면·UI 리듬·모션·오염 검사</td><td>애니풍을 저해상도 픽셀풍으로 강제</td></tr>
+                <tr><td>완료 전</td><td><code>verification-before-completion</code></td><td>주장마다 현재 증거 확인</td><td>headless를 device·fun PASS로 확대</td></tr>
+                <tr><td>통합</td><td><code>requesting-code-review</code>, <code>finishing-a-development-branch</code></td><td>전체 diff와 검증 뒤 통합</td><td>자동 main 직행</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <details data-searchable>
+          <summary>Godot MCP 가벼운 운영</summary>
+          <div class="details-body grid two">
+            <div><h4>작업 중</h4><ul><li>프로젝트 경로와 editor 상태 먼저 확인</li><li>짧게 끝나는 CLI 우선</li><li>필요 없으면 HTTP·dashboard off</li><li>낮은 tool surface 사용</li><li>한 번에 editor 하나</li><li>agent가 띄운 PID 기록</li></ul></div>
+            <div><h4>작업 종료·출시</h4><ul><li>scene stop</li><li>agent PID와 자식만 종료</li><li>MCP 9200~9215·status 확인</li><li>모든 release preset에서 plugin 비활성</li><li>autoload 2개 제거·addon exclude 확인</li><li>PCK cold boot와 addon·서버 문자열 부재 검사</li></ul></div>
+          </div>
+          <p class="subtle">현재 <code>export_presets.cfg</code>는 없다. 첫 release preset을 만들 때 export 제외 gate도 같이 만든다.</p>
+        </details>
+      </div>
+    </section>
+
+    <section id="performance-ops" data-searchable data-source="user-cloud-local-policy,house-duck-process-cleanup" data-decision="QT-RB-OPS-001,QT-RB-OPS-002,QT-RB-OPS-003,QT-RB-DOC-003,QT-RB-TECH-006" data-feature="QT-RB-TC-PERF-001,QT-RB-TC-RESET-001,QT-RB-TC-DOC-001,QT-RB-TC-PROCESS-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">16 · PERFORMANCE, CLOUD/LOCAL &amp; CONTEXT</div><h2>MacBook을 쉬게 하고 문맥을 Git에 남긴다</h2></div></div>
+        <p class="section-intro">“로컬에서 할 수 있으니 로컬에서 한다”가 아니라 “로컬에서 해야만 하는 것만 로컬에서 한다.” 코어·문서·분석은 GitHub와 Cloud, Godot·물리·화면·오디오·빌드는 의미 있는 게이트에서 Local로 묶는다.</p>
+        <div class="grid two">
+          <article class="card keep" data-searchable>
+            <div class="kicker">CLOUD FIRST</div><h3>코드·정적 작업</h3>
+            <ul><li>전체 구조·호출 흐름 분석</li><li>GDScript 규칙·데이터 작성</li><li>grep·JSON·경로·파일 크기 검사</li><li>중복 제거·문서·manifest·라이선스</li><li>코드 리뷰·commit·push</li><li>같은 Godot 4.7 CLI가 있을 때만 HEADLESS</li></ul>
+          </article>
+          <article class="card new" data-searchable>
+            <div class="kicker">LOCAL ONLY WHEN NEEDED</div><h3>실제 엔진·기기 작업</h3>
+            <ul><li>Godot import·scene 실행</li><li>collider·붕괴·드래그·스와이프</li><li>UI·전환·다국어 캡처</li><li>오디오·햅틱 청음</li><li>Android/iOS export·실기기</li><li>AdMob·Billing·StoreKit sandbox</li></ul>
+          </article>
+        </div>
+        <details open data-searchable>
+          <summary>초기 모바일 성능 예산</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>항목</th><th>초기 예산</th><th>초과 시 먼저 할 일</th><th>증거</th></tr></thead>
+              <tbody>
+                <tr><td>리더+동료</td><td>최대 6 actors</td><td>고급 flock AI가 아니라 단순 follow·separation 유지</td><td>RUNTIME</td></tr>
+                <tr><td>동시 적·큰 상호작용물</td><td>화면 내 18개 안팎 후보</td><td>offscreen 비활성, encounter 밀도 조정</td><td>DEVICE</td></tr>
+                <tr><td>활성 RigidBody3D</td><td>대형 붕괴 순간 최대 24</td><td>미리 애니메이션된 조각으로 전환, 빠른 sleep/freeze</td><td>RUNTIME+DEVICE</td></tr>
+                <tr><td>재사용 debris</td><td>최대 48 nodes</td><td>작은 조각을 particle·decal로 통합</td><td>RUNTIME</td></tr>
+                <tr><td>짧은 SFX voices</td><td>동시 최대 12</td><td>impact cooldown·재질군 우선순위</td><td>DEVICE</td></tr>
+                <tr><td>frame 목표</td><td>60fps, 최악 장면 p95≤16.7ms 후보</td><td>효과·물리·투명 overdraw를 측정해 큰 항목부터 줄임</td><td>DEVICE</td></tr>
+              </tbody>
+            </table>
+            <p class="subtle">예산은 <span class="badge proposed">PROPOSED</span>다. 목표 저사양 Android가 정해지면 실측으로 조정한다. Mac headless나 M2 에디터 FPS로 모바일 PASS를 선언하지 않는다.</p>
+          </div>
+        </details>
+        <details open data-searchable>
+          <summary>파일 성장과 저토큰 방지책</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>파일</th><th>경고</th><th>차단·검토</th><th>대응</th></tr></thead>
+              <tbody>
+                <tr><td><code>.gd</code></td><td>500줄</td><td>800줄</td><td>책임·caller 흐름 기준 분리. 줄 수만 맞추는 helper 분해 금지.</td></tr>
+                <tr><td><code>.md/.json</code></td><td>600줄 또는 60KiB</td><td>1,200줄 또는 120KiB</td><td>영역·데이터 책임별 분리, history는 archive.</td></tr>
+                <tr><td>Master HTML</td><td>120KiB</td><td>180KiB</td><td>공유 CSS/JS + 섹션 HTML + index로 분리. 외부 CDN·빌드 없음.</td></tr>
+                <tr><td><code>WORK_STATE.md</code></td><td>150줄</td><td>200줄 또는 20KiB</td><td>완료를 Git/history로 옮기고 현재·다음·미검증만 유지.</td></tr>
+              </tbody>
+            </table>
+            <ul><li>위 수치는 <span class="badge proposed">PROPOSED / NOT ENFORCED</span>다. 현재 검사기는 전체 byte·JSON·HTML gate를 아직 강제하지 않는다.</li><li>결정은 stable ID 하나에 원문을 두고 다른 문서는 링크만 한다.</li><li>한 task는 관련 결정 ID·테스트 ID·파일만 읽는다.</li><li>계획은 명세 전체를 복사하지 않고 입력·출력·오류·검증 계약만 적는다.</li><li>긴 세션 전후 context 도구를 써도 Git과 WORK_STATE가 권위다.</li><li>완료 이력을 work state에 누적하지 않는다.</li></ul>
+          </div>
+        </details>
+        <details data-searchable>
+          <summary>GitHub 중심 전환과 작업 종료</summary>
+          <div class="details-body">
+            <div class="flow">
+              <div class="flow-step"><b>1 · Inspect</b>branch, status, remote 차이, 미커밋 소유권</div><span class="flow-arrow">›</span>
+              <div class="flow-step"><b>2 · Isolate</b><code>codex/*</code> worktree에서 관련 코드 묶음</div><span class="flow-arrow">›</span>
+              <div class="flow-step"><b>3 · Cloud</b>구현·정적 검사·review·commit·push</div><span class="flow-arrow">›</span>
+              <div class="flow-step"><b>4 · Local Gate</b>fetch→별도 worktree, Godot CLI·기기 최소 검증</div><span class="flow-arrow">›</span>
+              <div class="flow-step"><b>5 · Clean</b>정확한 PID 종료, 생성물 정리, commit·push</div>
+            </div>
+            <ul><li>ZIP과 수동 파일 전달 금지.</li><li>미커밋 변경이 있으면 pull·checkout부터 하지 않는다.</li><li><code>reset --hard</code>, <code>clean -fd</code>, 강제 push를 기본 흐름으로 쓰지 않는다.</li><li>Godot 종료는 agent가 시작한 PID와 자식만 대상으로 한다. 광범위한 <code>pkill</code> 금지.</li><li>포트 6505·7777은 legacy, 9080~9095·9100~9115·9200~9215는 MCP 범위로 확인한다.</li><li>종료 PASS는 baseline 대비 새 agent-owned 잔존 0이다.</li></ul>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="qa-analytics" data-searchable data-source="FEATURE_TEST_MAP.md,house_duck_test_case_standard" data-decision="QT-RB-QA-001,QT-RB-QA-002,QT-RB-QA-003,QT-RB-QA-004,QT-RB-ANALYTICS-001,QT-RB-ANALYTICS-002,QT-RB-ANALYTICS-003" data-feature="QT-RB-TC-BAT-001,QT-RB-TC-CORE-001,QT-RB-TC-COLLAPSE-001,QT-RB-TC-PERF-001,QT-RB-TC-ANALYTICS-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">17 · QA, ANALYTICS &amp; FUN GATES</div><h2>자동 PASS와 재미 PASS를 섞지 않는다</h2></div></div>
+        <p class="section-intro">상세 TC와 현재 상태는 <a href="FEATURE_TEST_MAP.md">FEATURE_TEST_MAP.md</a>에 있다. 여기서는 어떤 순서로 무엇을 증명해야 다음 투자를 허용하는지 고정한다.</p>
+        <div class="grid three">
+          <article class="card keep" data-searchable><div class="number">A</div><h3>90초 Greybox</h3><p>오리·거위·비둘기, 한 구역, 세 막, 3택 한 번. 5명 중 3명 이상이 자발적으로 재도전해야 한다.</p></article>
+          <article class="card new" data-searchable><div class="number">B</div><h3>5분 Run</h3><p>외부 10명 이상, 세 구역+송출실, 닭·까마귀, 3택 세 번. pause·광고·background 제외 wall time 4:30~5:30 후보와 빌드 설명률을 함께 본다.</p></article>
+          <article class="card info" data-searchable><div class="number">C</div><h3>Art·Audio·Outgame</h3><p>오리 master의 2D·3D 파생, 4스템 청음, 앱 셸·도감·상점·랭킹 mock이 통과한다.</p></article>
+        </div>
+        <details open data-searchable>
+          <summary>Gate A · 사람 재미 완료 기준</summary>
+          <div class="details-body">
+            <ul><li>5명 중 4명 이상이 첫 10초 안에 다음 행동을 설명 없이 시도한다.</li><li>5명 중 4명 이상이 “무엇에 부딪혔고 무엇 때문에 무너졌는지” 맞게 말한다.</li><li>5명 중 4명 이상이 진입·난투·사슬의 차이를 설명한다.</li><li>5명 중 3명 이상이 요청 없이 즉시 다시 플레이한다.</li><li>한 명이라도 심각한 멀미·입력 불능·원인 불명 붕괴를 겪으면 원인을 고친 뒤 다시 본다.</li><li>실패하면 아트·상점·SDK 범위를 늘리지 않는다.</li></ul>
+          </div>
+        </details>
+        <details open data-searchable>
+          <summary>자동화 최소 세트</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>분류</th><th>검사</th><th>핵심 실패</th></tr></thead>
+              <tbody>
+                <tr><td>Static</td><td>project parse, main scene, file size, forbidden core dependency, manifest</td><td>깨진 참조·거대 파일·Node/SDK 누수</td></tr>
+                <tr><td>Headless</td><td>같은 seed의 조우·3택·event ledger, phase state, merge/reward once, Sponsor 단위 동등성</td><td>이산 규칙 비결정·상태 초기화·중복 지급</td></tr>
+                <tr><td>Runtime</td><td>touch router, collider, force direction, collapse settle, restart cleanup</td><td>유령 입력·원인 없는 붕괴·잔존 node</td></tr>
+                <tr><td>Visual</td><td>20:9, KO/EN/DE/JA/AR, vertical choice, mascot, Reduce Motion</td><td>잘림·겹침·CTA 가림·중복 설명</td></tr>
+                <tr><td>Device</td><td>frame time, safe area, touch, haptic, audio, resume</td><td>끊김·지연·진동 과다·광고 복귀 실패</td></tr>
+                <tr><td>Release</td><td>purchase restore, dedupe, rank checksum, MCP export absence</td><td>중복 지급·잘못된 기록·개발 서버 포함</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <details data-searchable>
+          <summary>분석 이벤트와 payload 예산</summary>
+          <div class="details-body grid two">
+            <div>
+              <h4>필수 이벤트</h4>
+              <p><code>app_open</code>, <code>home_view</code>, <code>run_start/end</code>, <code>district_start/end</code>, <code>act_end</code>, <code>build_offer/pick/reroll</code>, <code>support_offer/use</code>, <code>reward_ad_offer/start/complete/cancel/fail/no_fill</code>, <code>interstitial_show/dismiss/fail</code>, <code>purchase_start/complete/cancel/fail/restore</code>, <code>rank_submit</code>, <code>affiliation_select</code>.</p>
+            </div>
+            <div>
+              <h4>보내지 않는 것</h4>
+              <p>모든 touch point, 매 frame 위치, 개인 대화, GPS·IP 기반 소속을 보내지 않는다. <code>act_end</code>에 입력 수, 구조·합성, 받은 피해, 강충돌, 경로 길이, 사슬 대상, 붕괴 수를 집계한다.</p>
+            </div>
+            <div><h4>예산</h4><p>5분 런당 이벤트 60개 이하, payload 2KB 이하 후보. 구역 종료 때 묶어 저장·전송한다.</p></div>
+            <div><h4>무결성</h4><p>10,000 seed 이산 규칙 불가능 상태 0, 같은 seed event ledger 불일치 0, 광고·결제 티켓 단위 효과 불일치 0을 요구한다. Godot 물리는 대상이 아니다.</p></div>
+          </div>
+        </details>
+        <details data-searchable>
+          <summary>소프트런치 내부 목표 · 시장 평균 아님</summary>
+          <div class="details-body">
+            <div class="metric"><b>첫 세션</b><span>성공·실패 어느 쪽이든 <code>run_end</code> 도달을 첫 런 결과로 센다. 도달률 80%+, 같은 세션 두 번째 런 시작률 45% 목표. 35% 미만이면 meta/BM 확장을 멈춘다.</span></div>
+            <div class="metric"><b>Retention</b><span>D1은 설치 24~48h, D7은 144~192h 내 세션. D1 최소 25%·목표 30%+, D7 최소 8%·목표 10~12%. 신규 500명과 완전한 관찰 기간 전에는 방향성만 본다.</span></div>
+            <div class="metric"><b>Build health</b><span>선택지 500회 이상 노출 뒤 선택률 5% 미만 또는 70% 초과, 상위 3빌드가 완료 런 60% 초과면 재검토한다.</span></div>
+            <div class="metric"><b>Stability</b><span>crash-free session 99.5%+, ANR 0.3% 미만, 광고 관련 crash 0, duplicate run_id 수락 0을 내부 목표로 둔다.</span></div>
+            <div class="metric"><b>Paid UA</b><span>D1/D7, 광고 수익, crash/ANR, 재미 Gate A~C가 확인되기 전에는 광고비를 집행하지 않는다.</span></div>
+          </div>
+        </details>
+      </div>
+    </section>
+
+    <section id="roadmap" data-searchable data-source="user-one-month-goal,quirky-ball-priority" data-decision="QT-RB-QA-002,QT-RB-QA-004,QT-RB-OPS-002" data-feature="QT-RB-TC-CORE-001,QT-RB-TC-ART-001,QT-RB-TC-AUDIO-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">18 · ONE-MONTH PROTOTYPE ROADMAP</div><h2>한 달 동안 호수 하나씩 끓인다</h2></div></div>
+        <p class="section-intro">한 달 목표는 출시형 라이브 서비스가 아니라 “재미가 읽히는 5분 프로토타입 + 승인된 자산 파이프라인 + outgame mock”이다. Quirky Ball의 2026-08-24 양대 마켓 준비가 P0이며, Tower Local 검증은 Quirky Ball 출시 blocker와 충돌하지 않게 묶는다.</p>
+        <div class="grid four">
+          <article class="card keep" data-searchable><div class="kicker">WEEK 1</div><h3>90초 Greybox</h3><ul><li>순수 RunState·seed</li><li>오리·거위·비둘기 도형</li><li>한 구역 세 막</li><li>3택 한 번</li><li>5명 사람 Gate A</li></ul></article>
+          <article class="card new" data-searchable><div class="kicker">WEEK 2</div><h3>5분 Run</h3><ul><li>세 구역+송출실</li><li>닭·까마귀 규칙</li><li>story prop·마스코트</li><li>빌드 세 번</li><li>Gate B·밸런스 seed</li></ul></article>
+          <article class="card info" data-searchable><div class="kicker">WEEK 3</div><h3>Art·Audio·UI</h3><ul><li>오리 2D·3D master</li><li>공용 frame·상점 파생</li><li>4스템·핵심 SFX</li><li>HUD·전환·다국어</li><li>20:9·청음 Gate C</li></ul></article>
+          <article class="card playtest" data-searchable><div class="kicker">WEEK 4</div><h3>Outgame·Device</h3><ul><li>홈·설정·도감 mock</li><li>프로필·상점·랭킹 mock</li><li>Sponsor Ticket fake</li><li>Android/iOS 최소 검증</li><li>계속/중단 결정</li></ul></article>
+        </div>
+        <details open data-searchable>
+          <summary>게이트별 산출물과 중단 조건</summary>
+          <div class="details-body">
+            <table>
+              <thead><tr><th>Gate</th><th>산출물</th><th>통과 뒤 허용</th><th>실패 시</th></tr></thead>
+              <tbody>
+                <tr><td>0 · Spec</td><td>이 HTML, decision, work state, test map</td><td>90초 구현 계획</td><td>문서 수정, 코드 시작 금지</td></tr>
+                <tr><td>A · Greybox</td><td>한 구역 전체와 사람 5명 증거</td><td>5분 run·닭·까마귀</td><td>입력·인과·페이싱 수정</td></tr>
+                <tr><td>B · 5-minute</td><td>세 구역+송출실·빌드·story</td><td>오리 master·4스템·outgame UI</td><td>meta·상품 대신 core 수정</td></tr>
+                <tr><td>C · Art/Audio/UI</td><td>2D·3D 짝, 실제 청음, 20:9·i18n</td><td>mock BM·device</td><td>pipeline 한 종만 재작업</td></tr>
+                <tr><td>D · SDK/Backend</td><td>AdMob·purchase·rank·Supabase 각각의 실제 증거</td><td>출시 후보</td><td>문제 SDK 하나만 격리·수정</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+        <div class="callout"><strong>월말 완료 정의:</strong> 새 코어를 처음 보는 사람이 원인과 세 막을 이해하고 다시 플레이하며, 오리 하나가 2D·3D·프로필·상점에서 같은 캐릭터로 보이고, 엔진·프로세스·Git 상태가 다음 작업자가 바로 이어갈 수 있게 정리돼 있어야 한다.</div>
+      </div>
+    </section>
+
+    <section id="change-boundary" data-searchable data-source="DECISION_REGISTER.md,WORK_STATE.md" data-decision="QT-RB-DOC-001,QT-RB-DOC-004,QT-RB-DOC-006,QT-RB-QA-006" data-feature="QT-RB-TC-EXPORT-001">
+      <div class="shell">
+        <div class="section-head"><div><div class="section-index">19 · DECISIONS, SOURCES &amp; CHANGE BOUNDARY</div><h2>무엇이 승인됐고 무엇이 아직 후보인가</h2></div></div>
+        <div class="grid three">
+          <article class="card keep" data-searchable><div class="kicker">LOCKED</div><h3>사용자 승인 범위</h3><ul><li>세 막을 하나로 연결</li><li>리더 1+동료≤5</li><li>조류 세계관</li><li>20:9·세로 선택</li><li>Project K 계열 애니풍</li><li>P2W·광고/결제 동일 효과</li><li>통합 랭킹·국가/소속 한 카테고리</li><li>Supabase 후순위·Cloud/Local 균형</li></ul></article>
+          <article class="card new" data-searchable><div class="kicker">PROPOSED / PLAYTEST</div><h3>이번 검토 후보</h3><ul><li>방송 탈취 이야기·삐약 PD</li><li>종별 세 막 역할·치킨 각성</li><li>구역·런 정확한 시간</li><li>남청·망고·청록 팔레트</li><li>112 BPM·4스템</li><li>Sponsor Ticket 사용처·광고 간격</li><li>성능·파일 크기 수치</li><li>MCP v0.8.0 갱신 여부</li></ul></article>
+          <article class="card remove" data-searchable><div class="kicker">DEFERRED / CUT</div><h3>지금 하지 않음</h3><ul><li>기존 15층 도메인 코어</li><li>전체 캐릭터·상점 양산</li><li>시즌 패스·유료 가챠</li><li>Supabase·실제 랭킹</li><li>AdMob·Billing·StoreKit</li><li>추가 런타임 플러그인</li><li>대형 절차 파괴·복잡한 AI</li><li>출시 완료 주장</li></ul></article>
+        </div>
+        <details open data-searchable>
+          <summary>주요 로컬 근거</summary>
+          <div class="details-body">
+            <ul>
+              <li><code>/Users/junheechoi/Desktop/quirky_tower_master_spec.md</code> · SHA-256 <code>a9cedc409ca2e669e18628da97967a34c06095f069fb44926d02463eda717f3f</code></li>
+              <li><code>docs/canonical/*</code> · 앱 셸·공통 기반·구 프로토타입의 legacy/reuse evidence. 15층 도메인은 리부트 정본이 아님.</li>
+              <li><code>../shared/standards/house_duck_test_case_standard.md</code> · House Duck 공통 TC 정본</li>
+              <li><code>/Users/junheechoi/projects/houseduck/Project K/docs/canonical/ASSET_ART_DIRECTION.md</code></li>
+              <li><code>/Users/junheechoi/projects/houseduck/Project K/docs/canonical/UI_DESIGN_SYSTEM.md</code></li>
+              <li><code>/Users/junheechoi/projects/houseduck/Project K/docs/reference/house_duck_audio_taste_profile.md</code></li>
+              <li><code>/Users/junheechoi/projects/houseduck/Project K/docs/design/PROJECT_K_REBUILD_BLUEPRINT_2026-08-10.html</code></li>
+            </ul>
+          </div>
+        </details>
+        <details data-searchable>
+          <summary>외부 1차 출처</summary>
+          <div class="details-body">
+            <ul>
+              <li><a href="https://apps.apple.com/us/iphone/charts/6014">Apple US iPhone Games Top Charts</a> · 2026-08-11 조회</li>
+              <li><a href="https://play.google.com/store/apps/details?id=com.block.juggle&amp;hl=en_US">Block Blast · Google Play</a></li>
+              <li><a href="https://play.google.com/store/apps/details?id=com.dxx.firenow">Survivor.io · Google Play</a></li>
+              <li><a href="https://play.google.com/store/apps/details?id=com.percent.aos.luckydefense&amp;hl=en-US">Lucky Defense · Google Play</a></li>
+              <li><a href="https://play.google.com/store/apps/details?id=com.habby.capybara&amp;hl=en-US">Capybara Go · Google Play</a></li>
+              <li><a href="https://play.google.com/store/apps/details?id=com.RedNexusGamesInc.Peglin&amp;hl=en-US">Peglin · Google Play</a></li>
+              <li><a href="https://docs.godotengine.org/en/4.7/about/list_of_features.html">Godot 4.7 Features · Official Docs</a></li>
+              <li><a href="https://godotengine.org/asset-library/asset/5367">Godot MCP/CLI · Godot Asset Library community entry</a></li>
+              <li><a href="https://github.com/regiellis/godot-mcp-go/releases/tag/v0.7.2">Godot MCP/CLI v0.7.2 upstream release</a></li>
+              <li><a href="https://github.com/regiellis/godot-mcp-go/releases/tag/v0.8.0">Godot MCP/CLI v0.8.0 upstream release</a></li>
+            </ul>
+          </div>
+        </details>
+        <div class="callout success-callout"><strong>다음 승인 게이트:</strong> 이 파일과 <a href="DECISION_REGISTER.md">DECISION_REGISTER.md</a>의 <code>PROPOSED</code> 항목을 사용자가 검토한다. 승인 뒤에만 <code>writing-plans</code>로 90초 greybox 구현 계획을 작성한다.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="shell">
+      <p><strong>Quirky Tower Reboot Master Spec</strong> · Review Candidate · 2026-08-11</p>
+      <p>이 HTML은 외부 라이브러리 없이 동작한다. 구현 상태는 <a href="WORK_STATE.md">WORK_STATE.md</a>, 결정은 <a href="DECISION_REGISTER.md">DECISION_REGISTER.md</a>, 검증은 <a href="FEATURE_TEST_MAP.md">FEATURE_TEST_MAP.md</a>를 우선한다.</p>
+    </div>
+  </footer>
+
+  <script src="reboot_spec.js"></script>
+</body>
+</html>
