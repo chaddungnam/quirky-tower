@@ -267,10 +267,12 @@ func _run() -> void:
 	assert(contact_records[0].color != rebound_records[0].color, "contact and rebound use distinct high-contrast materials")
 	var rebound_marker_offset: Vector3 = rebound_records[0].position - rebound_records[0].leader_position
 	assert(rebound_marker_offset.y >= 0.6 and rebound_marker_offset.z >= 0.35, "the rebound glyph clears the leader silhouette")
+	var leader_rebound_distance := (rebound_records[0].leader_position as Vector3).distance_to(contact_records[0].leader_position)
 	assert(
-		(rebound_records[0].leader_position as Vector3).distance_to(contact_records[0].leader_position) > 1.1,
-		"rebound visibly separates the leader from contact"
+		leader_rebound_distance > 0.25 and leader_rebound_distance <= 0.8,
+		"visual feedback preserves the authored leader rebound range"
 	)
+	assert(rebound_marker_offset.z >= 1.0, "the marker, not the gameplay body, exaggerates the opposite-direction rebound")
 	assert(
 		camera.unproject_position(rebound_records[0].position).distance_to(camera.unproject_position(contact_records[0].position)) >= 48.0,
 		"contact and rebound markers occupy unmistakably distinct screen positions"

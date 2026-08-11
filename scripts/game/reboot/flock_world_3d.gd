@@ -340,8 +340,10 @@ func _show_rebound(direction: Vector3, generation: int) -> void:
 	if _act_id != "brawl" or generation != _feedback_generation:
 		return
 	_contact_marker.visible = false
-	_leader.global_position -= direction * 1.4
-	_rebound_marker.global_position = _leader.global_position + Vector3(0.0, 1.0, 0.45)
+	_leader.global_position -= direction * 0.65
+	_rebound_marker.global_position = (
+		_leader.global_position - direction * 0.8 + Vector3(0.0, 1.0, 0.45)
+	)
 	_rebound_marker.visible = true
 	impact.emit("rebound", _leader.global_position)
 	await get_tree().create_timer(0.12).timeout
