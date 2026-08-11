@@ -234,11 +234,17 @@ func _run() -> void:
 	await process_frame
 	assert(not dash_collision.disabled, "the real-contact dash enables the leader hitbox")
 	var weak_impulse_seen := false
+	var post_contact_input_sent := false
 	for _frame in range(120):
 		await physics_frame
 		weak_impulse_seen = weak_impulse_seen or weak_point.linear_velocity.z < -0.1
+		if not dash_contacts.is_empty() and not post_contact_input_sent:
+			post_contact_input_sent = true
+			world.set_drag_target(Vector2(320.0, 320.0))
+			world.release_swipe(Vector2(320.0, 320.0), Vector2.ZERO)
 		if not rewards.is_empty():
 			break
+	assert(post_contact_input_sent, "the regression releases input after real contact")
 	assert(dash_contacts.size() == 1, "the dash hitbox contacts one real rigid enemy")
 	assert(contact_records.size() == 1, "real collider contact exposes one contact beat")
 	assert(contact_records[0].visible and contact_records[0].on_camera, "the contact marker is visible on camera")
@@ -401,6 +407,9 @@ func _run() -> void:
 
 	world.set_drag_target(camera.unproject_position(antenna.global_position))
 	world.set_drag_target(camera.unproject_position(relay.global_position))
+	var antenna_visual := antenna.get_node("Visual") as MeshInstance3D
+	var antenna_material := antenna_visual.mesh.material as StandardMaterial3D
+	var antenna_base_color: Color = antenna.get_meta("chain_color")
 	var before_cancel: Dictionary = {}
 	for target_id in chain_ids:
 		var target := chain_targets[target_id] as RigidBody3D
@@ -409,13 +418,15 @@ func _run() -> void:
 	var canceled_after_overlap := false
 	for _frame in range(240):
 		await physics_frame
-		if world.get("_chain_struck_targets").has("relay_b"):
+		if world.get("_chain_struck_targets").has("antenna_a"):
 			canceled_after_overlap = true
+			assert(antenna_material.albedo_color == Color(1.0, 0.95, 0.5), "the first real strike begins bright")
 			world.cancel_gesture()
+			assert(antenna_material.albedo_color == antenna_base_color, "cancel restores the active flash in the same frame")
 			break
-	assert(canceled_after_overlap, "cancel regression reaches the last selected target through real overlap")
-	for _frame in range(30):
-		await physics_frame
+	assert(canceled_after_overlap, "cancel regression reaches the first selected target through real overlap")
+	await process_frame
+	assert(antenna_material.albedo_color == antenna_base_color, "cancel keeps the active flash restored next frame")
 	assert(chain_completions.is_empty(), "cancel prevents a late Chain completion")
 	assert(rewards == [1], "cancel releases no Chain reward")
 	assert(state.event_ledger.size() == ledger_before_chain, "cancel writes no discrete chain ledger")
@@ -426,6 +437,7 @@ func _run() -> void:
 		assert(target.transform.is_equal_approx(expected.transform), "a canceled chain preserves every target transform")
 		assert(target.freeze == expected.freeze, "a canceled chain preserves every target freeze state")
 
+	await create_timer(0.12).timeout
 	for target_id in chain_ids:
 		var target := chain_targets[target_id] as RigidBody3D
 		world.set_drag_target(camera.unproject_position(target.global_position))
@@ -454,6 +466,14 @@ func _run() -> void:
 	)
 	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
 	assert(chain_mesh.get_surface_count() == 1, "the successful released path remains visible while striking")
+	for _frame in range(30):
+		await physics_frame
+		if world.get("_chain_struck_targets").has("antenna_a"):
+			break
+	assert(antenna_material.albedo_color == Color(1.0, 0.95, 0.5), "a fresh retry starts its own bright flash")
+	for _frame in range(3):
+		await process_frame
+	assert(antenna_material.albedo_color == Color(1.0, 0.95, 0.5), "the canceled attempt cannot overwrite the fresh flash")
 	for _frame in range(240):
 		await physics_frame
 		if not chain_completions.is_empty():
@@ -496,7 +516,8 @@ func _run() -> void:
 	weak_point.rotation = Vector3(0.4, 0.5, 0.6)
 	weak_point.linear_velocity = Vector3.ONE * 4.0
 	weak_point.angular_velocity = Vector3.ONE * 3.0
-	world.setup(FlockRunState.new_run(424243))
+	var canceled_state := FlockRunState.new_run(424243)
+	trial.begin(canceled_state)
 	world.start_act("brawl")
 	assert(not contact_marker.visible and not rebound_marker.visible, "setup clears transient collision feedback")
 	assert(not crack_lines.visible and not reward_burst.visible and not break_marker.visible, "setup clears collapse and chain feedback")
@@ -518,11 +539,29 @@ func _run() -> void:
 		assert(piece.rotation.is_zero_approx(), "a reused piece restores zero rotation")
 		assert(piece.linear_velocity.is_zero_approx(), "a reused piece clears linear velocity")
 		assert(piece.angular_velocity.is_zero_approx(), "a reused piece clears angular velocity")
-	assert(world.trigger_collapse("antenna_a", Vector3.FORWARD), "a new Brawl can accept its own collapse")
-	world.cancel_gesture()
-	for _frame in range(12):
+	var canceled_stage_count := collapse_stages.size()
+	var canceled_reward_count := rewards.size()
+	weak_point.global_position = leader.global_position + Vector3(0.0, 0.0, -1.8)
+	weak_point.linear_velocity = Vector3.ZERO
+	weak_point.angular_velocity = Vector3.ZERO
+	world.set_drag_target(Vector2(300.0, 300.0))
+	world.release_swipe(Vector2(300.0, 100.0), Vector2(0.0, -2000.0))
+	for _frame in range(90):
 		await physics_frame
-	assert(not crack_lines.visible and not reward_burst.visible, "cancel keeps delayed collapse feedback reset")
+		if collapse_stages.size() > canceled_stage_count:
+			break
+	assert(collapse_stages[-1] == "contact", "external cancel regression begins through a real collider contact")
+	var target_transform_at_cancel := brawl_target.transform
+	world.cancel_gesture()
+	for _frame in range(50):
+		await physics_frame
+	assert(collapse_stages.size() == canceled_stage_count + 1, "external cancel stops every later collapse stage")
+	assert(brawl_target.transform.is_equal_approx(target_transform_at_cancel), "external cancel prevents delayed target lowering")
+	for piece in detached_pieces.get_children():
+		assert(not piece.visible and piece.freeze, "external cancel prevents delayed debris release")
+	assert(rewards.size() == canceled_reward_count and canceled_state.act_id == "brawl", "external cancel prevents reward and transition")
+	assert(not contact_marker.visible and not rebound_marker.visible, "external cancel hides contact and rebound feedback")
+	assert(not crack_lines.visible and not reward_burst.visible, "external cancel keeps delayed collapse feedback reset")
 
 	world.cancel_gesture()
 	trial.free()

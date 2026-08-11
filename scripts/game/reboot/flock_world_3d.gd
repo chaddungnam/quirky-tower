@@ -102,7 +102,7 @@ func setup(run_state: FlockRunState) -> void:
 	flock_changed.emit(_run_state.snapshot())
 
 func start_act(act_id: String) -> void:
-	cancel_gesture()
+	cancel_gesture(false)
 	_act_id = act_id
 	_resolved_routes.clear()
 	if _run_state != null:
@@ -125,6 +125,8 @@ func set_drag_target(screen_position: Vector2) -> void:
 		_select_chain_target(screen_position)
 		return
 	if _act_id == "brawl":
+		if _collapsed_targets.has(BRAWL_TARGET_ID):
+			return
 		if not _has_swipe_candidate:
 			_swipe_start = screen_position
 			_has_swipe_candidate = true
@@ -151,6 +153,8 @@ func release_swipe(screen_position: Vector2, velocity: Vector2) -> void:
 	if _act_id == "chain":
 		_release_chain()
 		return
+	if _act_id == "brawl" and _collapsed_targets.has(BRAWL_TARGET_ID):
+		return
 	if (
 		_act_id != "brawl"
 		or not _has_swipe_candidate
@@ -166,7 +170,14 @@ func release_swipe(screen_position: Vector2, velocity: Vector2) -> void:
 	_dash_collision.set_deferred("disabled", false)
 	set_physics_process(true)
 
-func cancel_gesture() -> void:
+func cancel_gesture(reset_collapse := true) -> void:
+	var collapse_active := (
+		_act_id == "brawl" and _collapse_tween != null
+		and _collapse_tween.is_valid() and _collapse_tween.is_running()
+	)
+	if collapse_active:
+		_collapse_tween.kill()
+		_collapse_tween = null
 	_feedback_generation += 1
 	if _chain_attack_active:
 		_chain_attack_consumed = false
@@ -182,6 +193,8 @@ func cancel_gesture() -> void:
 		_attack_orb.visible = false
 	if _chain_path_mesh != null:
 		_chain_path_mesh.clear_surfaces()
+	for target in _chain_targets.values():
+		_set_chain_target_flash(target, false)
 	_hide_feedback()
 	_has_drag_target = false
 	_has_swipe_candidate = false
@@ -191,6 +204,8 @@ func cancel_gesture() -> void:
 		_dash_collision.set_deferred("disabled", true)
 	if _leader != null:
 		_leader.velocity = Vector3.ZERO
+	if collapse_active and reset_collapse:
+		_reset_brawl_encounter()
 
 func _physics_process(delta: float) -> void:
 	if _act_id == "brawl":
@@ -304,6 +319,7 @@ func _show_collapse_reward(generation: int) -> void:
 	collapse_stage.emit("reward")
 
 func _emit_collapse_reward() -> void:
+	_collapse_tween = null
 	reward_released.emit(1)
 
 func _on_dash_body_entered(body: Node3D) -> void:
@@ -409,6 +425,7 @@ func _execute_chain(target_ids: Array[String], generation: int) -> void:
 		await get_tree().create_timer(CHAIN_TRAIL_DELAY).timeout
 		if generation != _chain_release_generation:
 			return
+		_set_chain_target_flash(target, false)
 		_trail_chain_companion(index, target.global_position)
 		_attack_orb.global_position = Vector3(0.0, -20.0, 0.0)
 		await get_tree().physics_frame
@@ -458,7 +475,7 @@ func _on_attack_orb_body_entered(body: Node3D) -> void:
 	if target_id != _chain_expected_target_id or _chain_struck_targets.has(target_id):
 		return
 	_chain_struck_targets[target_id] = true
-	_flash_chain_target(body)
+	_set_chain_target_flash(body, true)
 	impact.emit("chain_strike", body.global_position)
 
 func _trail_chain_companion(index: int, target_position: Vector3) -> void:
@@ -471,14 +488,13 @@ func _trail_chain_companion(index: int, target_position: Vector3) -> void:
 	var companion := visible_companions[index % visible_companions.size()]
 	companion.global_position = target_position + FOLLOW_OFFSETS[index % FOLLOW_OFFSETS.size()] * 0.35
 
-func _flash_chain_target(target: Node3D) -> void:
+func _set_chain_target_flash(target: Node3D, bright: bool) -> void:
 	var visual := target.get_node_or_null("Visual") as MeshInstance3D
 	if visual == null:
 		return
 	var material := visual.mesh.material as StandardMaterial3D
 	var base_color: Color = target.get_meta("chain_color")
-	material.albedo_color = Color(1.0, 0.95, 0.5)
-	create_tween().tween_property(material, "albedo_color", base_color, 0.18)
+	material.albedo_color = Color(1.0, 0.95, 0.5) if bright else base_color
 
 func _draw_chain_path(broken: bool) -> void:
 	if _chain_path_mesh == null:
