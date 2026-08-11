@@ -1,6 +1,8 @@
 class_name FlockWorld3D
 extends Node3D
 
+const FlockBirdFactory = preload("res://scripts/game/reboot/flock_bird_factory.gd")
+
 signal act_completed(act_id: String, result: Dictionary)
 signal flock_changed(snapshot: Dictionary)
 signal impact(kind: String, world_point: Vector3)
@@ -23,6 +25,8 @@ const CHAIN_TARGET_IDS: Array[String] = [BRAWL_TARGET_ID, "relay_b", "vent_c"]
 const CHAIN_PICK_RADIUS := 96.0
 const CHAIN_TRAIL_DELAY := 0.06
 const CHAIN_PATH_Y := FLOOR_Y + 0.04
+const CHAIN_PATH_HALF_WIDTH := 0.14
+const RESCUE_BEAT_SECONDS := 0.14
 
 var _run_state: FlockRunState
 var _act_id := ""
@@ -56,6 +60,12 @@ var _chain_path_mesh: ImmediateMesh
 var _chain_path_material: StandardMaterial3D
 var _attack_orb: Area3D
 var _attack_orb_collision: CollisionShape3D
+var _contact_marker: Node3D
+var _rebound_marker: Node3D
+var _crack_lines: Node3D
+var _reward_burst: Node3D
+var _break_marker: Node3D
+var _feedback_generation := 0
 
 @onready var _camera: Camera3D = $Camera
 @onready var _actors: Node3D = $Actors
@@ -63,18 +73,19 @@ var _attack_orb_collision: CollisionShape3D
 
 func _ready() -> void:
 	_camera.look_at(Vector3(0.0, 0.0, -3.5))
-	_leader = _make_bird_actor("duck")
+	_leader = FlockBirdFactory.make("duck")
 	_leader.name = "Leader"
 	_leader.position = Vector3(0.0, FLOOR_Y, 4.0)
 	_actors.add_child(_leader)
 	_make_dash_hitbox()
 	_make_brawl_encounter()
 	_make_chain_raid()
+	_make_feedback()
 
-	var goose := _make_bird_actor("goose")
+	var goose := FlockBirdFactory.make("goose")
 	goose.visible = false
 	_companion_slots.get_node("CompanionSlot1").add_child(goose)
-	var pigeon := _make_bird_actor("pigeon")
+	var pigeon := FlockBirdFactory.make("pigeon")
 	pigeon.visible = false
 	_companion_slots.get_node("CompanionSlot2").add_child(pigeon)
 
@@ -84,6 +95,7 @@ func _ready() -> void:
 	_drag_target = _leader.global_position
 
 func setup(run_state: FlockRunState) -> void:
+	cancel_gesture()
 	_run_state = run_state
 	_chain_reward_claimed = false
 	_sync_companions()
@@ -96,10 +108,12 @@ func start_act(act_id: String) -> void:
 	if _run_state != null:
 		_run_state.begin_act(act_id)
 	set_physics_process(act_id == "entry")
+	_set_act_visuals(act_id)
 	if act_id == "brawl":
 		_reset_brawl_encounter()
 		collapse_stage.emit("warning")
 	elif act_id == "chain":
+		_stage_chain()
 		_chain_target_ids.clear()
 		_chain_struck_targets.clear()
 		_chain_status = ""
@@ -153,6 +167,7 @@ func release_swipe(screen_position: Vector2, velocity: Vector2) -> void:
 	set_physics_process(true)
 
 func cancel_gesture() -> void:
+	_feedback_generation += 1
 	if _chain_attack_active:
 		_chain_attack_consumed = false
 	_chain_release_generation += 1
@@ -167,6 +182,7 @@ func cancel_gesture() -> void:
 		_attack_orb.visible = false
 	if _chain_path_mesh != null:
 		_chain_path_mesh.clear_surfaces()
+	_hide_feedback()
 	_has_drag_target = false
 	_has_swipe_candidate = false
 	_dash_active = false
@@ -232,6 +248,9 @@ func _on_route_entered(body: Node3D, route_kind: String) -> void:
 			impact.emit("score", _leader.global_position)
 	cancel_gesture()
 	set_physics_process(false)
+	await get_tree().create_timer(RESCUE_BEAT_SECONDS).timeout
+	if _act_id != "entry" or _resolved_routes.get("resolved") != route_kind:
+		return
 	act_completed.emit("entry", result)
 
 func trigger_collapse(target_id: String, force_direction: Vector3) -> bool:
@@ -240,22 +259,28 @@ func trigger_collapse(target_id: String, force_direction: Vector3) -> bool:
 	_collapsed_targets[target_id] = true
 	var releases_reward := not _reward_claimed
 	_reward_claimed = true
+	var feedback_generation := _feedback_generation
 	_set_target_color(Color(1.0, 0.93, 0.72))
 	collapse_stage.emit("contact")
 	_collapse_tween = create_tween()
 	_collapse_tween.tween_interval(0.12)
-	_collapse_tween.tween_callback(_show_collapse_crack)
+	_collapse_tween.tween_callback(_show_collapse_crack.bind(feedback_generation))
 	_collapse_tween.tween_interval(0.12)
 	_collapse_tween.tween_callback(_release_collapse_pieces.bind(force_direction))
 	_collapse_tween.tween_interval(0.12)
 	_collapse_tween.tween_callback(_lower_collapse_target)
 	if releases_reward:
 		_collapse_tween.tween_interval(0.12)
+		_collapse_tween.tween_callback(_show_collapse_reward.bind(feedback_generation))
+		_collapse_tween.tween_interval(0.16)
 		_collapse_tween.tween_callback(_emit_collapse_reward)
 	return true
 
-func _show_collapse_crack() -> void:
+func _show_collapse_crack(generation: int) -> void:
 	_set_target_color(Color(0.27, 0.29, 0.34))
+	if generation == _feedback_generation:
+		_crack_lines.global_position = _brawl_target.global_position + Vector3(0.0, 0.25, 0.72)
+		_crack_lines.visible = true
 	collapse_stage.emit("crack")
 
 func _release_collapse_pieces(force_direction: Vector3) -> void:
@@ -270,8 +295,15 @@ func _lower_collapse_target() -> void:
 	_brawl_target.position.y -= 1.35
 	collapse_stage.emit("collapse")
 
-func _emit_collapse_reward() -> void:
+func _show_collapse_reward(generation: int) -> void:
+	if generation == _feedback_generation:
+		_reward_burst.global_position = Vector3(
+			_brawl_target.global_position.x, FLOOR_Y + 1.0, _brawl_target.global_position.z + 0.8
+		)
+		_reward_burst.visible = true
 	collapse_stage.emit("reward")
+
+func _emit_collapse_reward() -> void:
 	reward_released.emit(1)
 
 func _on_dash_body_entered(body: Node3D) -> void:
@@ -281,8 +313,24 @@ func _on_dash_body_entered(body: Node3D) -> void:
 	_dash_collision.set_deferred("disabled", true)
 	_leader.velocity = Vector3.ZERO
 	_weak_point.apply_central_impulse(_dash_direction * DASH_IMPULSE)
+	_contact_marker.global_position = _weak_point.global_position
+	_contact_marker.visible = true
 	impact.emit("dash", _weak_point.global_position)
+	_show_rebound(_dash_direction, _feedback_generation)
 	trigger_collapse(str(_weak_point.get_meta("target_id")), _dash_direction)
+
+func _show_rebound(direction: Vector3, generation: int) -> void:
+	await get_tree().create_timer(0.07).timeout
+	if _act_id != "brawl" or generation != _feedback_generation:
+		return
+	_contact_marker.visible = false
+	_leader.global_position -= direction * 0.65
+	_rebound_marker.global_position = _leader.global_position
+	_rebound_marker.visible = true
+	impact.emit("rebound", _leader.global_position)
+	await get_tree().create_timer(0.12).timeout
+	if generation == _feedback_generation:
+		_rebound_marker.visible = false
 
 func _sync_companions() -> void:
 	if _run_state == null:
@@ -332,7 +380,6 @@ func _release_chain() -> void:
 	_chain_status = "released"
 	_chain_struck_targets.clear()
 	var released_ids: Array[String] = _chain_target_ids.duplicate()
-	_chain_target_ids.clear()
 	_draw_chain_path(false)
 	_chain_release_generation += 1
 	_execute_chain(released_ids, _chain_release_generation)
@@ -393,6 +440,8 @@ func _execute_chain(target_ids: Array[String], generation: int) -> void:
 	_chain_attack_active = false
 	_attack_orb.visible = false
 	_attack_orb_collision.set_deferred("disabled", true)
+	_chain_target_ids.clear()
+	_draw_chain_path(false)
 	if _run_state != null:
 		_run_state.record_event("chain_targets", {"target_ids": target_ids})
 		for target_id in target_ids:
@@ -435,24 +484,33 @@ func _draw_chain_path(broken: bool) -> void:
 	if _chain_path_mesh == null:
 		return
 	_chain_path_mesh.clear_surfaces()
+	_break_marker.visible = false
 	if _chain_target_ids.is_empty() and not broken:
 		return
 	_chain_path_material.albedo_color = Color(1.0, 0.16, 0.2) if broken else Color(0.1, 1.0, 0.86)
-	_chain_path_mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP, _chain_path_material)
-	if _chain_target_ids.is_empty():
-		var marker_position := _leader.global_position
-		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x - 0.24, CHAIN_PATH_Y, marker_position.z))
-		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x + 0.24, CHAIN_PATH_Y, marker_position.z))
-	elif _chain_target_ids.size() == 1:
-		var marker_target := _chain_targets[_chain_target_ids[0]] as Node3D
-		var marker_position := marker_target.global_position
-		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x - 0.24, CHAIN_PATH_Y, marker_position.z))
-		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x + 0.24, CHAIN_PATH_Y, marker_position.z))
+	_chain_path_mesh.surface_begin(Mesh.PRIMITIVE_TRIANGLES, _chain_path_material)
+	var points: Array[Vector3] = []
+	for target_id in _chain_target_ids:
+		var target := _chain_targets[target_id] as Node3D
+		points.append(Vector3(target.global_position.x, CHAIN_PATH_Y, target.global_position.z))
+	if points.size() < 2:
+		var center := _leader.global_position if points.is_empty() else points[0]
+		center.y = CHAIN_PATH_Y
+		_add_path_segment(center, center + Vector3(0.38, 0.0, 0.0))
 	else:
-		for target_id in _chain_target_ids:
-			var target := _chain_targets[target_id] as Node3D
-			_chain_path_mesh.surface_add_vertex(Vector3(target.global_position.x, CHAIN_PATH_Y, target.global_position.z))
+		for index in range(points.size() - 1):
+			_add_path_segment(points[index], points[index + 1])
 	_chain_path_mesh.surface_end()
+	if broken:
+		var break_point: Vector3 = _leader.global_position if points.is_empty() else points[-1]
+		_break_marker.global_position = break_point
+		_break_marker.visible = true
+
+func _add_path_segment(from: Vector3, to: Vector3) -> void:
+	var direction := (to - from).normalized()
+	var side := Vector3(-direction.z, 0.0, direction.x) * CHAIN_PATH_HALF_WIDTH
+	for vertex in [from + side, from - side, to + side, from - side, to - side, to + side]:
+		_chain_path_mesh.surface_add_vertex(vertex)
 
 func _make_dash_hitbox() -> void:
 	var hitbox := Area3D.new()
@@ -585,6 +643,75 @@ func _make_chain_raid() -> void:
 	_attack_orb.add_child(_attack_orb_collision)
 	_attack_orb.body_entered.connect(_on_attack_orb_body_entered)
 
+func _make_feedback() -> void:
+	_contact_marker = _make_glyph("ContactMarker", Color(1.0, 0.9, 0.2), 0.9)
+	_rebound_marker = _make_glyph("ReboundMarker", Color(0.2, 0.9, 1.0), 0.72)
+	_crack_lines = _make_glyph("CrackLines", Color(0.04, 0.05, 0.08), 1.4)
+	_break_marker = _make_glyph("BreakMarker", Color(1.0, 0.08, 0.12), 0.85)
+	_reward_burst = Node3D.new()
+	_reward_burst.name = "RewardBurst"
+	_reward_burst.visible = false
+	$Effects.add_child(_reward_burst)
+	var value := Label3D.new()
+	value.name = "Value"
+	value.text = "+100"
+	value.font_size = 72
+	value.pixel_size = 0.016
+	value.modulate = Color(1.0, 0.86, 0.18)
+	value.outline_size = 12
+	value.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+	value.no_depth_test = true
+	_reward_burst.add_child(value)
+
+func _make_glyph(node_name: String, color: Color, length: float) -> Node3D:
+	var glyph := Node3D.new()
+	glyph.name = node_name
+	glyph.visible = false
+	$Effects.add_child(glyph)
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.emission_enabled = true
+	material.emission = color
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.no_depth_test = true
+	for angle in [-0.65, 0.65]:
+		var mesh := BoxMesh.new()
+		mesh.size = Vector3(length, 0.13, 0.1)
+		mesh.material = material
+		var bar := MeshInstance3D.new()
+		bar.mesh = mesh
+		bar.rotation.z = angle
+		glyph.add_child(bar)
+	return glyph
+
+func _set_act_visuals(act_id: String) -> void:
+	$World/RouteMarkers.visible = act_id == "entry"
+	_brawl_target.visible = act_id in ["brawl", "chain"]
+	$Encounter/DetachedPieces.visible = act_id in ["brawl", "chain"]
+	_weak_point.visible = act_id in ["brawl", "chain"]
+	for target_id in ["relay_b", "vent_c"]:
+		(_chain_targets[target_id] as Node3D).visible = act_id == "chain"
+
+func _stage_chain() -> void:
+	var positions := {
+		BRAWL_TARGET_ID: Vector3(-1.7, FLOOR_Y, 0.6),
+		"relay_b": Vector3(0.0, FLOOR_Y, -1.3),
+		"vent_c": Vector3(1.7, FLOOR_Y, -3.2),
+	}
+	for target_id in CHAIN_TARGET_IDS:
+		var target := _chain_targets[target_id] as RigidBody3D
+		target.freeze = true
+		target.transform = Transform3D(Basis.IDENTITY, positions[target_id])
+		target.linear_velocity = Vector3.ZERO
+		target.angular_velocity = Vector3.ZERO
+	_leader.global_position = Vector3(0.0, FLOOR_Y, 2.7)
+	_sync_companions()
+
+func _hide_feedback() -> void:
+	for marker in [_contact_marker, _rebound_marker, _crack_lines, _reward_burst, _break_marker]:
+		if marker != null:
+			marker.visible = false
+
 func _make_chain_weak_point(
 	node_name: String,
 	target_id: String,
@@ -648,147 +775,3 @@ func _reset_brawl_encounter() -> void:
 
 func _set_target_color(color: Color) -> void:
 	_target_material.albedo_color = color
-
-func _make_bird_actor(species: String) -> CharacterBody3D:
-	var actor := CharacterBody3D.new()
-	actor.name = species.capitalize()
-	actor.set_meta("species", species)
-	actor.collision_layer = 1 if species == "duck" else 0
-	actor.collision_mask = 4 if species == "duck" else 0
-
-	var body_color := Color(0.93, 0.74, 0.26)
-	var head_color := Color(0.98, 0.86, 0.4)
-	var body_scale := Vector3(1.0, 0.82, 1.12)
-	var head_y := 0.62
-	var bill_size := Vector3(0.48, 0.12, 0.38)
-	var collision_height := 1.1
-	var collision_radius := 0.36
-	match species:
-		"goose":
-			body_color = Color(0.83, 0.86, 0.82)
-			head_color = Color(0.93, 0.94, 0.89)
-			body_scale = Vector3(0.9, 1.0, 1.15)
-			head_y = 1.28
-			bill_size = Vector3(0.42, 0.11, 0.52)
-			collision_height = 1.75
-			collision_radius = 0.34
-		"pigeon":
-			body_color = Color(0.38, 0.44, 0.56)
-			head_color = Color(0.46, 0.53, 0.63)
-			body_scale = Vector3(0.72, 0.64, 0.82)
-			head_y = 0.47
-			bill_size = Vector3(0.3, 0.08, 0.24)
-			collision_height = 0.82
-			collision_radius = 0.27
-
-	var collision_shape := CapsuleShape3D.new()
-	collision_shape.height = collision_height
-	collision_shape.radius = collision_radius
-	var collision := CollisionShape3D.new()
-	collision.name = "Collision"
-	collision.shape = collision_shape
-	actor.add_child(collision)
-
-	var body_material := StandardMaterial3D.new()
-	body_material.albedo_color = body_color
-	body_material.roughness = 0.9
-	var body_mesh := SphereMesh.new()
-	body_mesh.radius = 0.52
-	body_mesh.height = 1.04
-	body_mesh.radial_segments = 8
-	body_mesh.rings = 4
-	body_mesh.material = body_material
-	var body := MeshInstance3D.new()
-	body.name = "Body"
-	body.mesh = body_mesh
-	body.scale = body_scale
-	actor.add_child(body)
-
-	var head_material := StandardMaterial3D.new()
-	head_material.albedo_color = head_color
-	head_material.roughness = 0.9
-	if species == "goose":
-		var neck_mesh := CylinderMesh.new()
-		neck_mesh.top_radius = 0.19
-		neck_mesh.bottom_radius = 0.26
-		neck_mesh.height = 0.9
-		neck_mesh.radial_segments = 6
-		neck_mesh.material = head_material
-		var neck := MeshInstance3D.new()
-		neck.name = "Neck"
-		neck.position.y = 0.76
-		neck.mesh = neck_mesh
-		actor.add_child(neck)
-
-	var head_mesh := SphereMesh.new()
-	head_mesh.radius = 0.3 if species != "pigeon" else 0.24
-	head_mesh.height = 0.6 if species != "pigeon" else 0.48
-	head_mesh.radial_segments = 8
-	head_mesh.rings = 4
-	head_mesh.material = head_material
-	var head := MeshInstance3D.new()
-	head.name = "Head"
-	head.position = Vector3(0.0, head_y, 0.12)
-	head.mesh = head_mesh
-	actor.add_child(head)
-
-	var bill_material := StandardMaterial3D.new()
-	bill_material.albedo_color = Color(0.95, 0.45, 0.12)
-	bill_material.roughness = 0.85
-	var bill_mesh := BoxMesh.new()
-	bill_mesh.size = bill_size
-	bill_mesh.material = bill_material
-	var bill := MeshInstance3D.new()
-	bill.name = "Bill"
-	bill.position = Vector3(0.0, head_y - 0.04, 0.38)
-	bill.mesh = bill_mesh
-	actor.add_child(bill)
-
-	var foot_material := StandardMaterial3D.new()
-	foot_material.albedo_color = Color(0.9, 0.42, 0.1)
-	foot_material.roughness = 0.9
-	var foot_mesh := BoxMesh.new()
-	foot_mesh.size = Vector3(0.22, 0.08, 0.36)
-	foot_mesh.material = foot_material
-	for side in [-1.0, 1.0]:
-		var foot := MeshInstance3D.new()
-		foot.name = "FootLeft" if side < 0.0 else "FootRight"
-		foot.position = Vector3(side * 0.2, -0.48, 0.14)
-		foot.mesh = foot_mesh
-		actor.add_child(foot)
-
-	if species == "pigeon":
-		var band_material := StandardMaterial3D.new()
-		band_material.albedo_color = Color(0.17, 0.74, 0.67)
-		band_material.roughness = 0.85
-		var band_mesh := BoxMesh.new()
-		band_mesh.size = Vector3(0.82, 0.12, 0.52)
-		band_mesh.material = band_material
-		var wing_band := MeshInstance3D.new()
-		wing_band.name = "WingBand"
-		wing_band.position = Vector3(0.0, 0.02, 0.03)
-		wing_band.mesh = band_mesh
-		actor.add_child(wing_band)
-
-	var face_image := Image.create_empty(16, 16, false, Image.FORMAT_RGBA8)
-	face_image.fill(Color.TRANSPARENT)
-	for y in range(2, 14):
-		for x in range(2, 14):
-			face_image.set_pixel(x, y, head_color)
-	var eye_color := Color(0.04, 0.05, 0.08)
-	for eye_x in [5, 10]:
-		face_image.set_pixel(eye_x, 6, eye_color)
-		face_image.set_pixel(eye_x, 7, eye_color)
-	for x in range(6, 10):
-		face_image.set_pixel(x, 10, bill_material.albedo_color)
-		face_image.set_pixel(x, 11, bill_material.albedo_color)
-	var face := Sprite3D.new()
-	face.name = "FaceSurface"
-	face.position = Vector3(0.0, head_y, 0.43)
-	face.pixel_size = 0.025 if species != "pigeon" else 0.021
-	face.billboard = BaseMaterial3D.BILLBOARD_ENABLED
-	face.texture_filter = BaseMaterial3D.TEXTURE_FILTER_NEAREST
-	face.texture = ImageTexture.create_from_image(face_image)
-	actor.add_child(face)
-
-	return actor

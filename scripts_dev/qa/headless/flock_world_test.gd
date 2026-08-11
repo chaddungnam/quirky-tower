@@ -9,6 +9,18 @@ func _init() -> void:
 	call_deferred("_run")
 
 
+func _camera_contains(camera: Camera3D, point: Vector3, viewport_size: Vector2, margin := 24.0) -> bool:
+	if camera.is_position_behind(point):
+		return false
+	var screen_point := camera.unproject_position(point)
+	return (
+		screen_point.x >= margin
+		and screen_point.y >= margin
+		and screen_point.x <= viewport_size.x - margin
+		and screen_point.y <= viewport_size.y - margin
+	)
+
+
 func _run() -> void:
 	var trial := FlockWorldScene.instantiate() as Control
 	root.add_child(trial)
@@ -35,6 +47,13 @@ func _run() -> void:
 
 	var state := FlockRunState.new_run(424242)
 	trial.begin(state)
+	var staged_brawl_target := world.get_node("Encounter/BrawlTarget") as Node3D
+	var staged_weak_point := world.get_node("Encounter/BrawlWeakPoint") as RigidBody3D
+	var staged_relay := world.get_node("Encounter/ChainRelayB") as RigidBody3D
+	var staged_vent := world.get_node("Encounter/ChainVentC") as RigidBody3D
+	assert(route_markers.visible, "Entry exposes only its route lanes")
+	assert(not staged_brawl_target.visible and not staged_weak_point.visible, "Entry hides the future Brawl encounter")
+	assert(not staged_relay.visible and not staged_vent.visible, "Entry hides future Chain targets")
 	var start_position := leader.global_position
 	var viewport_size: Vector2 = world.get_viewport().get_visible_rect().size
 	var drag_position := Vector2(viewport_size.x * 0.78, viewport_size.y * 0.68)
@@ -55,12 +74,25 @@ func _run() -> void:
 	)
 	var rescue_area := world.get_node("Encounter/Rescue") as Area3D
 	rescue_area.global_position = leader.global_position
-	await physics_frame
-	await physics_frame
+	for _frame in range(8):
+		await physics_frame
+		if state.companions.size() == 2:
+			break
 	assert(rescue_area.overlaps_body(leader), "native physics reports the rescue overlap")
 	assert(state.companions.size() == 2, "the rescue overlap adds the goose and pigeon")
 	assert(state.event_ledger.size() == 2, "the rescue overlap records both companions")
-	assert(completed_routes.size() == 1, "the first route completes Approach once")
+	var goose := companion_slots.get_node("CompanionSlot1/Goose") as CharacterBody3D
+	var pigeon := companion_slots.get_node("CompanionSlot2/Pigeon") as CharacterBody3D
+	assert(goose.visible and pigeon.visible, "the actual rescue exposes both birds during Entry")
+	assert(completed_routes.is_empty() and state.act_id == "entry", "the rescue holds a renderable Entry beat before completion")
+	await process_frame
+	assert(completed_routes.is_empty(), "the rescue beat survives a render frame")
+	for _frame in range(60):
+		await physics_frame
+		if not completed_routes.is_empty():
+			break
+	assert(completed_routes.size() == 1, "the first route completes Approach once after the rescue beat")
+	assert(state.act_id == "brawl", "the rescue beat advances to Brawl only after completion")
 	rescue_area.global_position += Vector3(0.0, 0.0, 4.0)
 	await physics_frame
 	await physics_frame
@@ -79,8 +111,6 @@ func _run() -> void:
 	assert(state.companions.size() == 2, "the same rescue cannot add twice")
 	assert(state.event_ledger.size() == 2, "the same route cannot record twice")
 
-	var goose := companion_slots.get_node("CompanionSlot1/Goose") as CharacterBody3D
-	var pigeon := companion_slots.get_node("CompanionSlot2/Pigeon") as CharacterBody3D
 	assert(goose.visible, "the rescued goose occupies the first follow slot")
 	assert(pigeon.visible, "the rescued pigeon occupies the second follow slot")
 	assert(goose.get_node("Head").position.y > leader.get_node("Head").position.y, "the goose silhouette is taller")
@@ -90,18 +120,28 @@ func _run() -> void:
 		assert(face.texture.get_size() == Vector2(16, 16), "bird faces use a 16x16 surface")
 		assert(face.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST, "bird faces keep nearest filtering")
 
-	var weak_point := world.get_node("Encounter/BrawlWeakPoint") as RigidBody3D
+	var weak_point := staged_weak_point
 	var dash_collision := world.get_node("Actors/Leader/DashHitbox/Collision") as CollisionShape3D
-	var brawl_target := world.get_node("Encounter/BrawlTarget") as Node3D
+	var brawl_target := staged_brawl_target
 	var target_visual := brawl_target.get_child(0) as MeshInstance3D
 	var target_material := target_visual.mesh.material as StandardMaterial3D
 	var detached_pieces := world.get_node("Encounter/DetachedPieces") as Node3D
+	var contact_marker := world.get_node("Effects/ContactMarker") as Node3D
+	var rebound_marker := world.get_node("Effects/ReboundMarker") as Node3D
+	var crack_lines := world.get_node("Effects/CrackLines") as Node3D
+	var reward_burst := world.get_node("Effects/RewardBurst") as Node3D
+	var reward_label := reward_burst.get_node("Value") as Label3D
+	var break_marker := world.get_node("Effects/BreakMarker") as Node3D
+	var attack_orb := world.get_node("Effects/AttackOrb") as Area3D
 	var collapse_stages: Array[String] = []
 	var stage_records: Array[Dictionary] = []
 	var rewards: Array[int] = []
 	var dash_contacts: Array[Vector3] = []
+	var contact_records: Array[Dictionary] = []
+	var rebound_records: Array[Dictionary] = []
 	var act_at_reward_stage := [""]
 	var brawl_reward_order: Array[String] = []
+	var reward_signal_frame := [-1]
 	world.collapse_stage.connect(
 		func(stage: String) -> void:
 			if stage == "reward":
@@ -120,9 +160,15 @@ func _run() -> void:
 				"visible_pieces": visible_pieces,
 				"target_y": brawl_target.position.y,
 				"reward_count": rewards.size(),
+				"crack_visible": crack_lines.visible,
+				"crack_segments": crack_lines.get_child_count(),
+				"reward_visible": reward_burst.visible,
+				"reward_position": reward_burst.global_position,
 			})
 	)
 	world.reward_released.connect(func(value: int) -> void:
+		if rewards.is_empty():
+			reward_signal_frame[0] = Engine.get_process_frames()
 		rewards.append(value)
 		brawl_reward_order.append("signal")
 	)
@@ -130,8 +176,26 @@ func _run() -> void:
 		func(kind: String, world_point: Vector3) -> void:
 			if kind == "dash":
 				dash_contacts.append(world_point)
+				contact_records.append({
+					"frame": Engine.get_process_frames(),
+					"leader_position": leader.global_position,
+					"visible": contact_marker.visible,
+					"position": contact_marker.global_position,
+					"on_camera": _camera_contains(camera, contact_marker.global_position, viewport_size),
+				})
+			elif kind == "rebound":
+				rebound_records.append({
+					"frame": Engine.get_process_frames(),
+					"leader_position": leader.global_position,
+					"visible": rebound_marker.visible,
+					"position": rebound_marker.global_position,
+					"on_camera": _camera_contains(camera, rebound_marker.global_position, viewport_size),
+				})
 	)
 	world.start_act("brawl")
+	assert(not route_markers.visible, "Brawl hides the Entry lanes")
+	assert(brawl_target.visible and weak_point.visible, "Brawl exposes its target and weak point")
+	assert(not staged_relay.visible and not staged_vent.visible, "Brawl hides non-Brawl Chain targets")
 	assert(collapse_stages == ["warning"], "Brawl warns before any contact feedback")
 	assert(stage_records[0].color == Color(0.98, 0.67, 0.16), "warning exposes the warning color")
 	assert(stage_records[0].visible_pieces == 0, "warning keeps debris hidden")
@@ -169,12 +233,27 @@ func _run() -> void:
 	assert(dash_collision.disabled, "the real-contact dash also waits for deferred hitbox enable")
 	await process_frame
 	assert(not dash_collision.disabled, "the real-contact dash enables the leader hitbox")
+	var weak_impulse_seen := false
 	for _frame in range(120):
 		await physics_frame
+		weak_impulse_seen = weak_impulse_seen or weak_point.linear_velocity.z < -0.1
 		if not rewards.is_empty():
 			break
 	assert(dash_contacts.size() == 1, "the dash hitbox contacts one real rigid enemy")
-	assert(weak_point.linear_velocity.z < -0.1, "contact applies forward impulse to the rigid enemy")
+	assert(contact_records.size() == 1, "real collider contact exposes one contact beat")
+	assert(contact_records[0].visible and contact_records[0].on_camera, "the contact marker is visible on camera")
+	assert(
+		(contact_records[0].position as Vector3).distance_to(dash_contacts[0]) < 0.05,
+		"the contact marker uses the real collision point"
+	)
+	assert(rebound_records.size() == 1, "contact advances to one distinct rebound beat")
+	assert(rebound_records[0].visible and rebound_records[0].on_camera, "the rebound marker is visible on camera")
+	assert(rebound_records[0].frame > contact_records[0].frame, "rebound advances to a later render frame")
+	assert(
+		(rebound_records[0].leader_position as Vector3).distance_to(contact_records[0].leader_position) > 0.25,
+		"rebound visibly separates the leader from contact"
+	)
+	assert(weak_impulse_seen, "contact applies forward impulse to the rigid enemy")
 	assert(
 		collapse_stages == ["warning", "contact", "crack", "pieces", "collapse", "reward"],
 		"authored collapse stages preserve causal order"
@@ -191,15 +270,22 @@ func _run() -> void:
 	assert(stage_records[1].color == Color(1.0, 0.93, 0.72), "contact exposes the flash color")
 	assert(stage_records[1].visible_pieces == 0, "contact keeps debris hidden")
 	assert(stage_records[2].color == Color(0.27, 0.29, 0.34), "crack exposes the cracked color")
+	assert(stage_records[2].crack_visible and stage_records[2].crack_segments >= 2, "crack exposes real seam geometry")
+	assert(_camera_contains(camera, crack_lines.global_position, viewport_size), "crack seams remain on camera")
 	assert(stage_records[3].visible_pieces == 3, "pieces stage exposes all authored debris")
 	assert(stage_records[4].target_y < 0.0, "collapse stage exposes the lowered target")
 	for index in range(5):
 		assert(stage_records[index].reward_count == 0, "reward is absent before the reward stage")
 	assert(stage_records[5].reward_count == 0, "the visible reward stage precedes reward delivery")
+	assert(stage_records[5].reward_visible and reward_label.text == "+100", "reward exposes a readable +100 burst")
+	assert(_camera_contains(camera, stage_records[5].reward_position, viewport_size), "reward burst stays on camera")
+	assert(reward_signal_frame[0] > stage_records[5].process_frame, "reward delivery waits through a visible render beat")
 	assert(brawl_reward_order == ["stage", "signal"], "the reward stage emits before reward delivery")
 	assert(act_at_reward_stage[0] == "brawl", "the visible reward stage still belongs to Brawl")
 	assert(state.act_id == "chain", "the reward signal advances to Chain after the reward stage")
 	assert(rewards == [1], "one collider-triggered collapse releases one reward")
+	assert(not contact_marker.visible and not rebound_marker.visible, "contact feedback clears after its authored beats")
+	assert(not crack_lines.visible and not reward_burst.visible, "act transition clears crack and reward feedback")
 	assert(not world.trigger_collapse("antenna_a", Vector3.FORWARD), "a repeated trigger is rejected")
 	world.call("_on_dash_body_entered", weak_point)
 	assert(rewards == [1], "repeated trigger and callback cannot release a second reward")
@@ -237,20 +323,27 @@ func _run() -> void:
 	var chain_path := world.get_node("Effects/ChainPath") as MeshInstance3D
 	var chain_mesh := chain_path.mesh as ImmediateMesh
 	var ledger_before_chain := state.event_ledger.size()
+	assert(not route_markers.visible, "Chain keeps Entry lanes hidden")
+	assert(weak_point.visible and staged_relay.visible and staged_vent.visible, "Chain exposes all three raid targets")
+	for actor in [leader, goose, pigeon, weak_point, staged_relay, staged_vent]:
+		assert(_camera_contains(camera, actor.global_position, viewport_size, 36.0), "Chain staging keeps actors and endpoints camera-safe")
 
 	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
 	assert(world.get("_chain_status") == "broken", "a zero-target release reports broken")
 	assert(chain_mesh.get_surface_count() == 1, "a zero-target broken path keeps one visible surface")
 	var zero_vertices: PackedVector3Array = chain_mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
-	assert(zero_vertices.size() >= 2, "a zero-target broken path renders a visible segment")
+	assert(zero_vertices.size() >= 6, "a zero-target broken path renders a thick visible marker")
 	var zero_midpoint := (zero_vertices[0] + zero_vertices[1]) * 0.5
 	assert(zero_midpoint.distance_to(leader.global_position) < 0.5, "the zero-target marker appears near the leader")
+	assert(break_marker.visible and break_marker.get_child_count() >= 2, "zero-target release exposes a red break glyph")
+	assert(_camera_contains(camera, break_marker.global_position, viewport_size), "the zero-target break glyph is on camera")
 	assert(
 		(chain_mesh.surface_get_material(0) as StandardMaterial3D).albedo_color == Color(1.0, 0.16, 0.2),
 		"the zero-target broken marker is high-contrast red"
 	)
 	assert(state.event_ledger.size() == ledger_before_chain, "a zero-target release writes no ledger")
 	world.cancel_gesture()
+	assert(chain_mesh.get_surface_count() == 0 and not break_marker.visible, "cancel clears broken path feedback")
 
 	var antenna := chain_targets.antenna_a as RigidBody3D
 	var relay := chain_targets.relay_b as RigidBody3D
@@ -269,9 +362,13 @@ func _run() -> void:
 	world.release_swipe(antenna_screen, Vector2.ZERO)
 	assert(world.get("_chain_status") == "broken", "one target reports broken without consuming the attack")
 	assert(world.get("_chain_target_ids") == ["antenna_a"], "one-target broken path stays selected")
+	assert(break_marker.visible and break_marker.global_position.distance_to(antenna.global_position) < 0.6, "broken glyph marks the last valid target")
 	world.set_drag_target(camera.unproject_position(relay.global_position))
 	world.set_drag_target(camera.unproject_position(vent.global_position))
 	assert(world.get("_chain_target_ids") == chain_ids, "chain target IDs preserve first-seen order")
+	var drawn_vertices: PackedVector3Array = chain_mesh.surface_get_arrays(0)[Mesh.ARRAY_VERTEX]
+	assert(drawn_vertices.size() >= 12, "three targets create two thick ribbon segments")
+	assert(drawn_vertices[0].distance_to(drawn_vertices[1]) >= 0.16, "the chain ribbon has visible world-space width")
 
 	var vent_collision := vent.get_node("Collision") as CollisionShape3D
 	vent_collision.set_deferred("disabled", true)
@@ -281,6 +378,7 @@ func _run() -> void:
 		var target := chain_targets[target_id] as RigidBody3D
 		before_miss[target_id] = {"transform": target.transform, "freeze": target.freeze}
 	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
+	assert(chain_mesh.get_surface_count() == 1, "the released path remains visible during the real attack")
 	for _frame in range(240):
 		await physics_frame
 		if not world.get("_chain_attack_active"):
@@ -289,6 +387,7 @@ func _run() -> void:
 	assert(rewards == [1], "a missed selected target cannot release the Chain reward")
 	assert(state.event_ledger.size() == ledger_before_chain, "a missed chain writes no discrete ledger")
 	assert(world.get("_chain_status") == "broken", "a missed target returns the chain to broken")
+	assert(break_marker.visible and _camera_contains(camera, break_marker.global_position, viewport_size), "a miss marks its on-camera break point")
 	assert(not world.get("_chain_attack_consumed"), "a missed target refunds the chain attack")
 	for target_id in chain_ids:
 		var target := chain_targets[target_id] as RigidBody3D
@@ -298,6 +397,7 @@ func _run() -> void:
 	vent_collision.set_deferred("disabled", false)
 	await process_frame
 	world.cancel_gesture()
+	assert(not break_marker.visible and chain_mesh.get_surface_count() == 0, "cancel resets miss feedback")
 
 	world.set_drag_target(camera.unproject_position(antenna.global_position))
 	world.set_drag_target(camera.unproject_position(relay.global_position))
@@ -331,10 +431,10 @@ func _run() -> void:
 		world.set_drag_target(camera.unproject_position(target.global_position))
 	assert(world.get("_chain_target_ids") == chain_ids, "fresh selection succeeds after cancellation")
 	assert(world.has_node("Effects/AttackOrb"), "the world owns one attack orb")
-	var attack_orb := world.get_node("Effects/AttackOrb") as Area3D
 	var orb_collision := attack_orb.get_node("Collision") as CollisionShape3D
 	assert(attack_orb.get_child_count() == 2 and orb_collision.shape != null, "the single attack orb has a real collider")
 	var success_overlap_ids: Array[String] = []
+	var chain_strike_visuals: Array[Dictionary] = []
 	attack_orb.body_entered.connect(
 		func(body: Node3D) -> void:
 			if chain_capture.active and body.has_meta("target_id"):
@@ -343,7 +443,17 @@ func _run() -> void:
 	chain_flash_ids.clear()
 	chain_capture.active = true
 	var goose_before_chain := goose.global_position
+	world.impact.connect(
+		func(kind: String, world_point: Vector3) -> void:
+			if kind == "chain_strike" and chain_capture.active:
+				chain_strike_visuals.append({
+					"visible": attack_orb.visible,
+					"at_overlap": attack_orb.global_position.distance_to(world_point) < 0.05,
+					"on_camera": _camera_contains(camera, attack_orb.global_position, viewport_size),
+				})
+	)
 	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
+	assert(chain_mesh.get_surface_count() == 1, "the successful released path remains visible while striking")
 	for _frame in range(240):
 		await physics_frame
 		if not chain_completions.is_empty():
@@ -352,6 +462,9 @@ func _run() -> void:
 	assert(chain_completions == [{"status": "released", "target_ids": chain_ids}], "actual Brawl order completes Chain once")
 	assert(success_overlap_ids == chain_ids, "one real physics overlap strikes every unique target in order")
 	assert(chain_flash_ids == chain_ids, "every real chain strike exposes the authored flash")
+	assert(chain_strike_visuals.size() == chain_ids.size(), "every overlap exposes one visible strike beat")
+	for strike in chain_strike_visuals:
+		assert(strike.visible and strike.at_overlap and strike.on_camera, "AttackOrb is visible at each camera-safe real overlap")
 	for target_id in chain_ids:
 		var target := chain_targets[target_id] as RigidBody3D
 		assert(target.global_position.y < 0.3 and target.freeze, "every struck target visibly lowers and freezes")
@@ -385,6 +498,9 @@ func _run() -> void:
 	weak_point.angular_velocity = Vector3.ONE * 3.0
 	world.setup(FlockRunState.new_run(424243))
 	world.start_act("brawl")
+	assert(not contact_marker.visible and not rebound_marker.visible, "setup clears transient collision feedback")
+	assert(not crack_lines.visible and not reward_burst.visible and not break_marker.visible, "setup clears collapse and chain feedback")
+	assert(chain_mesh.get_surface_count() == 0 and not attack_orb.visible, "setup clears path and strike feedback")
 	assert(not weak_point.freeze, "only the intended weak point is reactivated for Brawl")
 	assert(weak_point.rotation.is_zero_approx(), "a reused weak point restores zero rotation")
 	assert(weak_point.linear_velocity.is_zero_approx(), "a reused weak point clears linear velocity")
@@ -403,6 +519,10 @@ func _run() -> void:
 		assert(piece.linear_velocity.is_zero_approx(), "a reused piece clears linear velocity")
 		assert(piece.angular_velocity.is_zero_approx(), "a reused piece clears angular velocity")
 	assert(world.trigger_collapse("antenna_a", Vector3.FORWARD), "a new Brawl can accept its own collapse")
+	world.cancel_gesture()
+	for _frame in range(12):
+		await physics_frame
+	assert(not crack_lines.visible and not reward_burst.visible, "cancel keeps delayed collapse feedback reset")
 
 	world.cancel_gesture()
 	trial.free()
