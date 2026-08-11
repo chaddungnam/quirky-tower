@@ -20,11 +20,95 @@ children_of() {
 
 stop_owned_processes() {
   [[ -n "$godot_pid" ]] || return 0
-  local child
+  local owner_pid="$$"
+  local parent_pid="$godot_pid"
+  local child=""
+  local child_parent=""
+  local any_alive=0
+  local owned_pids=()
+  local parent_parent="$(ps -o ppid= -p "$parent_pid" 2>/dev/null | tr -d ' ' || true)"
+  if [[ "$parent_parent" != "$owner_pid" ]]; then
+    echo "WARN refusing cleanup for unverified PID $parent_pid"
+    return 1
+  fi
   while IFS= read -r child; do
-    [[ -n "$child" ]] && kill -TERM "$child" 2>/dev/null || true
+    [[ -n "$child" ]] || continue
+    child_parent="$(ps -o ppid= -p "$child" 2>/dev/null | tr -d ' ' || true)"
+    [[ "$child_parent" == "$parent_pid" ]] && owned_pids+=("$child")
   done < <(children_of "$godot_pid")
-  kill -TERM "$godot_pid" 2>/dev/null || true
+  owned_pids+=("$parent_pid")
+
+  for child in "${owned_pids[@]}"; do
+    kill -TERM "$child" 2>/dev/null || true
+  done
+  for _attempt in {1..20}; do
+    any_alive=0
+    for child in "${owned_pids[@]}"; do
+      kill -0 "$child" 2>/dev/null && any_alive=1
+    done
+    (( any_alive == 0 )) && break
+    sleep 0.05
+  done
+  for child in "${owned_pids[@]}"; do
+    if kill -0 "$child" 2>/dev/null; then
+      kill -KILL "$child" 2>/dev/null || true
+      [[ "$child" == "$parent_pid" ]] || sleep 0.05
+    fi
+  done
+  for _attempt in {1..20}; do
+    any_alive=0
+    for child in "${owned_pids[@]}"; do
+      kill -0 "$child" 2>/dev/null && any_alive=1
+    done
+    (( any_alive == 0 )) && break
+    sleep 0.05
+  done
+  for child in "${owned_pids[@]}"; do
+    wait "$child" 2>/dev/null || true
+  done
+}
+
+run_cleanup_self_test() {
+  local child_file="$stage_dir/owned-child.pid"
+  local owned_child=""
+  local unrelated_pid=""
+  local failed=0
+  (
+    trap '' TERM
+    (
+      trap '' TERM
+      while :; do :; done
+    ) &
+    printf '%s\n' "$!" >"$child_file"
+    wait 2>/dev/null || true
+  ) &
+  godot_pid=$!
+  (
+    trap 'exit 0' TERM
+    while :; do :; done
+  ) &
+  unrelated_pid=$!
+
+  for _attempt in {1..20}; do
+    [[ -s "$child_file" ]] && break
+    sleep 0.05
+  done
+  owned_child="$(<"$child_file")"
+  stop_owned_processes
+  kill -0 "$godot_pid" 2>/dev/null && failed=1
+  kill -0 "$owned_child" 2>/dev/null && failed=1
+  kill -0 "$unrelated_pid" 2>/dev/null || failed=1
+
+  kill -KILL "$owned_child" "$godot_pid" 2>/dev/null || true
+  kill -TERM "$unrelated_pid" 2>/dev/null || true
+  wait "$godot_pid" 2>/dev/null || true
+  wait "$unrelated_pid" 2>/dev/null || true
+  godot_pid=""
+  if (( failed != 0 )); then
+    echo "FAIL cleanup did not reap only the exact owned process tree"
+    return 1
+  fi
+  echo "PASS cleanup reaps only the exact owned process tree"
 }
 
 cleanup() {
@@ -32,6 +116,11 @@ cleanup() {
   rm -rf "$stage_dir"
 }
 trap cleanup EXIT INT TERM
+
+if [[ "${1:-}" == "--self-test-cleanup" ]]; then
+  run_cleanup_self_test
+  exit
+fi
 
 echo "Gate A baseline processes:"
 ps -axo pid=,ppid=,stat=,lstart=,command= \
