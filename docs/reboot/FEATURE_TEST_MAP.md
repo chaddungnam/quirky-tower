@@ -1,10 +1,10 @@
 # Quirky Tower Reboot Feature → Test Map
 
-상태: **Approved for Gate A implementation / 아직 실행되지 않음**
+상태: **Gate A implementation candidate / Human gate blocked**
 기준일: **2026-08-11**
 결정 정본: [`DECISION_REGISTER.md`](DECISION_REGISTER.md)
 
-이 표는 “코드가 있다”와 “게임이 된다”를 구분한다. 모든 행의 현재 결과는 `Not Tested`이다. 기존 15층 프로토타입 PASS를 새 코어의 PASS로 이월하지 않는다.
+이 표는 “코드가 있다”와 “게임이 된다”를 구분한다. runtime source `c66e2e0`, visual evidence commit `6b9818b`에서 실행된 부분만 `Complete/Partial/Blocked`로 갱신했다. 기존 15층 프로토타입 PASS를 새 코어의 PASS로 이월하지 않는다.
 
 ## 증거 종류
 
@@ -23,42 +23,42 @@
 
 ## House Duck 공통 TC 적용
 
-이 파일은 요구사항→테스트의 **계획 지도**이며 실행 결과표를 대신하지 않는다. 실행 전 각 TC ID는 정본 [`../../../shared/standards/house_duck_test_case_standard.md`](../../../shared/standards/house_duck_test_case_standard.md)의 `분류·우선순위·사전조건·행동·기대결과·플랫폼·자동화 명령/캡처·결과·증거·이슈` 필드를 가진 실행 기록으로 확장한다.
+이 파일은 요구사항→테스트의 **계획 지도**이며 실행 결과표를 대신하지 않는다. 실행 전 각 TC ID는 House Duck workspace 정본 `shared/standards/house_duck_test_case_standard.md`의 `분류·우선순위·사전조건·행동·기대결과·플랫폼·자동화 명령/캡처·결과·증거·이슈` 필드를 가진 실행 기록으로 확장한다.
 
 - `STATIC/HEADLESS/RUNTIME/...`은 증거 종류이며 BAT/BVT/Feature/Risk/Visual/Device/Data 스위트와 섞지 않는다.
 - Gate A 코어·기동·입력·전환·중복 보상은 `P0`, Gate B~C의 아트·오디오·화면은 구현 중 `P1`, 실제 SDK·export는 Gate D부터 `P0`다.
 - 플랫폼은 `HEADLESS=Common`, `RUNTIME=Desktop QA`, `DEVICE/STORE=Android·iOS 별도`로 시작하되 계획에서 목표 기기·build·명령을 구체화한다.
-- 자동화 명령과 증거 경로가 아직 없으므로 모든 현재 결과는 `Not Tested`다. 빈 P0 결과나 증거 없는 Pass는 gate를 통과시키지 않는다.
+- 실행 기록은 [`../../qa_output/reboot_gate_a/GATE_A_QA_REPORT.md`](../../qa_output/reboot_gate_a/GATE_A_QA_REPORT.md), 14장의 화면 해시·플랫폼 경계는 [`../../qa_output/reboot_gate_a/after/README.md`](../../qa_output/reboot_gate_a/after/README.md)를 본다. 빈 P0 결과나 증거 없는 Pass는 gate를 통과시키지 않는다.
 
 ## P0 코어 지도
 
 | TC ID | 관련 결정 | 증거 | 검증 행동 | 통과 기준 | 단계 | 현재 |
 |---|---|---|---|---|---|---|
-| `QT-RB-TC-BAT-001` | `QT-RB-UI-001`, `QT-RB-TECH-001` | `STATIC+RUNTIME` | 프로젝트를 파싱하고 메인 씬을 실행한다. | 오류 없이 앱 셸이 뜨고 기본 창은 1080×2400이다. 논리 기준 720×1280 safe frame은 명시적으로 가운데 정렬되고 20:9 추가 영역은 배경·월드에만 확장된다. | Greybox | `Not Tested` |
-| `QT-RB-TC-CORE-001` | `QT-RB-PROD-001`, `QT-RB-GAME-001`, `QT-RB-GAME-002`, `QT-RB-GAME-003`, `QT-RB-TECH-003` | `HEADLESS` | 한 시드로 진입→난투→사슬→3택을 한 번 진행한다. | 같은 `RunState`의 리더, 동료≤5, 체력, 빌드, 콤보가 막 사이에 보존된다. | Greybox | `Not Tested` |
-| `QT-RB-TC-TRANSITION-001` | `QT-RB-GAME-003`, `QT-RB-GAME-012` | `RUNTIME+VISUAL` | drag 중 막 전환, popup, focus loss, 정상 전환을 교차한다. | 로딩 화면·HUD 초기화·유령 release·유령 dash가 없고 새 막의 첫 touch부터 현재 router 하나가 소유한다. | Greybox | `Not Tested` |
-| `QT-RB-TC-RNG-001` | `QT-RB-GAME-006`, `QT-RB-GAME-010`, `QT-RB-TECH-002`, `QT-RB-TECH-007` | `HEADLESS` | 같은 시드 두 런과 다른 시드 한 런의 이산 규칙 원장을 비교한다. | 같은 시드는 영입·조우·3택·지원 효과·event ledger가 같고 다른 시드는 허용 범위에서 달라진다. cosmetic RNG와 물리 위치는 checksum에 들어가지 않는다. | Greybox | `Not Tested` |
+| `QT-RB-TC-BAT-001` | `QT-RB-UI-001`, `QT-RB-TECH-001` | `STATIC+RUNTIME` | 프로젝트를 파싱하고 메인 씬을 실행한다. | 오류 없이 앱 셸이 뜨고 기본 창은 1080×2400이다. 논리 기준 720×1280 safe frame은 명시적으로 가운데 정렬되고 20:9 추가 영역은 배경·월드에만 확장된다. | Greybox | `Complete (macOS/headless)` |
+| `QT-RB-TC-CORE-001` | `QT-RB-PROD-001`, `QT-RB-GAME-001`, `QT-RB-GAME-002`, `QT-RB-GAME-003`, `QT-RB-TECH-003` | `HEADLESS` | 한 시드로 진입→난투→사슬→3택을 한 번 진행한다. | 같은 `RunState`의 리더, 동료≤5, 체력, 빌드, 콤보가 막 사이에 보존된다. | Greybox | `Complete (headless)` |
+| `QT-RB-TC-TRANSITION-001` | `QT-RB-GAME-003`, `QT-RB-GAME-012` | `RUNTIME+VISUAL` | drag 중 막 전환, popup, focus loss, 정상 전환을 교차한다. | 로딩 화면·HUD 초기화·유령 release·유령 dash가 없고 새 막의 첫 touch부터 현재 router 하나가 소유한다. | Greybox | `Partial (popup stale-release path)` |
+| `QT-RB-TC-RNG-001` | `QT-RB-GAME-006`, `QT-RB-GAME-010`, `QT-RB-TECH-002`, `QT-RB-TECH-007` | `HEADLESS` | 같은 시드 두 런과 다른 시드 한 런의 이산 규칙 원장을 비교한다. | 같은 시드는 영입·조우·3택·지원 효과·event ledger가 같고 다른 시드는 허용 범위에서 달라진다. cosmetic RNG와 물리 위치는 checksum에 들어가지 않는다. | Greybox | `Partial (same-seed only)` |
 | `QT-RB-TC-RETRY-001` | `QT-RB-GAME-013`, `QT-RB-BM-002`, `QT-RB-BM-011` | `HEADLESS+RUNTIME` | 막 실패 뒤 광고·결제 source ticket으로 각각 재도전한다. | 막 시작 snapshot과 gameplay RNG가 같게 복원되고 callback은 RNG를 진행하지 않는다. `retry_count`와 모든 시도의 active time은 누적되며 보상은 한 번이다. | Mock BM | `Not Tested` |
 | `QT-RB-TC-MERGE-001` | `QT-RB-GAME-010` | `HEADLESS` | 같은 동료 중복 획득과 연타 입력을 재현한다. | 합성 후보와 보상은 정확히 한 번 생기고 동료 수가 5를 넘지 않는다. | Greybox | `Not Tested` |
-| `QT-RB-TC-ENTRY-001` | `QT-RB-PROD-002`, `QT-RB-GAME-004`, `QT-RB-GAME-007`, `QT-RB-GAME-012` | `RUNTIME+HUMAN` | 드래그로 세 경로를 오가고 구조·장애물·근접 회피를 시도한다. | 리더가 손을 따라가고 동료가 읽히게 추종한다. 구조와 충돌의 원인을 설명 없이 말할 수 있다. | Greybox | `Not Tested` |
-| `QT-RB-TC-BRAWL-001` | `QT-RB-GAME-004`, `QT-RB-GAME-007`, `QT-RB-GAME-008`, `QT-RB-GAME-012` | `RUNTIME+HUMAN` | 이동·짧은 스와이프로 적을 벽과 구조물에 날린다. | 대시 방향이 결과를 바꾸며 예고→충돌→피해→반동이 분리되어 보인다. drag release가 임의 대시로 오인되지 않는다. | Greybox | `Not Tested` |
-| `QT-RB-TC-CHAIN-001` | `QT-RB-GAME-007`, `QT-RB-GAME-008`, `QT-RB-GAME-009` | `HEADLESS+RUNTIME` | 동료·약점을 경로로 잇고 손을 떼며 같은 목표를 두 번 경유한다. | 연결 순서대로 한 번씩 돌진하고 같은 목표의 파괴·보상이 중복 지급되지 않는다. 끊긴 지점이 보인다. | Greybox | `Not Tested` |
-| `QT-RB-TC-COLLAPSE-001` | `QT-RB-GAME-008`, `QT-RB-TECH-004`, `QT-RB-TECH-007` | `RUNTIME+VISUAL+HUMAN` | 약점 충돌로 authored destruction을 발동한다. | 실제 collider 결과가 균열→부품→층→적→보상 순으로 이어지고 원인 없는 자동 붕괴가 없다. 정확 trajectory 재현은 PASS 조건이 아니다. | Greybox | `Not Tested` |
-| `QT-RB-TC-REWARD-001` | `QT-RB-GAME-006`, `QT-RB-UI-003`, `QT-RB-UI-009`, `QT-RB-UI-011` | `HEADLESS+VISUAL` | 구역 종료 3택을 여러 언어와 반복 입력으로 선택한다. | 세로 카드 3개, 96px 후보 높이, 최대 2줄 기본 설명, 단일 콜백, 다음 구역 상태 반영을 만족한다. | Greybox | `Not Tested` |
-| `QT-RB-TC-RESET-001` | `QT-RB-GAME-003`, `QT-RB-QA-005` | `HEADLESS+RUNTIME` | 실패, 홈 이동, 재시작을 반복한다. | 활성 phase·마스코트·임시 collider·signal 연결이 한 벌만 남고 이전 런 상태가 섞이지 않는다. | Greybox | `Not Tested` |
-| `QT-RB-TC-PACING-001` | `QT-RB-GAME-005`, `QT-RB-GAME-011`, `QT-RB-QA-002`, `QT-RB-QA-003`, `QT-RB-QA-004` | `RUNTIME+HUMAN+ANALYTICS` | Gate A 5명과 Gate B 10명 이상의 act·wall·active time, 첫 행동, 재도전을 기록한다. | Gate A 4/5 이해·인과·3막 구분, 3/5 자발 재도전과 Gate B 후보 wall time·빌드 설명·카타르시스 기준을 충족한다. | Greybox/5-minute | `Not Tested` |
+| `QT-RB-TC-ENTRY-001` | `QT-RB-PROD-002`, `QT-RB-GAME-004`, `QT-RB-GAME-007`, `QT-RB-GAME-012` | `RUNTIME+HUMAN` | 드래그로 세 경로를 오가고 구조·장애물·근접 회피를 시도한다. | 리더가 손을 따라가고 동료가 읽히게 추종한다. 구조와 충돌의 원인을 설명 없이 말할 수 있다. | Greybox | `Partial (Human blocked)` |
+| `QT-RB-TC-BRAWL-001` | `QT-RB-GAME-004`, `QT-RB-GAME-007`, `QT-RB-GAME-008`, `QT-RB-GAME-012` | `RUNTIME+HUMAN` | 이동·짧은 스와이프로 적을 벽과 구조물에 날린다. | 대시 방향이 결과를 바꾸며 예고→충돌→피해→반동이 분리되어 보인다. drag release가 임의 대시로 오인되지 않는다. | Greybox | `Partial (Human blocked)` |
+| `QT-RB-TC-CHAIN-001` | `QT-RB-GAME-007`, `QT-RB-GAME-008`, `QT-RB-GAME-009` | `HEADLESS+RUNTIME` | 동료·약점을 경로로 잇고 손을 떼며 같은 목표를 두 번 경유한다. | 연결 순서대로 한 번씩 돌진하고 같은 목표의 파괴·보상이 중복 지급되지 않는다. 끊긴 지점이 보인다. | Greybox | `Complete (Desktop QA)` |
+| `QT-RB-TC-COLLAPSE-001` | `QT-RB-GAME-008`, `QT-RB-TECH-004`, `QT-RB-TECH-007` | `RUNTIME+VISUAL+HUMAN` | 약점 충돌로 authored destruction을 발동한다. | 실제 collider 결과가 균열→부품→층→적→보상 순으로 이어지고 원인 없는 자동 붕괴가 없다. 정확 trajectory 재현은 PASS 조건이 아니다. | Greybox | `Partial (Human blocked)` |
+| `QT-RB-TC-REWARD-001` | `QT-RB-GAME-006`, `QT-RB-UI-003`, `QT-RB-UI-009`, `QT-RB-UI-011` | `HEADLESS+VISUAL` | 구역 종료 3택을 여러 언어와 반복 입력으로 선택한다. | 세로 카드 3개, 96px 후보 높이, 최대 2줄 기본 설명, 단일 콜백, 다음 구역 상태 반영을 만족한다. | Greybox | `Partial (downstream/i18n)` |
+| `QT-RB-TC-RESET-001` | `QT-RB-GAME-003`, `QT-RB-QA-005` | `HEADLESS+RUNTIME` | 실패, 홈 이동, 재시작을 반복한다. | 활성 phase·마스코트·임시 collider·signal 연결이 한 벌만 남고 이전 런 상태가 섞이지 않는다. | Greybox | `Partial (failure path)` |
+| `QT-RB-TC-PACING-001` | `QT-RB-GAME-005`, `QT-RB-GAME-011`, `QT-RB-QA-002`, `QT-RB-QA-003`, `QT-RB-QA-004` | `RUNTIME+HUMAN+ANALYTICS` | Gate A 5명과 Gate B 10명 이상의 act·wall·active time, 첫 행동, 재도전을 기록한다. | Gate A 4/5 이해·인과·3막 구분, 3/5 자발 재도전과 Gate B 후보 wall time·빌드 설명·카타르시스 기준을 충족한다. | Greybox/5-minute | `Blocked (external people)` |
 
 ## UI, 이야기, 아트
 
 | TC ID | 관련 결정 | 증거 | 검증 행동 | 통과 기준 | 단계 | 현재 |
 |---|---|---|---|---|---|---|
-| `QT-RB-TC-UI-001` | `QT-RB-UI-002`, `QT-RB-UI-003`, `QT-RB-UI-004`, `QT-RB-UI-005`, `QT-RB-UI-010` | `STATIC+VISUAL` | 공통 token 하나를 바꾸고 홈·HUD·3택·결과를 캡처한다. | 색·간격·반경·글자가 직접 상수 없이 함께 바뀌며 등장 순서가 배경→주체→맥락→행동이다. | Art/UI | `Not Tested` |
+| `QT-RB-TC-UI-001` | `QT-RB-UI-002`, `QT-RB-UI-003`, `QT-RB-UI-004`, `QT-RB-UI-005`, `QT-RB-UI-010` | `STATIC+VISUAL` | 공통 token 하나를 바꾸고 홈·HUD·3택·결과를 캡처한다. | 색·간격·반경·글자가 직접 상수 없이 함께 바뀌며 등장 순서가 배경→주체→맥락→행동이다. | Art/UI | `Partial (no token before/after)` |
 | `QT-RB-TC-SCREEN-001` | `QT-RB-UI-007`, `QT-RB-UI-011`, `QT-RB-UI-012`, `QT-RB-BM-007` | `STATIC+RUNTIME+VISUAL` | 필수 화면별 진입·주 CTA·back·empty/loading/error와 popup 중 back을 순회한다. | 화면 계약 누락 0, modal owner 한 개, 최상단 popup만 닫힘, freeze·입력 잠금·데이터 출처가 일치한다. | Outgame | `Not Tested` |
 | `QT-RB-TC-I18N-001` | `QT-RB-UI-003`, `QT-RB-UI-006`, `QT-RB-UI-009`, `QT-RB-UI-013` | `VISUAL` | KO·EN·DE·JA·AR에서 홈, 설정, 3택, 결과, 상점을 20:9와 작은 safe area로 본다. | 잘림·겹침·가로 스크롤·CTA ellipsis가 없고 RTL 방향이 맞으며 숫자·방향 고정 아이콘은 잘못 미러링되지 않는다. | Art/UI | `Not Tested` |
-| `QT-RB-TC-MASCOT-001` | `QT-RB-MASCOT-001`, `QT-RB-MASCOT-002` | `VISUAL+HUMAN` | 시작, 위험 전, 성공, 실패, story beat에서 말풍선을 재생한다. | 한 문장·두 줄 이내, 플레이 영역 비가림, 시스템 문구 비중복, 행동 방해 0건이다. | Art/UI | `Not Tested` |
+| `QT-RB-TC-MASCOT-001` | `QT-RB-MASCOT-001`, `QT-RB-MASCOT-002` | `VISUAL+HUMAN` | 시작, 위험 전, 성공, 실패, story beat에서 말풍선을 재생한다. | 한 문장·두 줄 이내, 플레이 영역 비가림, 시스템 문구 비중복, 행동 방해 0건이다. | Art/UI | `Partial (Human blocked)` |
 | `QT-RB-TC-STORY-001` | `QT-RB-STORY-001`, `QT-RB-STORY-002`, `QT-RB-STORY-003`, `QT-RB-STORY-004` | `HUMAN` | 스토리 승인 뒤 설명서 없이 한 런 후 목표·비밀·다음 런 이유를 묻는다. | 5명 중 4명 이상이 동료 구조·조작된 방송·송출실 탈취 중 둘 이상과 새 생방송 회차라는 재도전 이유를 말한다. | 5-minute | `Not Tested` |
 | `QT-RB-TC-CAST-001` | `QT-RB-CAST-001`, `QT-RB-CAST-002`, `QT-RB-CAST-003`, `QT-RB-CAST-004`, `QT-RB-CAST-005` | `STATIC+VISUAL` | 기본 종의 첫 동료 data와 구조·충돌·성공·실패 판을 본다. | 이름·성격·대표색·소품·필수 반응 누락 0이며 이름을 가려도 종과 역할을 구분한다. 치킨은 승인 전 후보 표시다. | Art/UI | `Not Tested` |
-| `QT-RB-TC-ART-001` | `QT-RB-ART-001`, `QT-RB-ART-002`, `QT-RB-ART-003`, `QT-RB-ART-004`, `QT-RB-ART-005`, `QT-RB-ART-006`, `QT-RB-ART-007`, `QT-RB-ART-008`, `QT-RB-ART-010`, `QT-RB-ART-011`, `QT-RB-ART-012`, `QT-RB-ART-013` | `STATIC+VISUAL` | 오리 마스터의 2D·crop·상점·3D·공통 애니메이션·실루엣 비교판을 만든다. | 같은 ID·체형·복장선·대표색·좌상단 광원과 crop safe area가 유지되고 Project K 팔레트·박스 3D를 복제하지 않는다. | Art/UI | `Not Tested` |
+| `QT-RB-TC-ART-001` | `QT-RB-ART-001`, `QT-RB-ART-002`, `QT-RB-ART-003`, `QT-RB-ART-004`, `QT-RB-ART-005`, `QT-RB-ART-006`, `QT-RB-ART-007`, `QT-RB-ART-008`, `QT-RB-ART-010`, `QT-RB-ART-011`, `QT-RB-ART-012`, `QT-RB-ART-013`, `QT-RB-ART-014` | `STATIC+VISUAL` | `quirky_tower_urban_broadcast_cel_v1` 오리 Truth Kit의 cel 3D master·400×800 전신·128×128 profile·3:4 shop layer·공통 frame·실루엣 비교판을 만든다. | 같은 ID·체형·복장선·대표색과 crop safe area가 유지되고 2–3단계 cel 명암·제한 네온을 쓴다. Project K·ZZZ의 구체 캐릭터·UI·셰이더·샷을 복제하지 않는다. | Gate C | `Not Tested (final art)` |
 | `QT-RB-TC-ASSET-001` | `QT-RB-ART-003`, `QT-RB-ART-007`, `QT-RB-ART-012`, `QT-RB-ART-013` | `STATIC` | `asset_manifest`의 경로, 해시, 라이선스, 공용 frame·animation 참조를 검사한다. | 누락·중복 ID 0, 캐릭터별 frame 복제 0, 이미지 내 번역 텍스트 0, 필수 animation 누락 0이다. | Art/UI | `Not Tested` |
 
 ## 오디오, 햅틱, 성능
@@ -88,9 +88,9 @@
 
 | TC ID | 관련 결정 | 증거 | 검증 행동 | 통과 기준 | 단계 | 현재 |
 |---|---|---|---|---|---|---|
-| `QT-RB-TC-DOC-001` | `QT-RB-DOC-001`, `QT-RB-DOC-002`, `QT-RB-DOC-003`, `QT-RB-DOC-004`, `QT-RB-DOC-005`, `QT-RB-DOC-006` | `STATIC` | 문서 ID·링크·크기·legacy 경계와 WORK_STATE를 검사한다. | 중복·누락 ID/링크 0, 기준 파일이 후보 한도 안이며 구 15층 canonical을 새 정본으로 읽지 않는다. | Every task | `Not Tested` |
-| `QT-RB-TC-VISUAL-001` | `QT-RB-QA-007` | `VISUAL` | 화면 결과가 바뀌는 구현의 비포·애프터를 최종 코드에서 캡처하고 명세→구현→증거를 대조한다. | 같은 상태·범위의 최종 코드 1080×2400 PNG 비포·애프터가 있으며, 실제 기기와 외부 사람 검증은 별도 증거로 기록한다. | Every visual task | `Not Tested` |
-| `QT-RB-TC-PROCESS-001` | `QT-RB-OPS-001`, `QT-RB-OPS-003`, `QT-RB-QA-006` | `STATIC+RUNTIME` | Local 작업 전후 PID·포트·Git 상태를 비교한다. | baseline 대비 새 agent-owned Godot·MCP·debug 잔존 0, 사용자 프로세스 종료 0, 의도하지 않은 Git 변경 0이다. | Every Local gate | `Not Tested` |
+| `QT-RB-TC-DOC-001` | `QT-RB-DOC-001`, `QT-RB-DOC-002`, `QT-RB-DOC-003`, `QT-RB-DOC-004`, `QT-RB-DOC-005`, `QT-RB-DOC-006` | `STATIC` | 문서 ID·링크·크기·legacy 경계와 WORK_STATE를 검사한다. | 중복·누락 ID/링크 0, 기준 파일이 후보 한도 안이며 구 15층 canonical을 새 정본으로 읽지 않는다. | Every task | `Complete (Task9 reconciliation)` |
+| `QT-RB-TC-VISUAL-001` | `QT-RB-QA-007` | `VISUAL` | 화면 결과가 바뀌는 구현의 비포·애프터를 최종 코드에서 캡처하고 명세→구현→증거를 대조한다. | 같은 상태·범위의 최종 코드 1080×2400 PNG 비포·애프터가 있으며, 실제 기기와 외부 사람 검증은 별도 증거로 기록한다. | Every visual task | `Partial (before not comparable)` |
+| `QT-RB-TC-PROCESS-001` | `QT-RB-OPS-001`, `QT-RB-OPS-003`, `QT-RB-QA-006` | `STATIC+RUNTIME` | Local 작업 전후 PID·포트·Git 상태를 비교한다. | baseline 대비 새 agent-owned Godot·MCP·debug 잔존 0, 사용자 프로세스 종료 0, 의도하지 않은 Git 변경 0이다. | Every Local gate | `Complete (final reconciliation)` |
 
 ## 사람 재미 게이트
 

@@ -1,6 +1,6 @@
 # Quirky Tower Reboot Decision Register
 
-상태: **Approved for Gate A implementation**
+상태: **Gate A implementation candidate / Human gate blocked**
 기준일: **2026-08-11**
 대상: 기존 15층 미니게임 프로토타입을 조류단 3막 로그라이트 액션으로 교체하는 리부트
 시각 검토본: [`QUIRKY_TOWER_REBOOT_MASTER_SPEC.html`](QUIRKY_TOWER_REBOOT_MASTER_SPEC.html)
@@ -55,19 +55,20 @@
 
 | ID | 상태 | 결정 | 이유·영향 |
 |---|---|---|---|
-| `QT-RB-ART-001` | `LOCKED` | Project K 최신 카툰 애니풍의 큰 실루엣, 좌상단 단일 주광원, 한 단계 원톤 그림자, 정리된 픽셀 경계를 계승한다. | 같은 회사의 제작 언어는 유지하되 세계관은 분리한다. |
-| `QT-RB-ART-002` | `LOCKED` | Project K의 적갈·올리브 선전 팔레트, 군복, 독재국·AI기업 세계관, 현재 절차형 박스 3D는 가져오지 않는다. | 복제와 분위기 충돌을 막는다. |
+| `QT-RB-ART-001` | `LOCKED` | 최신 Project K의 애니·셀 제작 언어인 큰 그래픽 실루엣, 얼굴·복장 판독, 정리된 경계를 계승한다. 도시 거리·방송 사고의 에너지와 그래픽 리듬은 HoYoverse의 ZZZ를 상위 영감으로만 참고한다. | House Duck 제작 언어를 유지하되 특정 작품 캐릭터·로고·의상·체형·UI 배치·셰이더·카메라 구도를 직접 복제하지 않는다. |
+| `QT-RB-ART-002` | `LOCKED` | Project K의 적갈·올리브 선전 팔레트, 군복, 독재국·AI기업 세계관, 현재 절차형 박스 3D는 가져오지 않는다. Project K와 ZZZ의 캐릭터·로고·복장·체형·UI 배치·셰이더·카메라 샷을 직접 복제하지 않는다. | 상위 제작 언어와 구체 자산 복제의 경계를 명시한다. |
 | `QT-RB-ART-003` | `LOCKED` | 2D 전신, 대화 크롭, 프로필, 카드, 상점 썸네일, 3D 모델은 같은 `character_id`, 체형, 복장선, 대표색을 공유한다. | 한 캐릭터가 화면마다 달라 보이지 않게 한다. |
-| `QT-RB-ART-004` | `PROPOSED` | 2D 원본은 400×800 전신과 표정 4종을 기본으로 하고, 프로필·대화·상점은 원본을 crop·scale해 파생한다. | 중복 원화 생산을 줄인다. |
-| `QT-RB-ART-005` | `LOCKED` | 3D는 2D를 자동 변환하지 않고 동일 턴어라운드를 기준으로 별도 저폴리 모델링한다. 실제 콜라이더를 사용한다. | 인게임 실루엣과 물리 원인을 둘 다 보장한다. |
-| `QT-RB-ART-006` | `PROPOSED` | 인게임은 저폴리 3D 몸체, nearest 필터의 2D 픽셀 얼굴·표면 재질, 저해상도 월드 데칼을 결합한다. | 사용자가 요청한 Godot 기본 3D와 2D 픽셀 표면을 결합한다. |
+| `QT-RB-ART-004` | `PROPOSED` | 승인된 cel 3D master에서 400×800 전신과 표정 4종을 렌더하고, 프로필·대화·상점은 그 렌더를 crop·scale해 파생한다. | 화면마다 얼굴을 재생성하지 않고 3D와 2D의 동일성을 유지한다. |
+| `QT-RB-ART-005` | `LOCKED` | 3D는 2D를 자동 변환하지 않고 동일 턴어라운드를 기준으로 별도 중밀도 cel 3D로 제작한다. 2–3단계 셀 명암, 제한된 네온 엑센트, 공용 rig과 실제 콜라이더를 사용한다. | 최종 인게임 실루엣과 물리 원인을 둘 다 보장한다. |
+| `QT-RB-ART-006` | `LOCKED` | 현재 저폴리 몸체·픽셀 얼굴·단순 표면은 Gate A 조작·인과·가독성을 보는 greybox로만 사용한다. 최종 제품 아트로 승인하지 않는다. | 임시 기술 실험과 Gate C의 최종 자산 승인을 분리한다. |
 | `QT-RB-ART-007` | `LOCKED` | 프로필·상점 희귀도 테두리는 공용 frame set을 재사용하고 캐릭터별로 복제하지 않는다. | 상점·도감 에셋 양산 비용을 줄인다. |
-| `QT-RB-ART-008` | `PROPOSED` | 첫 아트 게이트는 오리 1종의 2D 턴어라운드, 3D 모델, 프로필, 상점 카드, 실루엣 비교를 한 번에 통과시키는 것이다. | 파이프라인 승인 전에 전체 조류를 만들지 않는다. |
+| `QT-RB-ART-008` | `LOCKED` | Gate C의 첫 Truth Kit은 오리 리더 1종의 2D 턴어라운드, cel 3D 마스터, 128×128 프로필, 3:4 상점 레이어, 실루엣 비교를 한 번에 통과시킨다. | 파이프라인 승인 전에 전체 조류를 양산하지 않는다. Gate A에서는 미검증이다. |
 | `QT-RB-ART-009` | `DEFERRED` | 닭·까마귀·치킨을 포함한 전체 상점 에셋 양산은 90초 재미 게이트 이후다. | 재미없는 게임의 상품 이미지를 먼저 만들지 않는다. |
-| `QT-RB-ART-010` | `PROPOSED` | Tower 전용 팔레트는 밤 남청, 망고 노랑, 청록, 코럴, 라일락을 역할색으로 사용한다. 참고 스크린샷의 청록 SF 프레임은 그대로 복제하지 않는다. | Quirky Ball과 Project K 모두와 다른 방송 사고·옥상 활극 인상을 만든다. |
+| `QT-RB-ART-010` | `PROPOSED` | Tower 전용 팔레트는 어두운 남청·차콜 도시 방송 배경에 제한된 네온 역할색만 사용한다. 정확한 색 비율은 Gate C 오리 Truth Kit의 20:9·흑백 비교 후 승인한다. | Quirky Ball과 Project K, 참고 작품의 팔레트를 복제하지 않고 방송 사고·옥상 활극 인상을 만든다. |
 | `QT-RB-ART-011` | `PROPOSED` | 첫 frame set의 등급 이름은 `common/rare/epic/legendary` 4종으로 검토한다. | 이름과 수량은 경제 등급 구조 승인 전 바뀔 수 있다. |
-| `QT-RB-ART-012` | `PROPOSED` | 400×800 2D 마스터에서 프로필 1:1, 대화 crop, 상점 캐릭터 3:4를 비파괴 파생하고 번역 텍스트·frame은 별도 UI/NinePatch 레이어로 합성한다. 오리 게이트에서 얼굴·부리·소품 safe area를 잠근다. | 재생성으로 캐릭터 얼굴이 달라지거나 번역이 이미지에 굽는 일을 막는다. |
+| `QT-RB-ART-012` | `PROPOSED` | cel 3D master의 승인된 400×800 렌더에서 프로필 1:1, 대화 crop, 상점 캐릭터 3:4를 비파괴 파생하고 번역 텍스트·frame은 별도 UI/NinePatch 레이어로 합성한다. 오리 게이트에서 얼굴·부리·소품 safe area를 잠근다. | 재생성으로 캐릭터 얼굴이 달라지거나 번역이 이미지에 굽는 일을 막는다. |
 | `QT-RB-ART-013` | `PROPOSED` | 2D·3D는 `idle/locomotion/dash/hit/rescued/chain_windup/chain_attack/success/failure/shop_pose` 공통 animation ID를 사용한다. | 빠진 동작을 임의의 다른 애니메이션으로 대체하지 않고 파생 자산을 추적한다. |
+| `QT-RB-ART-014` | `LOCKED` | 최종 아트 패밀리 ID는 `quirky_tower_urban_broadcast_cel_v1`이다. 오리·거위·닭·까마귀·비둘기는 하나의 cel 3D 마스터·공용 rig·material/render profile에서 2D 파생을 만든다. | 도시 방송탑 정체성과 자산 추적을 한 계약으로 묶는다. 구현·시각 승인은 Gate C다. |
 
 ## UI, 화면, 다국어
 
@@ -147,7 +148,7 @@
 | `QT-RB-DOC-003` | `PROPOSED` | `.gd`는 500줄 경고·800줄 차단, `.md/.json`은 600줄 또는 60KiB(61,440 bytes) 경고·1,200줄 또는 120KiB(122,880 bytes) 차단, HTML은 120KiB 경고·180KiB 차단을 기본 gate로 둔다. 현재 검사기는 이 전체 규칙을 아직 강제하지 않는다. | 숫자만으로 기계 분리하지 않되 구현 전후 성장 신호를 자동으로 잡는다. |
 | `QT-RB-DOC-004` | `LOCKED` | 기능은 결정 ID와 테스트 ID를 함께 가져야 하고, 계획은 전체 명세 복사 대신 필요한 ID와 파일만 참조한다. | 저토큰으로도 요구와 검증을 잃지 않는다. |
 | `QT-RB-DOC-005` | `PROPOSED` | HTML이 120KiB를 넘으면 공유 CSS/JS, 섹션 HTML, `index.html`로 분리한다. 빌드 도구 없이 정적 파일로 열 수 있어야 한다. | 문서 로직을 복제하지 않고 단순 파일 구조를 유지한다. |
-| `QT-RB-DOC-006` | `LOCKED` | 이 리부트 4개 문서는 Gate A 구현 승인 정본이다. 기존 `docs/canonical/*`의 15층·Timing Ring 도메인은 legacy 근거이며 새 코어 정본이 아니다. 관련 canonical은 결정 ID 기준으로 갱신한다. | 구정본을 새 구현 요구로 잘못 읽는 일을 막는다. |
+| `QT-RB-DOC-006` | `LOCKED` | 이 리부트 4개 문서는 Gate A 구현 후보와 Gate C 최종 아트 계약의 정본이다. 기존 `docs/canonical/*`의 15층·Timing Ring 도메인은 legacy 근거이며 새 코어 정본이 아니다. 관련 canonical은 결정 ID 기준으로 갱신한다. | 구정본을 새 구현 요구로 잘못 읽는 일을 막는다. |
 
 ## 분석과 측정
 
@@ -190,7 +191,7 @@
 - 10개 locale와 영어 fallback
 - 원개발자 upstream Godot MCP 구조와 House Duck 프로세스 종료 규칙
 - 고정 시드, 대량 밸런스 시뮬레이션, 광고·결제 효과 동등성 검사라는 테스트 기법
-- 실제 콜라이더, 고정 사선 카메라, 2D 픽셀 표면이라는 기술 실험
+- 실제 콜라이더, 고정 사선 카메라, 저폴리·2D 픽셀 표면의 Gate A greybox 기술 실험
 
 ### DEFERRED
 
@@ -213,3 +214,4 @@
 |---|---|---|
 | 2026-08-11 | 리부트 검토본 최초 작성. 대화에서 승인된 범위는 `LOCKED`, 새 구체화는 `PROPOSED/NEEDS_PLAYTEST`로 분리. | 사용자 승인 및 기존 프로젝트·Project K 감사 |
 | 2026-08-11 | 독립 검토 뒤 TC namespace, 20:9 safe frame, 물리 비결정성, 재도전 snapshot, P2W 단위 동등성, 타임어택, 분석 시간창, MCP/export·Cloud 경계를 보정. | HTML·시장·플러그인/스킬 읽기 전용 리뷰와 Godot 4.7 로컬 공식 문서 |
+| 2026-08-11 | 최종 아트를 `quirky_tower_urban_broadcast_cel_v1`로 잠그고, 최신 Project K 애니·셀 제작 언어와 ZZZ의 상위 도시·그래픽 에너지만 참고하도록 보정. 저폴리·픽셀은 Gate A greybox로 재분류. | 사용자 최신 아트 지시; 직접 복제 금지; Gate C Truth Kit 미검증 |

@@ -8,6 +8,8 @@
 
 **Tech Stack:** Godot 4.7, typed GDScript, native `Camera3D`/`Area3D`/`CharacterBody3D`/`RigidBody3D`, existing `AppTheme`/`DesignTokens`/`GameOverlay`/`MascotGuide`, shell and Godot QA scripts, viewport PNG capture after `RenderingServer.frame_post_draw`.
 
+**Execution status (2026-08-11):** Tasks 1–8 produced runtime source `c66e2e0`, visual evidence `6b9818b`, and capture-runner cleanup `e85ecac`. Task 9 reconciliation and Task 10 final regression, independent review, process audit, and Git handoff are complete on `codex/reboot-vertical-slice`. Gate A has **not passed** because the external five-person Human gate is blocked.
+
 ## Global Constraints
 
 - Source of truth: `docs/reboot/DECISION_REGISTER.md`, relevant master HTML sections, then `docs/reboot/FEATURE_TEST_MAP.md`.
@@ -15,7 +17,7 @@
 - Input is one active pointer and only drag, short swipe, and release; transition, popup, focus loss, and restart cancel the gesture.
 - The same state keeps leader, companions (maximum five), health, combo, score, build, seed, and event ledger across acts.
 - Logical UI remains 720×1280; runtime/capture is 1080×2400 FHD+ 20:9; the 720×1280 safe frame is explicitly centered.
-- Gameplay uses a fixed orthographic diagonal `Camera3D`, low-poly shapes, pixel-style face surfaces, and real colliders.
+- Gate A gameplay uses a fixed orthographic diagonal `Camera3D`, low-poly shapes, pixel-style face surfaces, and real colliders. These visuals are greybox evidence only; final `quirky_tower_urban_broadcast_cel_v1` art is an untested Gate C deliverable.
 - Collapse reads in order: warning → collision → crack → detached pieces → target collapse → reward.
 - Three-choice actions reuse the existing vertical `VBoxContainer`, minimum 96 logical px, one callback after repeated taps, and no horizontal choice row.
 - Visual completion requires fresh 1080×2400 screenshots from final code. Headless/parser PASS cannot replace screenshot or human evidence.
@@ -25,23 +27,23 @@
 
 ## Requirement → Implementation → Evidence Checklist
 
-During Task 9, replace `Not Started` with `Complete`, `Partial`, `Blocked`, or `Excluded`, and link exact evidence.
+Verdicts below separate implementation evidence from Human, Device, and final-art evidence.
 
-| Req | Decisions | Tests | Planned implementation | Required evidence | Initial status |
+| Req | Decisions | Tests | Implementation | Evidence | Verdict |
 |---|---|---|---|---|---|
-| GA-01 app boot and 20:9 safe frame | `QT-RB-UI-001`, `QT-RB-TECH-001`, `QT-RB-QA-005` | `QT-RB-TC-BAT-001` | existing shell + centered `SafeFrame` + full-height 3D world | before/after boot and gameplay PNG at 1080×2400 | Not Started |
-| GA-02 one persistent flock state | `QT-RB-PROD-001/002`, `QT-RB-GAME-001/002/003` | `QT-RB-TC-CORE-001` | `FlockRunState` shared by all acts | state test plus act/choice PNGs | Not Started |
-| GA-03 one-pointer ownership | `QT-RB-GAME-004/012` | `QT-RB-TC-TRANSITION-001` | `FlockTrial` owns pointer ID and cancels at boundaries | runtime regression and transition PNGs | Not Started |
-| GA-04 Approach rescue/dodge | `QT-RB-GAME-007/012` | `QT-RB-TC-ENTRY-001` | drag across three lanes; rescue/hazard areas | entry PNG with companions and lanes | Not Started |
-| GA-05 Brawl dash/impact | `QT-RB-GAME-004/007/008/012` | `QT-RB-TC-BRAWL-001` | shared swipe threshold and dash hitbox | warning/contact/rebound PNGs | Not Started |
-| GA-06 Chain path/release | `QT-RB-GAME-007/008` | `QT-RB-TC-CHAIN-001` | unique projected target path and attack orb | path preview and strike PNGs | Not Started |
-| GA-07 authored destruction | `QT-RB-GAME-008`, `QT-RB-TECH-004/007` | `QT-RB-TC-COLLAPSE-001` | weak point triggers crack, pre-cut pieces, collapse, reward | six ordered collapse frames | Not Started |
-| GA-08 deterministic discrete rules | `QT-RB-GAME-006/010`, `QT-RB-TECH-002/007` | `QT-RB-TC-RNG-001`, `QT-RB-TC-MERGE-001` | seeded choice order and unique event ledger | same-seed test output | Not Started |
-| GA-09 vertical three-choice | `QT-RB-GAME-006`, `QT-RB-UI-003/009/011` | `QT-RB-TC-REWARD-001` | existing `GameOverlay.show_actions()` and one mutation | KO choice PNG; DE/AR partial until copy exists | Not Started |
-| GA-10 mascot and transitions | `QT-RB-MASCOT-001/002`, `QT-RB-UI-004/005/010` | `QT-RB-TC-MASCOT-001`, `QT-RB-TC-UI-001` | one short line per act and ordered reveal | intro, impact, choice, result PNGs | Not Started |
-| GA-11 restart cleanup | `QT-RB-GAME-003`, `QT-RB-QA-005` | `QT-RB-TC-RESET-001` | cancel/retire one trial and recreate one run | runtime node-count evidence | Not Started |
-| GA-12 external fun gate | `QT-RB-GAME-005/011`, `QT-RB-QA-002/003` | `QT-RB-TC-PACING-001` | external five-person observation | observation sheet and raw clips | Blocked: requires people |
-| GA-13 process and Git cleanup | `QT-RB-OPS-001/002/003`, `QT-RB-QA-006` | `QT-RB-TC-PROCESS-001` | exact process/port start/end comparison | process report, branch, commit, push | Not Started |
+| GA-01 app boot and 20:9 safe frame | `QT-RB-UI-001`, `QT-RB-TECH-001`, `QT-RB-QA-005` | `QT-RB-TC-BAT-001`, `QT-RB-TC-VISUAL-001` | [`project.godot`](../../../project.godot), [`run_screen.tscn`](../../../scenes/game/run_screen.tscn), [`app_shell_test.gd`](../../../scripts_dev/qa/headless/app_shell_test.gd) | [legacy start](../../../qa_output/reboot_gate_a/before/gameplay_start_1080x2400.png), [boot](../../../qa_output/reboot_gate_a/after/boot.png), [entry](../../../qa_output/reboot_gate_a/after/entry.png) | **Partial** — all are 1080×2400, but the removed Timing Ring before state is `not directly comparable` to the reboot. |
+| GA-02 one persistent flock state | `QT-RB-PROD-001/002`, `QT-RB-GAME-001/002/003` | `QT-RB-TC-CORE-001` | [`flock_run_state.gd`](../../../scripts/core/reboot/flock_run_state.gd), [`run_controller.gd`](../../../scripts/game/run_controller.gd) | [`flock_run_state_test.gd`](../../../scripts_dev/qa/headless/flock_run_state_test.gd), [entry](../../../qa_output/reboot_gate_a/after/entry.png), [choice](../../../qa_output/reboot_gate_a/after/choice.png), [result](../../../qa_output/reboot_gate_a/after/result.png) | **Complete** — same state and one build mutation verified for the Gate A slice. |
+| GA-03 one-pointer ownership | `QT-RB-GAME-004/012` | `QT-RB-TC-TRANSITION-001` | [`flock_trial.gd`](../../../scripts/game/reboot/flock_trial.gd) | [`flock_world_test.gd`](../../../scripts_dev/qa/headless/flock_world_test.gd), [brawl warning](../../../qa_output/reboot_gate_a/after/brawl_warning.png), [choice](../../../qa_output/reboot_gate_a/after/choice.png) | **Partial** — one owner, act/focus/overlay/home cancellation pass; drag→popup stale-release 직접 경로는 미검증이다. |
+| GA-04 Approach rescue/dodge | `QT-RB-GAME-007/012` | `QT-RB-TC-ENTRY-001` | [`flock_world_3d.gd`](../../../scripts/game/reboot/flock_world_3d.gd), [`flock_bird_factory.gd`](../../../scripts/game/reboot/flock_bird_factory.gd) | [`flock_world_test.gd`](../../../scripts_dev/qa/headless/flock_world_test.gd), [entry](../../../qa_output/reboot_gate_a/after/entry.png) | **Partial** — drag·Rescue는 pass; hazard/dodge 실행과 Human 이해도는 미검증이다. |
+| GA-05 Brawl dash/impact | `QT-RB-GAME-004/007/008/012` | `QT-RB-TC-BRAWL-001` | [`flock_world_3d.gd`](../../../scripts/game/reboot/flock_world_3d.gd) | [warning](../../../qa_output/reboot_gate_a/after/brawl_warning.png), [contact](../../../qa_output/reboot_gate_a/after/brawl_contact.png), [rebound](../../../qa_output/reboot_gate_a/after/brawl_rebound.png) | **Complete** — three authored Desktop QA states; Human cause recognition remains GA-12. |
+| GA-06 Chain path/release | `QT-RB-GAME-007/008` | `QT-RB-TC-CHAIN-001` | [`flock_world_3d.gd`](../../../scripts/game/reboot/flock_world_3d.gd) | [path](../../../qa_output/reboot_gate_a/after/chain_path.png), [broken](../../../qa_output/reboot_gate_a/after/chain_broken.png), [strike](../../../qa_output/reboot_gate_a/after/chain_strike.png) | **Complete** — unique target order, broken path, and collider attack path verified. |
+| GA-07 authored destruction | `QT-RB-GAME-008`, `QT-RB-TECH-004/007` | `QT-RB-TC-COLLAPSE-001` | [`flock_world_3d.gd`](../../../scripts/game/reboot/flock_world_3d.gd) | [contact](../../../qa_output/reboot_gate_a/after/brawl_contact.png) → [crack](../../../qa_output/reboot_gate_a/after/collapse_crack.png) → [pieces](../../../qa_output/reboot_gate_a/after/collapse_pieces.png) → [target](../../../qa_output/reboot_gate_a/after/collapse_target.png) → [reward](../../../qa_output/reboot_gate_a/after/collapse_reward.png) | **Complete** — authored order and one reward verified; Human cause recognition remains GA-12. |
+| GA-08 deterministic discrete rules | `QT-RB-GAME-006/010`, `QT-RB-TECH-002/007` | `QT-RB-TC-RNG-001` | [`flock_run_state.gd`](../../../scripts/core/reboot/flock_run_state.gd) | [`flock_run_state_test.gd`](../../../scripts_dev/qa/headless/flock_run_state_test.gd), [QA report](../../../qa_output/reboot_gate_a/GATE_A_QA_REPORT.md) | **Partial** — same-seed choice/ledger/one mutation은 pass; 다른 seed 분기는 미검증이다. |
+| GA-09 vertical three-choice | `QT-RB-GAME-006`, `QT-RB-UI-003/009/011` | `QT-RB-TC-REWARD-001` | [`game_overlay.gd`](../../../scripts/ui/game_overlay.gd), [`run_controller.gd`](../../../scripts/game/run_controller.gd) | [`ui_foundation_test.gd`](../../../scripts_dev/qa/headless/ui_foundation_test.gd), [KO choice](../../../qa_output/reboot_gate_a/after/choice.png), [result](../../../qa_output/reboot_gate_a/after/result.png) | **Partial** — vertical cards and one mutation pass, but effect across two later acts and DE/AR visual evidence require Gate B/localization QA. |
+| GA-10 mascot and transitions | `QT-RB-MASCOT-001/002`, `QT-RB-UI-004/005/010` | `QT-RB-TC-MASCOT-001`, `QT-RB-TC-UI-001` | [`flock_trial.gd`](../../../scripts/game/reboot/flock_trial.gd), [`game_overlay.gd`](../../../scripts/ui/game_overlay.gd) | [`mascot_guide_test.gd`](../../../scripts_dev/qa/headless/mascot_guide_test.gd), [entry](../../../qa_output/reboot_gate_a/after/entry.png), [contact](../../../qa_output/reboot_gate_a/after/brawl_contact.png), [choice](../../../qa_output/reboot_gate_a/after/choice.png), [result](../../../qa_output/reboot_gate_a/after/result.png) | **Complete** for KO Desktop QA; full language/Human response remains unverified. |
+| GA-11 restart cleanup | `QT-RB-GAME-003`, `QT-RB-QA-005` | `QT-RB-TC-RESET-001` | [`run_controller.gd`](../../../scripts/game/run_controller.gd), [`flock_trial.gd`](../../../scripts/game/reboot/flock_trial.gd) | [`flock_world_test.gd`](../../../scripts_dev/qa/headless/flock_world_test.gd), [`app_shell_test.gd`](../../../scripts_dev/qa/headless/app_shell_test.gd) | **Partial** — home·restart에서 이전 trial 해제와 1개 재생성은 pass; failure 재시작 경로는 미검증이다. |
+| GA-12 external fun gate | `QT-RB-GAME-005/011`, `QT-RB-QA-002/003` | `QT-RB-TC-PACING-001` | external five-person observation | no observation sheet or raw clips | **Blocked** — requires five people; Gate A has not passed. |
+| GA-13 process and Git cleanup | `QT-RB-OPS-001/002/003`, `QT-RB-QA-006` | `QT-RB-TC-PROCESS-001` | exact owner PID cleanup in [`run_gate_a_visual.sh`](../../../scripts_dev/qa/run_gate_a_visual.sh) | [QA process record](../../../qa_output/reboot_gate_a/GATE_A_QA_REPORT.md#process-evidence), commit `e85ecac` owner/child reap self-test | **Complete** — final six regressions, project check, cleanup self-test, PID/port audit, commit/push handoff verified. |
 
 ---
 
@@ -372,7 +374,7 @@ git commit -m "feat: integrate Gate A flock run"
 - Create generated evidence: `qa_output/reboot_gate_a/after/*.png`
 
 **Interfaces:**
-- Capture states: `boot`, `entry`, `brawl_warning`, `brawl_contact`, `collapse_crack`, `collapse_pieces`, `collapse_reward`, `chain_path`, `choice`, `result`.
+- Capture states: `boot`, `entry`, `brawl_warning`, `brawl_contact`, `brawl_rebound`, `chain_path`, `chain_broken`, `chain_strike`, `collapse_crack`, `collapse_pieces`, `collapse_target`, `collapse_reward`, `choice`, `result`.
 - Every PNG is exactly 1080×2400 and comes from the final candidate.
 
 - [ ] **Step 1: Write the capture runner**
@@ -392,7 +394,7 @@ Record Git SHA and Godot version, create only the intended evidence directory, l
 
 - [ ] **Step 3: Run capture once and stop its exact PID**
 
-Expected: ten fresh final-code PNGs and no new Godot/MCP listener after exit.
+Recorded: fourteen fresh runtime-source PNGs and no new agent-owned Godot/MCP listener after exit. Commit `e85ecac` additionally guards the exact owner PID, reaps its child, escalates TERM to KILL within bounded waits, and preserves unrelated processes.
 
 - [ ] **Step 4: Inspect every image at original detail**
 

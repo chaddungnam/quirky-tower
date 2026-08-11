@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="dark">
-  <title>Quirky Tower Reboot Master Spec · Approved for Gate A implementation · 2026-08-11</title>
+  <title>Quirky Tower Reboot Master Spec · Gate A implementation candidate · 2026-08-11</title>
   <link rel="stylesheet" href="reboot_spec.css">
 </head>
 <body>
@@ -13,20 +13,21 @@
   <header class="hero" data-searchable data-source="user-approval,quirky-tower-audit" data-decision="QT-RB-PROD-001,QT-RB-GAME-001">
     <div class="shell hero-grid">
       <div>
-        <div class="eyebrow">HOUSE DUCK · QUIRKY TOWER REBOOT · APPROVED FOR GATE A IMPLEMENTATION · 2026-08-11</div>
+        <div class="eyebrow">HOUSE DUCK · QUIRKY TOWER REBOOT · GATE A IMPLEMENTATION CANDIDATE · HUMAN GATE BLOCKED · 2026-08-11</div>
         <h1>같은 조류단으로<br>피하고, 들이받고, 무너뜨린다</h1>
         <p class="lead">오리 리더 한 마리와 이름 있는 동료 최대 다섯 마리를 직접 움직여 방송탑에 잠입한다. 한 구역에서 진입, 옥상 난투, 깃털 사슬 습격이 끊기지 않고 이어지고, 구역 사이 랜덤 3택이 매 런 다른 조류단을 만든다.</p>
         <div class="hero-quote"><strong>이번 리부트의 약속:</strong> 설명을 읽어서 이해하는 게임이 아니라, 손가락을 움직이면 원인과 결과가 곧바로 보이고 마지막 붕괴에서 도파민이 터지는 20:9 세로 5분 액션을 만든다.</div>
         <div class="status-row">
-          <span class="badge approved">큰 방향 승인</span>
+          <span class="badge approved">Gate A 구현 후보</span>
           <span class="badge proposed">세부 수치 검토 후보</span>
-          <span class="badge playtest">손맛은 미검증</span>
-          <span class="badge evidence">Godot 실행 안 함</span>
-          <span class="badge evidence">코드 변경 안 함</span>
+          <span class="badge evidence">Godot 4.7 Desktop QA</span>
+          <span class="badge evidence">1080×2400 PNG 14장</span>
+          <span class="badge playtest">5인 재미 Gate 차단</span>
+          <span class="badge deferred">최종 아트 Gate C 미검증</span>
         </div>
-        <div class="trace"><b>문서 기준:</b> source master SHA-256 <code title="a9cedc409ca2e669e18628da97967a34c06095f069fb44926d02463eda717f3f">a9cedc409ca2…717f3f</code> · code base <code>0717db2</code></div>
+        <div class="trace"><b>증거 기준:</b> runtime source <code>c66e2e0</code> · visual evidence commit <code>6b9818b</code> · source master SHA-256 <code title="a9cedc409ca2e669e18628da97967a34c06095f069fb44926d02463eda717f3f">a9cedc409ca2…717f3f</code></div>
       </div>
-      <div class="phone" role="img" aria-label="Gate A 구현 승인된 20대9 게임 방향 축약 모형. 삐약 PD는 가칭이다.">
+      <div class="phone" role="img" aria-label="Gate A 구현 후보의 20대9 게임 방향 축약 모형. 삐약 PD는 가칭이다.">
         <div class="phone-hud"><span>♥ 82%</span><span>조류단 3/5</span><span>구역 2</span></div>
         <div class="tower"><span class="weak one"></span><span class="weak two"></span><span class="path"></span></div>
         <span class="bird leader">D</span><span class="bird goose">G</span><span class="bird pigeon">P</span>
@@ -49,7 +50,7 @@
     <section id="document-status" data-searchable data-source="DECISION_REGISTER.md,WORK_STATE.md" data-decision="QT-RB-DOC-001" data-feature="QT-RB-TC-BAT-001">
       <div class="shell">
         <div class="section-head"><div><div class="section-index">00 · DOCUMENT STATUS</div><h2>문서의 역할과 증거 경계</h2></div></div>
-        <p class="section-intro">이 HTML은 Gate A 구현 승인을 받은 상세 시각 명세다. 리부트 결정표가 새 코어의 정본이며 기존 <code>docs/canonical/*</code>의 15층 도메인은 legacy 근거다. 이 파일만 보고 “구현 완료”를 주장할 수 없다.</p>
+        <p class="section-intro">이 HTML은 Gate A 구현 후보와 최신 아트 계약을 함께 기록한 상세 시각 명세다. 리부트 결정표가 새 코어의 정본이며 기존 <code>docs/canonical/*</code>의 15층 도메인은 legacy 근거다. 구현·Desktop QA 증거가 있어도 외부 사람 게이트 전에 “Gate A 통과”를 주장할 수 없다.</p>
         <div class="status-strip" aria-label="상태 배지 설명">
           <span class="approved">LOCKED / 승인</span>
           <span class="proposed">PROPOSED / 검토 후보</span>
@@ -68,10 +69,18 @@
           </article>
           <article class="card remove" data-searchable>
             <div class="kicker">NOT PROOF</div><h3>현재 증명하지 않은 것</h3>
-            <p>새 3막 플레이, 손가락 감각, 조류 아트, 오디오, 햅틱, 모바일 성능, 광고, 결제, Supabase, 실제 랭킹은 모두 미검증이다.</p>
+            <p>실제 손가락 감각·외부 사람 재미, 최종 cel 아트, 오디오, 햅틱, Android/iOS 성능, 광고, 결제, Supabase, 실제 랭킹은 미검증이다. macOS 스크린샷은 이 항목을 대체하지 않는다.</p>
           </article>
         </div>
-        <div class="callout danger-callout"><strong>중요:</strong> 기존 15층 프로토타입의 PASS는 재사용 가능한 앱 셸·UI·테스트 기법의 회귀 증거다. 새 게임 코어의 재미나 완주 가능성을 증명하지 않는다.</div>
+        <details open data-searchable>
+          <summary>Gate A 현재 구현·화면 증거</summary>
+          <div class="details-body">
+            <p><span class="badge approved">IMPLEMENTATION CANDIDATE</span> <span class="badge evidence">HEADLESS/RUNTIME PASS</span> <span class="badge evidence">14 VISUAL STATES</span> <span class="badge playtest">HUMAN BLOCKED</span> <span class="badge deferred">DEVICE/FINAL ART NOT TESTED</span></p>
+            <p><code>boot</code> → <code>entry</code> → <code>brawl_warning</code> → <code>brawl_contact</code> → <code>brawl_rebound</code> → <code>chain_path</code> → <code>chain_broken</code> → <code>chain_strike</code> → <code>collapse_crack</code> → <code>collapse_pieces</code> → <code>collapse_target</code> → <code>collapse_reward</code> → <code>choice</code> → <code>result</code></p>
+            <p class="subtle">정확한 파일·해시·플랫폼 경계는 <a href="../../qa_output/reboot_gate_a/after/README.md">visual evidence README</a>와 <a href="../../qa_output/reboot_gate_a/GATE_A_QA_REPORT.md">Gate A QA report</a>를 본다. 레거시 Timing Ring 비포 이미지는 새 상태와 <em>not directly comparable</em>이다.</p>
+          </div>
+        </details>
+        <div class="callout danger-callout"><strong>중요:</strong> 현재 증거는 Gate A 구현 후보의 macOS 구조·화면 증거다. 실제 손가락 조작, 외부 5인 재미, Android/iOS, 최종 아트를 증명하지 않으며 Gate A는 아직 통과하지 않았다.</div>
       </div>
     </section>
 
@@ -90,7 +99,7 @@
           </article>
           <article class="card new" data-searchable>
             <div class="number">NEW</div><h3>새로 만드는 재미</h3>
-            <ul><li>같은 조류단을 세 막에서 계속 조작</li><li>구조·중복 합성·랜덤 3택 누적 빌드</li><li>대시와 실제 환경 충돌</li><li>경로 그리기 후 일제 돌진</li><li>authored destruction 연쇄 붕괴</li><li>방송 조작을 폭로하는 짧은 이야기</li><li>Project K 계열 애니풍 2D·3D 짝</li></ul>
+            <ul><li>같은 조류단을 세 막에서 계속 조작</li><li>구조·중복 합성·랜덤 3택 누적 빌드</li><li>대시와 실제 환경 충돌</li><li>경로 그리기 후 일제 돌진</li><li>authored destruction 연쇄 붕괴</li><li>방송 조작을 폭로하는 짧은 이야기</li><li><code>quirky_tower_urban_broadcast_cel_v1</code> 3D master·2D 파생</li></ul>
           </article>
         </div>
         <div class="callout success-callout"><strong>유지 판단 기준:</strong> 90초 greybox에서 임시 도형만으로도 “무슨 일이 일어났는지 알겠다”와 “한 번 더 하고 싶다”가 함께 나오지 않으면 아트·상점·SDK를 만들지 않고 코어를 다시 고친다.</div>
@@ -422,18 +431,18 @@
       </div>
     </section>
 
-    <section id="asset-direction" data-searchable data-source="Project-K-ASSET_ART_DIRECTION.md,user-reference-images" data-decision="QT-RB-ART-001,QT-RB-ART-003,QT-RB-ART-005,QT-RB-ART-007,QT-RB-ART-012,QT-RB-ART-013" data-feature="QT-RB-TC-ART-001,QT-RB-TC-ASSET-001">
+    <section id="asset-direction" data-searchable data-source="Project-K-ASSET_ART_DIRECTION.md,user-reference-images,user-art-amendment" data-decision="QT-RB-ART-001,QT-RB-ART-003,QT-RB-ART-005,QT-RB-ART-006,QT-RB-ART-007,QT-RB-ART-008,QT-RB-ART-012,QT-RB-ART-013,QT-RB-ART-014" data-feature="QT-RB-TC-ART-001,QT-RB-TC-ASSET-001">
       <div class="shell">
         <div class="section-head"><div><div class="section-index">10 · 2D, 3D, PROFILE, FRAME &amp; SHOP</div><h2>한 캐릭터 원형에서 모든 화면으로</h2></div></div>
-        <p class="section-intro">Project K의 최근 애니풍은 “큰 실루엣, 얼굴·복장 판독, 단일 광원, 정리된 경계”를 뜻한다. 정치 선전 팔레트나 현행 절차형 3D를 복사한다는 뜻이 아니다.</p>
+        <p class="section-intro">최종 아트 패밀리는 <code>quirky_tower_urban_broadcast_cel_v1</code>이다. 최신 Project K의 애니·셀 제작 언어와 ZZZ에서 느껴지는 도시 거리·그래픽 에너지를 상위 영감으로만 사용한다. 현재 저폴리·픽셀 모델은 Gate A greybox이며 최종 아트 구현·승인은 Gate C의 미검증 범위다.</p>
         <div class="grid two">
           <article class="card keep" data-searchable>
             <div class="kicker">REUSE THE RULE</div><h3>계승</h3>
-            <ul><li>화면 축소에서도 읽히는 큰 머리·부리·날개·소품</li><li>좌상단 단일 주광원과 한 단계 툰 그림자</li><li>원화 후보→배경 제거→nearest 축소→경계·잡픽셀 정리</li><li>stable ID와 manifest</li><li>같은 전신을 profile·dialogue·card에 crop·scale 재사용</li><li>2D·3D silhouette comparison gate</li></ul>
+            <ul><li>화면 축소에서도 읽히는 큰 머리·부리·날개·소품과 그래픽 실루엣</li><li>중밀도 cel 3D, 2–3단계 명암, 제한된 네온 엑센트</li><li>어두운 도시 방송탑 배경과 <code>배경 → 주체 → 맥락 → 행동</code> UI 리듬</li><li>stable ID와 manifest</li><li>하나의 승인된 3D master에서 400×800 전신·128×128 profile·3:4 shop layer 파생</li><li>2D·3D silhouette comparison gate</li></ul>
           </article>
           <article class="card remove" data-searchable>
             <div class="kicker">DO NOT COPY</div><h3>금지</h3>
-            <ul><li>적갈·올리브·금색 선전물 팔레트</li><li>가상 독재국·AI기업·군복 세계관</li><li>Project K 인물 체형·복장·대사</li><li>현재 조잡한 절차형 박스 3D</li><li>2D 이미지를 자동으로 3D라고 부르는 것</li><li>생성 결과를 보정·manifest 없이 런타임에 넣는 것</li></ul>
+            <ul><li>Project K의 적갈·올리브·노후 금색 선전물 팔레트와 군복·정치 세계관</li><li>ZZZ의 캐릭터·로고·의상·체형·UI 배치·셰이더·카메라 샷 직접 복제</li><li>Project K 인물 체형·복장·대사 재사용</li><li>Gate A 절차형 박스 3D를 최종 자산으로 승인</li><li>2D 이미지를 자동으로 3D라고 부르는 것</li><li>생성 결과를 보정·manifest 없이 런타임에 넣는 것</li></ul>
           </article>
         </div>
         <details open data-searchable>
@@ -442,10 +451,10 @@
             <table>
               <thead><tr><th>자산</th><th>제작 계약</th><th>재사용</th><th>승인 증거</th></tr></thead>
               <tbody>
-                <tr><td>2D 전신</td><td>400×800 투명 캔버스, 정면·3/4·후면 턴어라운드, neutral/reaction/assertive/uneasy</td><td>원본 정본</td><td>실루엣·광원·해부 일치</td></tr>
-                <tr><td>대화·프로필</td><td>전신 원본에서 프로필 1:1·대화·상점 3:4를 비파괴 crop, 별도 얼굴 재생성 금지</td><td>말풍선·프로필·도감·상점</td><td>오리 gate에서 얼굴·부리·소품 safe area 고정</td></tr>
-                <tr><td>인게임 3D</td><td>동일 턴어라운드 기반 저폴리 GLB/TSCN, 공통 rig 우선, 실제 collider 별도</td><td>난투·사슬·관리 preview</td><td>2D/3D 정면·3/4 실루엣 비교</td></tr>
-                <tr><td>픽셀 표면</td><td>nearest, mipmaps off 검토, 제한된 face/feather/material texture</td><td>3D 얼굴·날개·월드 decal</td><td>20:9 캡처에서 번짐·필터링 0</td></tr>
+                <tr><td>cel 3D master</td><td>동일 턴어라운드 기반 중밀도 GLB/TSCN, 공통 rig, 2–3단계 cel material, 실제 collider 별도</td><td>난투·사슬·관리 preview의 원형</td><td>2D/3D 정면·3/4 실루엣·표정·대표색 비교</td></tr>
+                <tr><td>2D 전신</td><td>승인된 3D master에서 400×800 투명 전신·표정 파생, 임의의 별도 얼굴 재생성 금지</td><td>대화·도감·마케팅 원본</td><td>원형과 실루엣·해부·복장선 일치</td></tr>
+                <tr><td>대화·프로필</td><td>400×800 파생에서 128×128 profile·대화·3:4 상점 layer를 비파괴 crop</td><td>말풍선·프로필·도감·상점</td><td>오리 Truth Kit에서 얼굴·부리·소품 safe area 고정</td></tr>
+                <tr><td>머티리얼·렌더</td><td>어두운 도시 방송 배경, 2–3단계 셀 명암, 제한된 네온, 일관된 material/render profile</td><td>모든 조류·파생 자산</td><td>20:9·흑백·원형/파생 비교</td></tr>
                 <tr><td>상점 카드</td><td>3:4 캐릭터 layer·대표 pose·공용 NinePatch frame 조합, locale text는 별도 UI</td><td>상점·획득·결과</td><td>희귀도와 캐릭터 역할 동시 판독</td></tr>
                 <tr><td>공용 frame</td><td>공용 set 재사용; common/rare/epic/legendary 4종은 후보</td><td>모든 profile·item</td><td>캐릭터별 복제 0</td></tr>
               </tbody>
@@ -458,27 +467,24 @@
           <div class="details-body">
 <pre><code>{
   "character_id": "bird_duck_leader_01",
-  "species": "duck",
-  "role": ["leader", "route"],
-  "master_2d": "res://assets/reboot/characters/...",
-  "profile": "res://assets/reboot/profiles/...",
-  "shop_card": "res://assets/reboot/shop/...",
-  "model_3d": "res://assets/reboot/models/...",
-  "rig": "bird_common_v1",
-  "animation_set": "bird_biped_v1",
+  "variant_id": "default",
+  "art_family": "quirky_tower_urban_broadcast_cel_v1",
+  "source_path": "res://assets/reboot/models/bird_duck_leader_01.glb",
+  "rig_profile": "bird_common_v1",
+  "material_profile": "urban_broadcast_cel_v1",
+  "render_profile": "portrait_derivatives_v1",
   "frame_set": "rarity_frames_v1",
-  "palette": "tower_broadcast_v1",
-  "license": "house_duck_original",
-  "source_hash": "sha256:...",
+  "source_sha256": "sha256:...",
+  "derivative_sha256": {"fullbody": "sha256:...", "profile": "sha256:...", "shop": "sha256:..."},
   "approval_status": "candidate|approved|rejected"
 }</code></pre>
             <p class="subtle">위 예시는 계약 형식을 설명한다. 실제 경로와 ID는 구현 계획에서 존재하는 폴더에 맞춰 확정하며, 빈 파일을 미리 scaffold하지 않는다.</p>
           </div>
         </details>
         <div class="grid three">
-          <article class="card new" data-searchable><div class="kicker">PALETTE</div><h3>방송 사고의 밤</h3><p>남청 배경, 망고 리더, 청록 성공·경로, 코럴 충돌, 라일락 비밀을 역할색으로 사용한다.</p></article>
-          <article class="card info" data-searchable><div class="kicker">MATERIAL</div><h3>저폴리 + 픽셀 표면</h3><p>사진풍 roughness 노이즈와 다중 반사를 빼고 큰 면, 2D 얼굴, 표면 decal, 실제 그림자로 형태를 만든다.</p></article>
-          <article class="card keep" data-searchable><div class="kicker">FIRST GATE</div><h3>오리 하나를 끝까지</h3><p>2D·3D·프로필·상점·frame 조합을 한 번 승인한 뒤 같은 파이프라인으로 다른 조류를 확장한다.</p></article>
+          <article class="card new" data-searchable><div class="kicker">PALETTE</div><h3>도시 방송 사고의 밤</h3><p>어두운 남청·차콜을 배경으로 두고 네온은 성공·충돌·비밀 역할에만 제한한다. 정확한 비율은 Gate C 오리 Truth Kit의 20:9·흑백 비교 뒤 승인한다.</p></article>
+          <article class="card info" data-searchable><div class="kicker">MATERIAL</div><h3>중밀도 cel 3D</h3><p>2–3단계 셀 명암, 깔끔한 경계, 제한된 네온으로 형태를 만든다. Gate A 저폴리·픽셀 표면은 greybox에서만 유지한다.</p></article>
+          <article class="card keep" data-searchable><div class="kicker">GATE C · NOT TESTED</div><h3>오리 Truth Kit 하나를 끝까지</h3><p>cel 3D master·400×800 전신·128×128 profile·3:4 shop layer·frame 조합을 한 번 승인한 뒤 다른 조류를 확장한다.</p></article>
         </div>
       </div>
     </section>
@@ -858,14 +864,14 @@ assets/reboot/
       <div class="shell">
         <div class="section-head"><div><div class="section-index">17 · QA, ANALYTICS &amp; FUN GATES</div><h2>자동 PASS와 재미 PASS를 섞지 않는다</h2></div></div>
         <p class="section-intro">상세 TC와 현재 상태는 <a href="FEATURE_TEST_MAP.md">FEATURE_TEST_MAP.md</a>에 있다. 여기서는 어떤 순서로 무엇을 증명해야 다음 투자를 허용하는지 고정한다.</p>
-        <div class="callout"><strong>화면 완료 증거:</strong> 화면 결과가 바뀌면 최종 코드에서 만든 같은 상태·범위의 1080×2400 PNG 비포·애프터와 명세→구현→증거 대조표가 필요하다. 코드 파싱·headless PASS는 Visual 또는 Human PASS가 아니며, 실기기·외부 사람 증거는 별도로 기록한다.</div>
+        <div class="callout"><strong>현재 화면 증거:</strong> runtime source <code>c66e2e0</code>에서 14개 상태를 1080×2400 macOS Desktop QA PNG로 캡처했고 evidence commit <code>6b9818b</code>에 해시와 함께 기록했다. 레거시 Timing Ring 비포 상태는 새 코어와 <em>not directly comparable</em>이다. 실기기·외부 사람·최종 아트 증거는 별도다.</div>
         <div class="grid three">
-          <article class="card keep" data-searchable><div class="number">A</div><h3>90초 Greybox</h3><p>오리·거위·비둘기, 한 구역, 세 막, 3택 한 번. 5명 중 3명 이상이 자발적으로 재도전해야 한다.</p></article>
+          <article class="card keep" data-searchable><div class="number">A</div><h3>90초 Greybox · 미통과</h3><p>오리·거위·비둘기, 한 구역, 세 막, 3택 한 번의 구현 후보와 Desktop QA 증거는 있다. 외부 5인 사람 증거가 없어 Gate A는 아직 통과하지 않았다.</p></article>
           <article class="card new" data-searchable><div class="number">B</div><h3>5분 Run</h3><p>외부 10명 이상, 세 구역+송출실, 닭·까마귀, 3택 세 번. pause·광고·background 제외 wall time 4:30~5:30 후보와 빌드 설명률을 함께 본다.</p></article>
           <article class="card info" data-searchable><div class="number">C</div><h3>Art·Audio·Outgame</h3><p>오리 master의 2D·3D 파생, 4스템 청음, 앱 셸·도감·상점·랭킹 mock이 통과한다.</p></article>
         </div>
         <details open data-searchable>
-          <summary>Gate A · 사람 재미 완료 기준</summary>
+          <summary>Gate A · 사람 재미 완료 기준 · BLOCKED</summary>
           <div class="details-body">
             <ul><li>5명 중 4명 이상이 첫 10초 안에 다음 행동을 설명 없이 시도한다.</li><li>5명 중 4명 이상이 “무엇에 부딪혔고 무엇 때문에 무너졌는지” 맞게 말한다.</li><li>5명 중 4명 이상이 진입·난투·사슬의 차이를 설명한다.</li><li>5명 중 3명 이상이 요청 없이 즉시 다시 플레이한다.</li><li>한 명이라도 심각한 멀미·입력 불능·원인 불명 붕괴를 겪으면 원인을 고친 뒤 다시 본다.</li><li>실패하면 아트·상점·SDK 범위를 늘리지 않는다.</li></ul>
           </div>
@@ -939,7 +945,7 @@ assets/reboot/
             </table>
           </div>
         </details>
-        <div class="callout"><strong>월말 완료 정의:</strong> 새 코어를 처음 보는 사람이 원인과 세 막을 이해하고 다시 플레이하며, 오리 하나가 2D·3D·프로필·상점에서 같은 캐릭터로 보이고, 엔진·프로세스·Git 상태가 다음 작업자가 바로 이어갈 수 있게 정리돼 있어야 한다.</div>
+        <div class="callout"><strong>현재 판정:</strong> Gate A 구현 후보는 생성됐지만 GA-01 동등 비포, GA-03 popup stale-release, GA-04 hazard/dodge, GA-08 different-seed, GA-09 후속 두 막·DE/AR, GA-11 failure restart가 <em>Partial</em>이고 외부 5인 재미 게이트는 <em>Blocked</em>다. Gate A는 통과하지 않았고 최종 cel 아트는 Gate C에서 별도로 구현·검증한다.</div>
       </div>
     </section>
 
@@ -947,8 +953,8 @@ assets/reboot/
       <div class="shell">
         <div class="section-head"><div><div class="section-index">19 · DECISIONS, SOURCES &amp; CHANGE BOUNDARY</div><h2>무엇이 승인됐고 무엇이 아직 후보인가</h2></div></div>
         <div class="grid three">
-          <article class="card keep" data-searchable><div class="kicker">LOCKED</div><h3>사용자 승인 범위</h3><ul><li>세 막을 하나로 연결</li><li>리더 1+동료≤5</li><li>조류 세계관</li><li>20:9·세로 선택</li><li>Project K 계열 애니풍</li><li>P2W·광고/결제 동일 효과</li><li>통합 랭킹·국가/소속 한 카테고리</li><li>Supabase 후순위·Cloud/Local 균형</li></ul></article>
-          <article class="card new" data-searchable><div class="kicker">PROPOSED / PLAYTEST</div><h3>이번 검토 후보</h3><ul><li>방송 탈취 이야기·삐약 PD</li><li>종별 세 막 역할·치킨 각성</li><li>구역·런 정확한 시간</li><li>남청·망고·청록 팔레트</li><li>112 BPM·4스템</li><li>Sponsor Ticket 사용처·광고 간격</li><li>성능·파일 크기 수치</li><li>MCP v0.8.0 갱신 여부</li></ul></article>
+          <article class="card keep" data-searchable><div class="kicker">LOCKED</div><h3>사용자 승인 범위</h3><ul><li>세 막을 하나로 연결</li><li>리더 1+동료≤5</li><li>조류 세계관</li><li>20:9·세로 선택</li><li><code>quirky_tower_urban_broadcast_cel_v1</code></li><li>최신 Project K 애니·셀 제작 언어 + ZZZ 상위 도시·그래픽 에너지</li><li>특정 작품 캐릭터·UI·셰이더·샷 직접 복제 금지</li><li>P2W·광고/결제 동일 효과</li><li>통합 랭킹·국가/소속 한 카테고리</li><li>Supabase 후순위·Cloud/Local 균형</li></ul></article>
+          <article class="card new" data-searchable><div class="kicker">PROPOSED / PLAYTEST</div><h3>이번 검토 후보</h3><ul><li>방송 탈취 이야기·삐약 PD</li><li>종별 세 막 역할·치킨 각성</li><li>구역·런 정확한 시간</li><li>Gate C 제한 네온의 정확한 역할색·비율</li><li>112 BPM·4스템</li><li>Sponsor Ticket 사용처·광고 간격</li><li>성능·파일 크기 수치</li><li>MCP v0.8.0 갱신 여부</li></ul></article>
           <article class="card remove" data-searchable><div class="kicker">DEFERRED / CUT</div><h3>지금 하지 않음</h3><ul><li>기존 15층 도메인 코어</li><li>전체 캐릭터·상점 양산</li><li>시즌 패스·유료 가챠</li><li>Supabase·실제 랭킹</li><li>AdMob·Billing·StoreKit</li><li>추가 런타임 플러그인</li><li>대형 절차 파괴·복잡한 AI</li><li>출시 완료 주장</li></ul></article>
         </div>
         <details open data-searchable>
@@ -982,14 +988,14 @@ assets/reboot/
             </ul>
           </div>
         </details>
-        <div class="callout success-callout"><strong>구현 시작:</strong> 이 파일과 <a href="DECISION_REGISTER.md">DECISION_REGISTER.md</a>는 Gate A 구현 승인 정본이다. <code>PROPOSED</code>와 <code>NEEDS PLAYTEST</code> 항목은 후보 상태를 유지하며, 90초 greybox는 관련 결정·테스트 ID와 화면 증거 규칙을 따라 구현한다.</div>
+        <div class="callout success-callout"><strong>현재 정본:</strong> 이 파일과 <a href="DECISION_REGISTER.md">DECISION_REGISTER.md</a>는 Gate A 구현 후보와 Gate C 최종 아트 계약의 정본이다. 실제 판정은 <a href="FEATURE_TEST_MAP.md">FEATURE_TEST_MAP.md</a>와 QA report를 따르며, 외부 사람 증거 전에 Gate A PASS를 선언하지 않는다.</div>
       </div>
     </section>
   </main>
 
   <footer>
     <div class="shell">
-      <p><strong>Quirky Tower Reboot Master Spec</strong> · Approved for Gate A implementation · 2026-08-11</p>
+      <p><strong>Quirky Tower Reboot Master Spec</strong> · Gate A implementation candidate · Human gate blocked · 2026-08-11</p>
       <p>이 HTML은 외부 라이브러리 없이 동작한다. 구현 상태는 <a href="WORK_STATE.md">WORK_STATE.md</a>, 결정은 <a href="DECISION_REGISTER.md">DECISION_REGISTER.md</a>, 검증은 <a href="FEATURE_TEST_MAP.md">FEATURE_TEST_MAP.md</a>를 우선한다.</p>
     </div>
   </footer>
