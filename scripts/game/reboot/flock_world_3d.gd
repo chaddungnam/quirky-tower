@@ -5,6 +5,7 @@ signal act_completed(act_id: String, result: Dictionary)
 signal flock_changed(snapshot: Dictionary)
 signal impact(kind: String, world_point: Vector3)
 signal collapse_stage(stage: String)
+signal reward_released(value: int)
 
 const FOLLOW_OFFSETS := [Vector3(-0.72, 0.0, 0.82), Vector3(0.72, 0.0, 1.28)]
 const FLOOR_Y := 0.56
@@ -12,6 +13,12 @@ const MAX_SPEED := 8.0
 const ARRIVE_GAIN := 7.0
 const FOLLOW_GAIN := 8.0
 const FINGER_OFFSET := Vector2(0.0, 160.0)
+const SWIPE_MIN_DISTANCE := 90.0
+const SWIPE_MIN_VELOCITY := 900.0
+const DASH_SPEED := 16.0
+const DASH_DURATION := 0.24
+const DASH_IMPULSE := 7.0
+const BRAWL_TARGET_ID := "antenna_a"
 
 var _run_state: FlockRunState
 var _act_id := ""
@@ -19,11 +26,23 @@ var _drag_target := Vector3.ZERO
 var _has_drag_target := false
 var _resolved_routes: Dictionary = {}
 var _leader: CharacterBody3D
+var _swipe_start := Vector2.ZERO
+var _has_swipe_candidate := false
+var _dash_active := false
+var _dash_remaining := 0.0
+var _dash_direction := Vector3.ZERO
+var _dash_collision: CollisionShape3D
+var _brawl_target: Node3D
+var _target_material: StandardMaterial3D
+var _weak_point: RigidBody3D
+var _detached_pieces: Array[RigidBody3D] = []
+var _collapsed_targets: Dictionary = {}
+var _reward_claimed := false
+var _collapse_tween: Tween
 
 @onready var _camera: Camera3D = $Camera
 @onready var _actors: Node3D = $Actors
 @onready var _companion_slots: Node3D = $Actors/CompanionSlots
-
 
 func _ready() -> void:
 	_camera.look_at(Vector3(0.0, 0.0, -3.5))
@@ -31,6 +50,8 @@ func _ready() -> void:
 	_leader.name = "Leader"
 	_leader.position = Vector3(0.0, FLOOR_Y, 4.0)
 	_actors.add_child(_leader)
+	_make_dash_hitbox()
+	_make_brawl_encounter()
 
 	var goose := _make_bird_actor("goose")
 	goose.visible = false
@@ -44,12 +65,10 @@ func _ready() -> void:
 		area.body_entered.connect(_on_route_entered.bind(route_kind))
 	_drag_target = _leader.global_position
 
-
 func setup(run_state: FlockRunState) -> void:
 	_run_state = run_state
 	_sync_companions()
 	flock_changed.emit(_run_state.snapshot())
-
 
 func start_act(act_id: String) -> void:
 	cancel_gesture()
@@ -58,9 +77,16 @@ func start_act(act_id: String) -> void:
 	if _run_state != null:
 		_run_state.begin_act(act_id)
 	set_physics_process(act_id == "entry")
-
+	if act_id == "brawl":
+		_reset_brawl_encounter()
+		collapse_stage.emit("warning")
 
 func set_drag_target(screen_position: Vector2) -> void:
+	if _act_id == "brawl":
+		if not _has_swipe_candidate:
+			_swipe_start = screen_position
+			_has_swipe_candidate = true
+		return
 	if _act_id != "entry":
 		return
 	var adjusted_position := screen_position - FINGER_OFFSET
@@ -79,18 +105,43 @@ func set_drag_target(screen_position: Vector2) -> void:
 	)
 	_has_drag_target = true
 
-
-func release_swipe(_screen_position: Vector2, _velocity: Vector2) -> void:
-	cancel_gesture()
-
+func release_swipe(screen_position: Vector2, velocity: Vector2) -> void:
+	if (
+		_act_id != "brawl"
+		or not _has_swipe_candidate
+		or screen_position.distance_to(_swipe_start) < SWIPE_MIN_DISTANCE
+		or velocity.length() < SWIPE_MIN_VELOCITY
+	):
+		cancel_gesture()
+		return
+	_has_swipe_candidate = false
+	_dash_direction = Vector3(velocity.x, 0.0, velocity.y).normalized()
+	_dash_remaining = DASH_DURATION
+	_dash_active = true
+	_dash_collision.disabled = false
+	set_physics_process(true)
 
 func cancel_gesture() -> void:
 	_has_drag_target = false
+	_has_swipe_candidate = false
+	_dash_active = false
+	_dash_remaining = 0.0
+	if _dash_collision != null:
+		_dash_collision.disabled = true
 	if _leader != null:
 		_leader.velocity = Vector3.ZERO
 
-
 func _physics_process(delta: float) -> void:
+	if _act_id == "brawl":
+		if not _dash_active:
+			return
+		_leader.velocity = _dash_direction * DASH_SPEED
+		_leader.move_and_slide()
+		_leader.position.y = FLOOR_Y
+		_dash_remaining -= delta
+		if _dash_remaining <= 0.0:
+			cancel_gesture()
+		return
 	if _act_id != "entry" or not _has_drag_target:
 		return
 	var offset := _drag_target - _leader.global_position
@@ -100,7 +151,6 @@ func _physics_process(delta: float) -> void:
 	_leader.move_and_slide()
 	_leader.position.y = FLOOR_Y
 	_update_companions(delta)
-
 
 func _update_companions(delta: float) -> void:
 	for index in range(_companion_slots.get_child_count()):
@@ -115,7 +165,6 @@ func _update_companions(delta: float) -> void:
 			follow_target,
 			clampf(FOLLOW_GAIN * delta, 0.0, 1.0)
 		)
-
 
 func _on_route_entered(body: Node3D, route_kind: String) -> void:
 	if body != _leader or _act_id != "entry" or not _resolved_routes.is_empty():
@@ -139,6 +188,55 @@ func _on_route_entered(body: Node3D, route_kind: String) -> void:
 	set_physics_process(false)
 	act_completed.emit("entry", result)
 
+func trigger_collapse(target_id: String, force_direction: Vector3) -> bool:
+	if target_id != BRAWL_TARGET_ID or _collapsed_targets.has(target_id):
+		return false
+	_collapsed_targets[target_id] = true
+	var releases_reward := not _reward_claimed
+	_reward_claimed = true
+	collapse_stage.emit("contact")
+	_set_target_color(Color(1.0, 0.93, 0.72))
+	_collapse_tween = create_tween()
+	_collapse_tween.tween_interval(0.12)
+	_collapse_tween.tween_callback(_show_collapse_crack)
+	_collapse_tween.tween_interval(0.12)
+	_collapse_tween.tween_callback(_release_collapse_pieces.bind(force_direction))
+	_collapse_tween.tween_interval(0.12)
+	_collapse_tween.tween_callback(_lower_collapse_target)
+	if releases_reward:
+		_collapse_tween.tween_interval(0.12)
+		_collapse_tween.tween_callback(_emit_collapse_reward)
+	return true
+
+func _show_collapse_crack() -> void:
+	collapse_stage.emit("crack")
+	_set_target_color(Color(0.27, 0.29, 0.34))
+
+func _release_collapse_pieces(force_direction: Vector3) -> void:
+	for index in range(_detached_pieces.size()):
+		var piece := _detached_pieces[index]
+		piece.visible = true
+		piece.freeze = false
+		piece.apply_central_impulse(force_direction * 4.0 + Vector3(index - 1, 2.2, 0.0))
+	collapse_stage.emit("pieces")
+
+func _lower_collapse_target() -> void:
+	_brawl_target.position.y -= 1.35
+	collapse_stage.emit("collapse")
+
+func _emit_collapse_reward() -> void:
+	reward_released.emit(1)
+	collapse_stage.emit("reward")
+
+func _on_dash_body_entered(body: Node3D) -> void:
+	if not _dash_active or body != _weak_point:
+		return
+	_dash_active = false
+	_dash_collision.set_deferred("disabled", true)
+	_leader.velocity = Vector3.ZERO
+	_weak_point.apply_central_impulse(_dash_direction * DASH_IMPULSE)
+	impact.emit("dash", _weak_point.global_position)
+	trigger_collapse(str(_weak_point.get_meta("target_id")), _dash_direction)
 
 func _sync_companions() -> void:
 	if _run_state == null:
@@ -157,6 +255,105 @@ func _sync_companions() -> void:
 				bird.global_position = _leader.global_position + FOLLOW_OFFSETS[slot.get_index()]
 				break
 
+func _make_dash_hitbox() -> void:
+	var hitbox := Area3D.new()
+	hitbox.name = "DashHitbox"
+	hitbox.position.z = -0.35
+	hitbox.collision_layer = 0
+	hitbox.collision_mask = 8
+	_leader.add_child(hitbox)
+	var shape := SphereShape3D.new()
+	shape.radius = 0.72
+	_dash_collision = CollisionShape3D.new()
+	_dash_collision.name = "Collision"
+	_dash_collision.shape = shape
+	_dash_collision.disabled = true
+	hitbox.add_child(_dash_collision)
+	hitbox.body_entered.connect(_on_dash_body_entered)
+
+func _make_brawl_encounter() -> void:
+	_brawl_target = Node3D.new()
+	_brawl_target.name = "BrawlTarget"
+	_brawl_target.position = Vector3(0.0, 0.9, 0.0)
+	$Encounter.add_child(_brawl_target)
+	_target_material = StandardMaterial3D.new()
+	var target_mesh := BoxMesh.new()
+	target_mesh.size = Vector3(2.8, 2.2, 1.3)
+	target_mesh.material = _target_material
+	var target_visual := MeshInstance3D.new()
+	target_visual.mesh = target_mesh
+	_brawl_target.add_child(target_visual)
+	_set_target_color(Color(0.4, 0.44, 0.52))
+	_weak_point = RigidBody3D.new()
+	_weak_point.name = "BrawlWeakPoint"
+	_weak_point.position = Vector3(0.0, FLOOR_Y, 1.35)
+	_weak_point.freeze = true
+	_weak_point.collision_layer = 8
+	_weak_point.collision_mask = 4
+	_weak_point.set_meta("target_id", BRAWL_TARGET_ID)
+	$Encounter.add_child(_weak_point)
+	var weak_shape := SphereShape3D.new()
+	weak_shape.radius = 0.46
+	var weak_collision := CollisionShape3D.new()
+	weak_collision.shape = weak_shape
+	_weak_point.add_child(weak_collision)
+	var weak_material := StandardMaterial3D.new()
+	weak_material.albedo_color = Color(0.94, 0.22, 0.2)
+	var weak_mesh := SphereMesh.new()
+	weak_mesh.radius = 0.46
+	weak_mesh.height = 0.92
+	weak_mesh.radial_segments = 8
+	weak_mesh.rings = 4
+	weak_mesh.material = weak_material
+	var weak_visual := MeshInstance3D.new()
+	weak_visual.mesh = weak_mesh
+	_weak_point.add_child(weak_visual)
+
+	var pieces := Node3D.new()
+	pieces.name = "DetachedPieces"
+	$Encounter.add_child(pieces)
+	for index in range(3):
+		var piece := RigidBody3D.new()
+		piece.position = Vector3((index - 1) * 0.7, 1.45 + index * 0.25, 0.0)
+		piece.freeze = true
+		piece.visible = false
+		piece.collision_layer = 8
+		piece.collision_mask = 4
+		pieces.add_child(piece)
+		var piece_shape := BoxShape3D.new()
+		piece_shape.size = Vector3(0.6, 0.45, 0.9)
+		var piece_collision := CollisionShape3D.new()
+		piece_collision.shape = piece_shape
+		piece.add_child(piece_collision)
+		var piece_mesh := BoxMesh.new()
+		piece_mesh.size = piece_shape.size
+		piece_mesh.material = _target_material
+		var piece_visual := MeshInstance3D.new()
+		piece_visual.mesh = piece_mesh
+		piece.add_child(piece_visual)
+		_detached_pieces.append(piece)
+
+func _reset_brawl_encounter() -> void:
+	if _collapse_tween != null and _collapse_tween.is_valid():
+		_collapse_tween.kill()
+	_collapsed_targets.clear()
+	_reward_claimed = false
+	_brawl_target.position = Vector3(0.0, 0.9, 0.0)
+	_weak_point.position = Vector3(0.0, FLOOR_Y, 1.35)
+	_weak_point.linear_velocity = Vector3.ZERO
+	_weak_point.angular_velocity = Vector3.ZERO
+	_weak_point.freeze = false
+	for index in range(_detached_pieces.size()):
+		var piece := _detached_pieces[index]
+		piece.position = Vector3((index - 1) * 0.7, 1.45 + index * 0.25, 0.0)
+		piece.linear_velocity = Vector3.ZERO
+		piece.angular_velocity = Vector3.ZERO
+		piece.freeze = true
+		piece.visible = false
+	_set_target_color(Color(0.98, 0.67, 0.16))
+
+func _set_target_color(color: Color) -> void:
+	_target_material.albedo_color = color
 
 func _make_bird_actor(species: String) -> CharacterBody3D:
 	var actor := CharacterBody3D.new()

@@ -86,7 +86,57 @@ func _run() -> void:
 		assert(face.texture.get_size() == Vector2(16, 16), "bird faces use a 16x16 surface")
 		assert(face.texture_filter == BaseMaterial3D.TEXTURE_FILTER_NEAREST, "bird faces keep nearest filtering")
 
-	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
+	var weak_point := world.get_node("Encounter/BrawlWeakPoint") as RigidBody3D
+	var dash_collision := world.get_node("Actors/Leader/DashHitbox/Collision") as CollisionShape3D
+	var collapse_stages: Array[String] = []
+	var rewards: Array[int] = []
+	var dash_contacts: Array[Vector3] = []
+	world.collapse_stage.connect(func(stage: String) -> void: collapse_stages.append(stage))
+	world.reward_released.connect(func(value: int) -> void: rewards.append(value))
+	world.impact.connect(
+		func(kind: String, world_point: Vector3) -> void:
+			if kind == "dash":
+				dash_contacts.append(world_point)
+	)
+	world.start_act("brawl")
+	assert(collapse_stages == ["warning"], "Brawl warns before any contact feedback")
+	world.set_drag_target(Vector2(100.0, 100.0))
+	world.release_swipe(Vector2(300.0, 100.0), Vector2(80.0, 0.0))
+	assert(not world.get("_dash_active"), "a slow release does not start a dash")
+	assert(dash_collision.disabled, "a slow release keeps the dash collider disabled")
+	assert(rewards.is_empty(), "a release without contact cannot reward")
+
+	weak_point.global_position = leader.global_position + Vector3(0.0, 0.0, -1.5)
+	weak_point.linear_velocity = Vector3.ZERO
+	weak_point.angular_velocity = Vector3.ZERO
+	world.set_drag_target(Vector2(300.0, 300.0))
+	world.release_swipe(Vector2(300.0, 100.0), Vector2(0.0, -2000.0))
+	assert(world.get("_dash_active"), "a long high-velocity swipe starts one dash")
+	assert(not dash_collision.disabled, "a valid dash enables the leader hitbox")
+	for _frame in range(90):
+		await physics_frame
+		if not rewards.is_empty():
+			break
+	assert(dash_contacts.size() == 1, "the dash hitbox contacts one real rigid enemy")
+	assert(weak_point.linear_velocity.z < -0.1, "contact applies forward impulse to the rigid enemy")
+	assert(
+		collapse_stages == ["warning", "contact", "crack", "pieces", "collapse", "reward"],
+		"authored collapse stages preserve causal order"
+	)
+	assert(rewards == [1], "one collider-triggered collapse releases one reward")
+	assert(not world.trigger_collapse("antenna_a", Vector3.FORWARD), "a repeated trigger is rejected")
+	world.call("_on_dash_body_entered", weak_point)
+	assert(rewards == [1], "repeated trigger and callback cannot release a second reward")
+	world.setup(FlockRunState.new_run(424243))
+	world.start_act("brawl")
+	assert(
+		is_equal_approx(world.get_node("Encounter/BrawlTarget").position.y, 0.9),
+		"a reused world restores the authored target position"
+	)
+	for piece in world.get_node("Encounter/DetachedPieces").get_children():
+		assert(not piece.visible and piece.freeze, "a reused world hides and freezes detached pieces")
+	assert(world.trigger_collapse("antenna_a", Vector3.FORWARD), "a new Brawl can accept its own collapse")
+
 	world.cancel_gesture()
 	world.free()
 	print("PASS flock_world_test")
