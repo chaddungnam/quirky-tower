@@ -135,20 +135,30 @@ root
 
 마스터 명세의 `hips` 용어는 조류형 `body_root`로 통일한다. `shield_root` 아래에는 좌·중·우 3개 rigid panel과 각각의 pivot을 두고, 등 socket에 붙인 채 접힘→전개 transform만 bake한다.
 
+### 머리·시선 안정화 계약
+
+- 실제 조류처럼 몸은 움직여도 머리는 잠깐 공간에 남고, 짧게 다음 고정점으로 따라잡는 `hold → catch-up`을 사용한다. [비둘기 머리 안정화 연구](https://pmc.ncbi.nlm.nih.gov/articles/PMC5633612/)와 [메추라기 보행 연구](https://pmc.ncbi.nlm.nih.gov/articles/PMC3987125/)를 동작 원리 근거로 삼되 종별 진폭은 실제 turntable에서 조정한다.
+- 새 bone, runtime IK와 procedural controller를 추가하지 않는다. 기존 `neck_01 → neck_02 → head` key animation으로 몸통 움직임을 상쇄한다.
+- `idle_combat`, `move_*`, `turn_*`에서 적용한다. steady move-loop의 head pitch·roll은 rest 대비 ±5° 이내, 화면상 눈 높이 흔들림은 머리 높이의 10% 이내를 A4/DS-TC-RIG-001 후보 합격선으로 둔다.
+- 몸통 bob·궁둥이 sway·꼬리와 방패 후행은 그대로 유지한다. 이동 중 머리 catch-up은 0.06~0.10초, 회전은 시선과 머리가 몸보다 2~4 render frame 먼저 새 방향을 본다.
+- 부리 공격 contact, 일반 피격의 첫 2 render frame, 강피격과 KO에서는 안정화를 의도적으로 줄이거나 해제한다. 방패 스킬은 gaze lock을 유지하고, 일반 피격은 0.18~0.24초 안에 재고정한다.
+- 이 규칙은 silhouette 품질만 소유한다. hitbox, contact 위치, root 경로, 결과 타일과 BattleRules 판정을 바꾸지 않는다. Reduce Motion에서도 기본 조류 움직임으로 유지한다.
+- 덕 대장은 은은하게, 닭·비둘기는 더 또렷하게, 거위는 긴 목 하단의 굽힘으로 흡수한다. 모든 조류에 같은 머리 bob 진폭을 복사하지 않는다.
+
 표정은 `neutral`, `focus`, `assertive`, `hit`, `uneasy`, `victory` 6개다. 얼굴만 바꾸지 않고 머리, 목, 부리, 날개와 체중 중심을 함께 바꾼다. 눈꺼풀, 시선, 부리 열림, 머리 기울기와 볏을 조절하되 사람 얼굴의 입술·볼·손가락을 추가하지 않는다.
 
 ## 6. 애니메이션 패키지
 
 | 클립 | 목표 길이 | 필수 읽기 |
 |---|---:|---|
-| `idle_combat` | 2.40s loop | 느린 호흡, 좌우 체중 이동, 꼬리깃 1회 |
-| `move_start/loop/stop` | 0.10/0.36/0.10s | 뒤뚱거림, 궁둥이·꼬리 반동, 물갈퀴 접지 |
-| `turn_45/90/180` | 0.10/0.16/0.24s | 넓은 발을 축으로 회전 |
+| `idle_combat` | 2.40s loop | 느린 호흡, 좌우 체중 이동, 꼬리깃 1회, 머리 안정·불규칙 시선 |
+| `move_start/loop/stop` | 0.10/0.36/0.10s | 뒤뚱거림, 궁둥이·꼬리 반동, 물갈퀴 접지, 머리 hold→catch-up |
+| `turn_45/90/180` | 0.10/0.16/0.24s | 시선·머리 2~4 frame 선행 후 넓은 발과 몸통이 따라 회전 |
 | `basic_beak_shield` | 0.88s | 준비 → 부리 contact → self shield → 복귀 |
 | `active_quack_challenge` | 1.05s | 흡기 → 부채꼴 음파 → 상태 표시 → 복귀 |
 | `signature_duck_formation` | 2.25s | 등 방패 전개 → 지면 contact → 아군 보호 → 복귀 |
 | `guard_enter/loop/hit/exit` | 0.20/1.20/0.22/0.16s | 방패 앞세움과 압축 반동 |
-| `hit_light/heavy/push` | 0.40/0.64/0.72s | 방향성 충격, 궁둥이·꼬리 후행, 결과 타일 접지 |
+| `hit_light/heavy/push` | 0.40/0.64/0.72s | 방향성 충격에서 머리 lock 해제→재고정, 궁둥이·꼬리 후행, 결과 타일 접지 |
 | `ko` | 1.20s | 방패에 기대 앉듯 다운, 마지막 pose hold |
 | `victory` | 1.80s | 날개 경례, 짧은 꽥, 방패를 가볍게 두드림 |
 
