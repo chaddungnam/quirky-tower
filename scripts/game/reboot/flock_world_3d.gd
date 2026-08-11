@@ -50,6 +50,7 @@ var _chain_status := ""
 var _chain_expected_target_id := ""
 var _chain_attack_active := false
 var _chain_attack_consumed := false
+var _chain_reward_claimed := false
 var _chain_release_generation := 0
 var _chain_path_mesh: ImmediateMesh
 var _chain_path_material: StandardMaterial3D
@@ -84,6 +85,7 @@ func _ready() -> void:
 
 func setup(run_state: FlockRunState) -> void:
 	_run_state = run_state
+	_chain_reward_claimed = false
 	_sync_companions()
 	flock_changed.emit(_run_state.snapshot())
 
@@ -151,6 +153,8 @@ func release_swipe(screen_position: Vector2, velocity: Vector2) -> void:
 	set_physics_process(true)
 
 func cancel_gesture() -> void:
+	if _chain_attack_active:
+		_chain_attack_consumed = false
 	_chain_release_generation += 1
 	_chain_attack_active = false
 	_chain_expected_target_id = ""
@@ -329,8 +333,6 @@ func _release_chain() -> void:
 	var released_ids: Array[String] = _chain_target_ids.duplicate()
 	_chain_target_ids.clear()
 	_draw_chain_path(false)
-	if _run_state != null:
-		_run_state.record_event("chain_targets", {"target_ids": released_ids})
 	_chain_release_generation += 1
 	_execute_chain(released_ids, _chain_release_generation)
 
@@ -366,6 +368,18 @@ func _execute_chain(target_ids: Array[String], generation: int) -> void:
 			return
 	if generation != _chain_release_generation:
 		return
+	if _chain_struck_targets.size() != target_ids.size():
+		_chain_status = "broken"
+		_chain_attack_active = false
+		_chain_attack_consumed = false
+		_chain_target_ids = target_ids.duplicate()
+		_attack_orb.visible = false
+		_attack_orb_collision.set_deferred("disabled", true)
+		_draw_chain_path(true)
+		return
+	if not _collapsed_targets.has(BRAWL_TARGET_ID):
+		_reward_claimed = true
+		trigger_collapse(BRAWL_TARGET_ID, Vector3.FORWARD)
 	if _collapse_tween != null and _collapse_tween.is_valid() and _collapse_tween.is_running():
 		await _collapse_tween.finished
 		if generation != _chain_release_generation:
@@ -374,6 +388,13 @@ func _execute_chain(target_ids: Array[String], generation: int) -> void:
 	_chain_attack_active = false
 	_attack_orb.visible = false
 	_attack_orb_collision.set_deferred("disabled", true)
+	if _run_state != null:
+		_run_state.record_event("chain_targets", {"target_ids": target_ids})
+		for target_id in target_ids:
+			_run_state.record_event("chain_strike", {"target_id": target_id})
+	if not _chain_reward_claimed:
+		_chain_reward_claimed = true
+		reward_released.emit(1)
 	act_completed.emit("chain", {"status": "released", "target_ids": target_ids})
 
 func _on_attack_orb_body_entered(body: Node3D) -> void:
@@ -385,10 +406,6 @@ func _on_attack_orb_body_entered(body: Node3D) -> void:
 	_chain_struck_targets[target_id] = true
 	_flash_chain_target(body)
 	impact.emit("chain_strike", body.global_position)
-	if _run_state != null:
-		_run_state.record_event("chain_strike", {"target_id": target_id})
-	if target_id == BRAWL_TARGET_ID:
-		trigger_collapse(target_id, Vector3.FORWARD)
 
 func _trail_chain_companion(index: int, target_position: Vector3) -> void:
 	var visible_companions: Array[CharacterBody3D] = []
@@ -406,6 +423,8 @@ func _flash_chain_target(target: Node3D) -> void:
 		return
 	var material := visual.mesh.material as StandardMaterial3D
 	var base_color: Color = target.get_meta("chain_color")
+	(target as RigidBody3D).freeze = true
+	target.position.y = minf(target.position.y, FLOOR_Y - 0.35)
 	material.albedo_color = Color(1.0, 0.95, 0.5)
 	create_tween().tween_property(material, "albedo_color", base_color, 0.18)
 
@@ -413,11 +432,15 @@ func _draw_chain_path(broken: bool) -> void:
 	if _chain_path_mesh == null:
 		return
 	_chain_path_mesh.clear_surfaces()
-	if _chain_target_ids.is_empty():
+	if _chain_target_ids.is_empty() and not broken:
 		return
 	_chain_path_material.albedo_color = Color(1.0, 0.16, 0.2) if broken else Color(0.1, 1.0, 0.86)
 	_chain_path_mesh.surface_begin(Mesh.PRIMITIVE_LINE_STRIP, _chain_path_material)
-	if _chain_target_ids.size() == 1:
+	if _chain_target_ids.is_empty():
+		var marker_position := _leader.global_position
+		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x - 0.24, CHAIN_PATH_Y, marker_position.z))
+		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x + 0.24, CHAIN_PATH_Y, marker_position.z))
+	elif _chain_target_ids.size() == 1:
 		var marker_target := _chain_targets[_chain_target_ids[0]] as Node3D
 		var marker_position := marker_target.global_position
 		_chain_path_mesh.surface_add_vertex(Vector3(marker_position.x - 0.24, CHAIN_PATH_Y, marker_position.z))
