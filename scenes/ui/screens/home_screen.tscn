@@ -30,7 +30,7 @@ theme_override_constants/separation = 22
 [node name="Prototype" type="Label" parent="Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = "15-FLOOR PROTOTYPE"
+text = "FLOCK RAID PROTOTYPE"
 horizontal_alignment = 1
 
 [node name="Title" type="Label" parent="Content"]

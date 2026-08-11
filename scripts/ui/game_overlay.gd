@@ -69,11 +69,12 @@ func _add_action(text: String, action: Callable, option_id := "") -> void:
 	button.offset_transform_enabled = true
 	button.offset_transform_visual_only = true
 	button.pressed.connect(func() -> void:
-		if _action_taken:
+		if _action_taken or button.get_meta("resolved", false):
 			return
 		_action_taken = true
 		for sibling in button.get_parent().get_children():
 			(sibling as Button).disabled = true
+			(sibling as Button).set_meta("resolved", true)
 		if action.is_valid():
 			action.call()
 	)

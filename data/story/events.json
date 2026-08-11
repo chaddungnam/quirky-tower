@@ -1,5 +1,0 @@
-[
-  {"id": "broadcast_glitch", "floor": 5, "speaker": "HOST", "text": "방송이 잠깐 끊겼습니다. 아무것도 보지 못한 겁니다!"},
-  {"id": "host_contradiction", "floor": 10, "speaker": "HOST", "text": "처음 올라온 참가자치고는... 아니, 방금 말은 잊으세요."},
-  {"id": "finale_secret", "floor": 15, "speaker": "SYSTEM", "text": "타워는 참가자를 시험한 것이 아니라 다음 진행자를 고르고 있었다."}
-]

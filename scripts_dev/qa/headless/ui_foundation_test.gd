@@ -1,21 +1,24 @@
 extends SceneTree
 
-const RunState = preload("res://scripts/core/run/run_state.gd")
+const FlockRunState = preload("res://scripts/core/reboot/flock_run_state.gd")
 const HudScene = preload("res://scenes/ui/components/run_hud.tscn")
 const OverlayScene = preload("res://scenes/ui/components/game_overlay.tscn")
 
 
 func _init() -> void:
 	var hud = HudScene.instantiate()
-	var state = RunState.new_run(1, "DE")
-	state.floor = 7
+	var state = FlockRunState.new_run(1)
+	state.begin_act("brawl")
 	state.score = 420
 	state.combo = 3
-	state.hearts = 2
-	hud.update_state(state)
-	assert(hud.get_node("Margin/Row/Floor").text == "7F", "floor label updates")
-	assert(hud.get_node("Margin/Row/Score").text == "000420", "score label updates")
-	assert(hud.get_node("Margin/Row/Hearts").text == "♥ ♥", "heart label updates")
+	state.health = 2
+	state.rescue("goose_greta", "goose")
+	hud.update_state(state, "2막 · 옥상 난투")
+	assert(hud.get_node("Margin/Rows").get_child_count() == 2, "HUD uses two compact rows")
+	assert(hud.get_node("Margin/Rows/ActRow/Act").text == "2막 · 옥상 난투", "act label updates")
+	assert(hud.get_node("Margin/Rows/ActRow/Score").text == "SCORE 000420", "score label updates")
+	assert(hud.get_node("Margin/Rows/StateRow/Health").text == "♥ ♥", "health label updates")
+	assert(hud.get_node("Margin/Rows/StateRow/Flock").text.contains("GOOSE"), "flock species are visible")
 
 	var overlay = OverlayScene.instantiate()
 	overlay.show_message("READY", "Tap", "GO", func(): pass)
@@ -47,17 +50,20 @@ func _init() -> void:
 			"long translated choices wrap instead of clipping"
 		)
 	var action_calls := [0]
-	overlay.show_message("FAIL", "HEARTS 2", "CONTINUE", func() -> void:
+	overlay.show_message("CHOOSE", "", "FIRST", func() -> void:
 		action_calls[0] += 1
-		overlay.close()
+		overlay.show_actions("RESULT", "", [
+			{"label": "PLAY AGAIN", "action": func(): pass},
+			{"label": "HOME", "action": func(): pass},
+		])
 	)
 	var action_button: Button = actions.get_child(0)
 	action_button.pressed.emit()
 	action_button.pressed.emit()
-	assert(action_calls[0] == 1, "an overlay action resolves only once under repeated input")
+	assert(action_calls[0] == 1, "an old overlay action resolves only once after replacing its generation")
 	assert(
-		actions.get_child_count() == 0,
-		"an action can close its own overlay without leaving a locked button"
+		actions.get_child_count() == 2,
+		"an action can replace its own overlay with stacked result buttons"
 	)
 	overlay.close()
 	assert(not overlay.visible, "close hides the overlay")

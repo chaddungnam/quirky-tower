@@ -221,10 +221,11 @@ func _on_route_entered(body: Node3D, route_kind: String) -> void:
 			_run_state.record_event("approach_collision", result)
 			impact.emit("hazard", _leader.global_position)
 		"rescue":
-			if _run_state.rescue("goose_greta", "goose"):
-				_run_state.record_event("rescue", {"id": "goose_greta", "species": "goose"})
-				_sync_companions()
-				flock_changed.emit(_run_state.snapshot())
+			for companion in [{"id": "goose_greta", "species": "goose"}, {"id": "pigeon_pip", "species": "pigeon"}]:
+				if _run_state.rescue(companion.id, companion.species):
+					_run_state.record_event("rescue", companion)
+			_sync_companions()
+			flock_changed.emit(_run_state.snapshot())
 			impact.emit("rescue", _leader.global_position)
 		"score":
 			_run_state.record_event("approach_score", {"value": 100})

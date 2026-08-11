@@ -6,7 +6,7 @@
 layout_mode = 3
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 112.0
+offset_bottom = 128.0
 grow_horizontal = 2
 mouse_filter = 2
 script = ExtResource("1")
@@ -23,24 +23,37 @@ theme_override_constants/margin_top = 20
 theme_override_constants/margin_right = 24
 theme_override_constants/margin_bottom = 20
 
-[node name="Row" type="HBoxContainer" parent="Margin"]
+[node name="Rows" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="ActRow" type="HBoxContainer" parent="Margin/Rows"]
 layout_mode = 2
 theme_override_constants/separation = 18
 
-[node name="Floor" type="Label" parent="Margin/Row"]
-layout_mode = 2
-text = "1F"
-
-[node name="Score" type="Label" parent="Margin/Row"]
+[node name="Act" type="Label" parent="Margin/Rows/ActRow"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "000000"
-horizontal_alignment = 1
+text = "1막 · 구출 진입"
 
-[node name="Combo" type="Label" parent="Margin/Row"]
+[node name="Score" type="Label" parent="Margin/Rows/ActRow"]
+layout_mode = 2
+text = "SCORE 000000"
+
+[node name="StateRow" type="HBoxContainer" parent="Margin/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="Health" type="Label" parent="Margin/Rows/StateRow"]
+layout_mode = 2
+text = "♥ ♥ ♥"
+
+[node name="Combo" type="Label" parent="Margin/Rows/StateRow"]
 layout_mode = 2
 text = "COMBO ×0"
 
-[node name="Hearts" type="Label" parent="Margin/Row"]
+[node name="Flock" type="Label" parent="Margin/Rows/StateRow"]
 layout_mode = 2
-text = "♥ ♥ ♥"
+size_flags_horizontal = 3
+text = "DUCK"
+horizontal_alignment = 2

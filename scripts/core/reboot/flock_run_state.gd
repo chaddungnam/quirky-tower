@@ -6,6 +6,9 @@ const CHOICE_IDS := ["dash_power", "route_width", "guard"]
 
 var seed: int
 var act_id := "entry"
+var health := 3
+var score := 0
+var combo := 0
 var companions: Array = []
 var build := {"dash_power": 0, "route_width": 0, "guard": 0}
 var event_ledger: Array = []
@@ -54,6 +57,7 @@ func apply_choice(choice_id: String) -> bool:
 	if choice_options().any(func(option): return option.id == choice_id):
 		build[choice_id] = int(build[choice_id]) + 1
 		choice_applied = choice_id
+		record_event("build_choice", {"choice_id": choice_id})
 		return true
 	return false
 
@@ -62,6 +66,9 @@ func snapshot() -> Dictionary:
 	return {
 		"seed": seed,
 		"act_id": act_id,
+		"health": health,
+		"score": score,
+		"combo": combo,
 		"companions": companions.duplicate(true),
 		"build": build.duplicate(),
 		"event_ledger": event_ledger.duplicate(true),

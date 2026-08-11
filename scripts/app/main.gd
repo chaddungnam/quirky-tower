@@ -81,6 +81,7 @@ func _build_language_actions(options: Array) -> Array:
 func _apply_language() -> void:
 	get_node("HomeScreen").set_language(_locale)
 	get_node("SettingsScreen").set_language(_locale)
+	get_node("RunScreen").set_language(_locale)
 
 
 func _show_only(screen: Control) -> void:

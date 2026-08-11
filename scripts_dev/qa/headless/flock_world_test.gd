@@ -2,6 +2,7 @@ extends SceneTree
 
 const FlockRunState = preload("res://scripts/core/reboot/flock_run_state.gd")
 const FlockWorldScene = preload("res://scenes/game/reboot/flock_trial.tscn")
+const RunScreenScene = preload("res://scenes/game/run_screen.tscn")
 
 
 func _init() -> void:
@@ -9,9 +10,11 @@ func _init() -> void:
 
 
 func _run() -> void:
-	var world: Node3D = FlockWorldScene.instantiate()
-	root.add_child(world)
+	var trial := FlockWorldScene.instantiate() as Control
+	root.add_child(trial)
 	await process_frame
+	assert(trial != null and trial.name == "FlockTrial", "the integrated scene has one Control input root")
+	var world := trial.get_node("FlockWorld3D") as Node3D
 
 	var cameras: Array[Node] = world.find_children("*", "Camera3D", true, false)
 	assert(cameras.size() == 1, "the flock world has one camera")
@@ -56,8 +59,8 @@ func _run() -> void:
 	await physics_frame
 	await physics_frame
 	assert(rescue_area.overlaps_body(leader), "native physics reports the rescue overlap")
-	assert(state.companions.size() == 1, "the rescue overlap adds one companion")
-	assert(state.event_ledger.size() == 1, "the rescue overlap records one event")
+	assert(state.companions.size() == 2, "the rescue overlap adds the goose and pigeon")
+	assert(state.event_ledger.size() == 2, "the rescue overlap records both companions")
 	assert(completed_routes.size() == 1, "the first route completes Approach once")
 	rescue_area.global_position += Vector3(0.0, 0.0, 4.0)
 	await physics_frame
@@ -66,7 +69,7 @@ func _run() -> void:
 	score_area.global_position = leader.global_position
 	await physics_frame
 	await physics_frame
-	assert(state.event_ledger.size() == 1, "an adjacent route cannot resolve after the first")
+	assert(state.event_ledger.size() == 2, "an adjacent route cannot resolve after the first")
 	assert(completed_routes.size() == 1, "an adjacent route cannot complete Approach twice")
 	score_area.global_position += Vector3(0.0, 0.0, 4.0)
 	await physics_frame
@@ -74,13 +77,13 @@ func _run() -> void:
 	rescue_area.global_position = leader.global_position
 	await physics_frame
 	await physics_frame
-	assert(state.companions.size() == 1, "the same rescue cannot add twice")
-	assert(state.event_ledger.size() == 1, "the same route cannot record twice")
+	assert(state.companions.size() == 2, "the same rescue cannot add twice")
+	assert(state.event_ledger.size() == 2, "the same route cannot record twice")
 
 	var goose := companion_slots.get_node("CompanionSlot1/Goose") as CharacterBody3D
 	var pigeon := companion_slots.get_node("CompanionSlot2/Pigeon") as CharacterBody3D
 	assert(goose.visible, "the rescued goose occupies the first follow slot")
-	assert(not pigeon.visible, "the unrecruited pigeon keeps its slot hidden")
+	assert(pigeon.visible, "the rescued pigeon occupies the second follow slot")
 	assert(goose.get_node("Head").position.y > leader.get_node("Head").position.y, "the goose silhouette is taller")
 	assert(pigeon.has_node("WingBand"), "the smaller pigeon has a readable wing band")
 	for bird in [leader, goose, pigeon]:
@@ -392,6 +395,105 @@ func _run() -> void:
 	assert(world.trigger_collapse("antenna_a", Vector3.FORWARD), "a new Brawl can accept its own collapse")
 
 	world.cancel_gesture()
-	world.free()
+	trial.free()
+
+	var run_screen := RunScreenScene.instantiate() as Control
+	root.add_child(run_screen)
+	await process_frame
+	assert(run_screen.get_node("ChallengeSlot").get_child_count() == 0, "hidden gameplay is not pre-created")
+	run_screen.set_language("ko")
+	run_screen.restart_run(424242)
+	await process_frame
+	var integrated_trials := run_screen.get_node("ChallengeSlot").get_children()
+	assert(integrated_trials.size() == 1, "restart creates exactly one integrated trial")
+	var integrated_trial := integrated_trials[0] as Control
+	assert(integrated_trial.name == "FlockTrial", "the old TowerTrial is not integrated")
+	var integrated_world := integrated_trial.get_node("FlockWorld3D") as Node3D
+	var visual: Dictionary = integrated_trial.get_visual_state()
+	var integrated_state: FlockRunState = visual.run_state
+	assert(integrated_state.seed == 424242 and visual.act_id == "entry", "the seeded run begins in Approach")
+	assert(integrated_state.rescue("goose_greta", "goose"))
+	assert(integrated_state.rescue("pigeon_pip", "pigeon"))
+	integrated_world.setup(integrated_state)
+
+	var touch := InputEventScreenTouch.new()
+	touch.index = 4
+	touch.position = Vector2(240.0, 920.0)
+	touch.pressed = true
+	integrated_trial.call("_gui_input", touch)
+	assert(integrated_trial.get_visual_state().pointer_active, "the first touch owns gameplay input")
+	var second_touch := InputEventScreenTouch.new()
+	second_touch.index = 5
+	second_touch.position = Vector2(300.0, 900.0)
+	second_touch.pressed = true
+	integrated_trial.call("_gui_input", second_touch)
+	assert(integrated_trial.get_visual_state().pointer_id == 4, "a second pointer is ignored")
+	integrated_world.act_completed.emit("entry", {"route": "rescue"})
+	visual = integrated_trial.get_visual_state()
+	assert(visual.act_id == "brawl" and not visual.pointer_active, "the act transition cancels the owned pointer")
+	assert(visual.run_state == integrated_state and integrated_state.companions.size() == 2, "the same flock state persists into Brawl")
+	assert("날려" in str(visual.mascot_line), "the mascot changes to the Brawl action line")
+	assert(run_screen.get_node("SafeFrame/RunHud").get_node("Margin/Rows/ActRow/Act").text.contains("난투"), "the HUD changes to Brawl")
+
+	touch.index = 7
+	integrated_trial.call("_gui_input", touch)
+	integrated_trial.notification(Node.NOTIFICATION_APPLICATION_FOCUS_OUT)
+	assert(not integrated_trial.get_visual_state().pointer_active, "focus loss cancels the gesture")
+	integrated_world.reward_released.emit(1)
+	visual = integrated_trial.get_visual_state()
+	assert(visual.act_id == "chain" and visual.run_state == integrated_state, "the Brawl reward advances the same state to Chain")
+	assert(integrated_state.score > 0 and integrated_state.combo == 1, "the Brawl reward updates score and combo")
+	assert("손을 떼" in str(visual.mascot_line), "the mascot changes to the Chain action line")
+	var score_before_chain_reward := integrated_state.score
+	integrated_world.reward_released.emit(1)
+	assert(integrated_state.act_id == "chain" and not run_screen.get_node("SafeFrame/GameOverlay").visible, "the shared Chain reward cannot finish the district")
+	assert(integrated_state.score == score_before_chain_reward + 100 and integrated_state.combo == 2, "the Chain reward updates score and combo once")
+	run_screen.set_language("en")
+	integrated_world.act_completed.emit("chain", {"status": "released"})
+	assert(integrated_state.act_id == "choice", "Chain completion, not its shared reward, opens the choice")
+	var overlay := run_screen.get_node("SafeFrame/GameOverlay") as Control
+	assert(overlay.visible, "district completion opens the reused overlay")
+	var actions := overlay.get_node("Center/Card/Content/ActionScroll/Actions") as VBoxContainer
+	assert(actions.get_child_count() == 3, "the seeded offer has three actions")
+	for action in actions.get_children():
+		assert((action as Button).custom_minimum_size.y >= 96.0, "choices are vertical mobile touch targets")
+	var first_choice := actions.get_child(0) as Button
+	var build_before := integrated_state.build.duplicate()
+	var build_events_before := integrated_state.event_ledger.filter(func(event): return event.kind == "build_choice").size()
+	first_choice.pressed.emit()
+	first_choice.pressed.emit()
+	var build_delta := 0
+	for choice_id in integrated_state.build:
+		build_delta += int(integrated_state.build[choice_id]) - int(build_before[choice_id])
+	assert(build_delta == 1, "repeated presses mutate the build exactly once")
+	assert(integrated_state.event_ledger.filter(func(event): return event.kind == "build_choice").size() == build_events_before + 1, "repeated presses record one build event")
+	assert(integrated_state.act_id == "complete", "one choice completes the Gate A run")
+	assert(actions.get_child_count() == 2, "the result replaces choices with two actions")
+	assert((actions.get_child(0) as Button).text == "PLAY AGAIN" and (actions.get_child(1) as Button).text == "HOME", "result actions stay stacked")
+
+	var retired_trial := integrated_trial
+	run_screen.restart_run(424243)
+	await process_frame
+	await process_frame
+	assert(run_screen.get_node("ChallengeSlot").get_child_count() == 1, "restart leaves exactly one trial")
+	assert(not is_instance_valid(retired_trial), "restart frees the old trial and its signals")
+	var restarted_trial := run_screen.get_node("ChallengeSlot").get_child(0) as Control
+	var restarted_world := restarted_trial.get_node("FlockWorld3D") as Node3D
+	restarted_world.act_completed.emit("entry", {})
+	restarted_world.reward_released.emit(1)
+	restarted_world.act_completed.emit("chain", {})
+	var restarted_actions := overlay.get_node("Center/Card/Content/ActionScroll/Actions") as VBoxContainer
+	(restarted_actions.get_child(0) as Button).pressed.emit()
+	var home_actions := overlay.get_node("Center/Card/Content/ActionScroll/Actions") as VBoxContainer
+	var home_touch := InputEventScreenTouch.new()
+	home_touch.index = 2
+	home_touch.position = Vector2(200.0, 800.0)
+	home_touch.pressed = true
+	restarted_trial.call("_gui_input", home_touch)
+	var home_count := [0]
+	run_screen.home_requested.connect(func() -> void: home_count[0] += 1)
+	(home_actions.get_child(1) as Button).pressed.emit()
+	assert(home_count[0] == 1 and not restarted_trial.get_visual_state().pointer_active, "Home cancels gameplay before navigation")
+	run_screen.free()
 	print("PASS flock_world_test")
 	quit(0)
