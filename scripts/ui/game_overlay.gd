@@ -26,6 +26,7 @@ func show_choices(title: String, options: Array, action: Callable) -> void:
 		actions.append({
 			"id": option_id,
 			"label": str(option.get("label", option_id.replace("_", " ").capitalize())),
+			"role": str(option.get("role", Tokens.WARNING)),
 			"action": action.bind(option_id),
 		})
 	show_actions(title, "", actions)
@@ -42,7 +43,8 @@ func show_actions(title: String, body: String, options: Array) -> void:
 		_add_action(
 			str(option.get("label", "")),
 			option.get("action", Callable()),
-			str(option.get("id", ""))
+			str(option.get("id", "")),
+			str(option.get("role", Tokens.WARNING))
 		)
 	var action_scroll := get_node("Center/Card/Content/ActionScroll") as ScrollContainer
 	action_scroll.custom_minimum_size.y = minf(600.0, options.size() * 110.0)
@@ -59,13 +61,14 @@ func close() -> void:
 	_clear_actions()
 
 
-func _add_action(text: String, action: Callable, option_id := "") -> void:
+func _add_action(text: String, action: Callable, option_id := "", role := Tokens.WARNING) -> void:
 	var button := Button.new()
 	button.text = text
 	button.set_meta("option_id", option_id)
+	button.set_meta("role", role)
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	get_node("Center/Card/Content/ActionScroll/Actions").add_child(button)
-	Tokens.style_button(button, Tokens.WARNING)
+	Tokens.style_button(button, role)
 	button.offset_transform_enabled = true
 	button.offset_transform_visual_only = true
 	button.pressed.connect(func() -> void:

@@ -94,6 +94,34 @@ func _run() -> void:
 	)
 	assert(challenge_slot.get_child(0).has_node("FlockWorld3D"), "the native 3D world is visible without a SubViewport")
 	assert(challenge_slot.get_child(0).has_node("SafeFrame/MascotGuide"), "the mascot stays inside the safe frame")
+	var trial := challenge_slot.get_child(0) as Control
+	var trial_guide := trial.get_node("SafeFrame/MascotGuide") as Control
+	var world := trial.get_node("FlockWorld3D") as Node3D
+	assert(trial_guide.visible, "gameplay starts with one visible trial guide")
+	world.act_completed.emit("entry", {})
+	world.reward_released.emit(1)
+	world.act_completed.emit("chain", {})
+	var run_overlay := app.get_node("RunScreen/SafeFrame/GameOverlay") as Control
+	var overlay_guide := run_overlay.get_node("MascotGuide") as Control
+	assert(run_overlay.visible and overlay_guide.visible, "choice shows the overlay guide")
+	assert(not trial_guide.visible, "choice hides the stale Chain guide")
+	var choice_actions := run_overlay.get_node("Center/Card/Content/ActionScroll/Actions") as VBoxContainer
+	assert(choice_actions.get_child_count() == 3, "run offers three choice cards")
+	var glyphs: Dictionary = {}
+	var roles: Dictionary = {}
+	for child in choice_actions.get_children():
+		var button := child as Button
+		assert(button.text.split("\n").size() == 2, "run choice shows an affected-act cue on line two")
+		glyphs[button.text.split(" ")[0]] = true
+		roles[str(button.get_meta("role", ""))] = true
+	assert(glyphs.size() == 3 and roles.size() == 3, "run choices have distinct glyphs and accents")
+	(choice_actions.get_child(0) as Button).pressed.emit()
+	assert(not trial_guide.visible and overlay_guide.visible, "result keeps only the overlay guide")
+	app.get_node("RunScreen").restart_run(424245)
+	await process_frame
+	await process_frame
+	assert(challenge_slot.get_child_count() == 1, "restart still leaves one trial")
+	assert((challenge_slot.get_child(0) as Control).get_node("SafeFrame/MascotGuide").visible, "restart restores one visible trial guide")
 	app.free()
 
 	var tall_host := Control.new()

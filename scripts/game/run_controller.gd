@@ -6,6 +6,11 @@ const FlockRunState = preload("res://scripts/core/reboot/flock_run_state.gd")
 const FLOCK_TRIAL_SCENE = preload("res://scenes/game/reboot/flock_trial.tscn")
 const Tokens = preload("res://scripts/ui/design_tokens.gd")
 const UIText = preload("res://scripts/ui/ui_text.gd")
+const CHOICE_ROLES := {
+	"dash_power": Tokens.PRIMARY,
+	"route_width": Tokens.SECRET,
+	"guard": Tokens.SECONDARY,
+}
 
 var _state: FlockRunState
 var _current_trial: FlockTrial
@@ -50,11 +55,16 @@ func _on_district_finished() -> void:
 		return
 	_current_trial.cancel_input()
 	_current_trial.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_current_trial.get_node("SafeFrame/MascotGuide").hide()
 	_update_hud()
 	var options: Array = []
 	for option in _state.choice_options():
 		var choice_id := str(option.id)
-		options.append({"id": choice_id, "label": UIText.text(_locale, "choice_%s" % choice_id)})
+		options.append({
+			"id": choice_id,
+			"label": UIText.text(_locale, "choice_%s" % choice_id),
+			"role": CHOICE_ROLES[choice_id],
+		})
 	get_node("SafeFrame/GameOverlay").show_choices(
 		UIText.text(_locale, "choice_title"), options, _choose_build
 	)

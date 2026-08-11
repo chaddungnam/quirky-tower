@@ -3,6 +3,7 @@ extends SceneTree
 const FlockRunState = preload("res://scripts/core/reboot/flock_run_state.gd")
 const HudScene = preload("res://scenes/ui/components/run_hud.tscn")
 const OverlayScene = preload("res://scenes/ui/components/game_overlay.tscn")
+const Tokens = preload("res://scripts/ui/design_tokens.gd")
 
 
 func _init() -> void:
@@ -28,6 +29,8 @@ func _init() -> void:
 		overlay.get_node("Center/Card/Content/ActionScroll/Actions").get_child_count() == 1,
 		"one action is shown"
 	)
+	var generic_button := overlay.get_node("Center/Card/Content/ActionScroll/Actions").get_child(0) as Button
+	assert(generic_button.get_meta("role", "") == Tokens.WARNING, "generic actions keep the warning role")
 	overlay.show_actions("CHOOSE A FLOCK BUILD", "", [{"label": "BUILD", "action": func(): pass}])
 	assert(overlay.get_node("MascotGuide/Bubble/Text").text == "Pick one.", "English choice copy keeps the mascot English")
 	overlay.show_actions("DISTRICT CLEARED", "", [{"label": "HOME", "action": func(): pass}])
@@ -37,10 +40,11 @@ func _init() -> void:
 	overlay.show_actions("구역 돌파", "", [{"label": "홈", "action": func(): pass}])
 	assert(overlay.get_node("MascotGuide/Bubble/Text").text == "다음 습격도 준비됐어.", "Korean result copy keeps the mascot Korean")
 	overlay.show_choices(
-		"QUIRK",
+		"CHOOSE A FLOCK BUILD",
 		[
-			{"id": "safe", "label": "Sicherer Weg mit besonders langem übersetztem Namen"},
-			{"id": "risk", "label": "Überraschend riskanter Weg für mutige Kandidaten"},
+			{"id": "dash", "label": ">> HEAVY FIRST WING\nBRAWL + CHAIN", "role": Tokens.PRIMARY},
+			{"id": "guard", "label": "[] GOOSE GUARD\nAPPROACH + BRAWL", "role": Tokens.SECONDARY},
+			{"id": "route", "label": "// PIGEON SHORTCUT\nAPPROACH + CHAIN", "role": Tokens.SECRET},
 		],
 		func(_id): pass
 	)
@@ -48,7 +52,9 @@ func _init() -> void:
 	var actions = action_scroll.get_node("Actions")
 	assert(action_scroll is ScrollContainer, "choices use a vertical scroll container")
 	assert(actions is VBoxContainer, "choices are always stacked vertically")
-	assert(actions.get_child_count() == 2, "choices replace old actions")
+	assert(actions.get_child_count() == 3, "choices replace old actions")
+	var choice_labels: Dictionary = {}
+	var choice_roles: Dictionary = {}
 	for child in actions.get_children():
 		var button := child as Button
 		assert(button != null, "every choice is a button")
@@ -57,6 +63,15 @@ func _init() -> void:
 			button.autowrap_mode == TextServer.AUTOWRAP_WORD_SMART,
 			"long translated choices wrap instead of clipping"
 		)
+		assert(button.text.split("\n").size() == 2, "each choice has one affected-act cue line")
+		choice_labels[button.text] = true
+		var role := str(button.get_meta("role", ""))
+		choice_roles[role] = true
+		var style := button.get_theme_stylebox("normal") as StyleBoxFlat
+		assert(style.bg_color == Tokens.color(button, role), "each choice carries its role accent")
+	assert(choice_labels.size() == 3, "choice glyph labels are distinct")
+	assert(choice_roles.keys().all(func(role): return role in [Tokens.PRIMARY, Tokens.SECONDARY, Tokens.SECRET]), "choice roles use existing theme accents")
+	assert(choice_roles.size() == 3, "each choice uses a distinct role")
 	var action_calls := [0]
 	overlay.show_message("CHOOSE", "", "FIRST", func() -> void:
 		action_calls[0] += 1
