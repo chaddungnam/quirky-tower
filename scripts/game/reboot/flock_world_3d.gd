@@ -118,9 +118,9 @@ func _update_companions(delta: float) -> void:
 
 
 func _on_route_entered(body: Node3D, route_kind: String) -> void:
-	if body != _leader or _act_id != "entry" or _resolved_routes.has(route_kind):
+	if body != _leader or _act_id != "entry" or not _resolved_routes.is_empty():
 		return
-	_resolved_routes[route_kind] = true
+	_resolved_routes["resolved"] = route_kind
 	var result := {"route": route_kind}
 	match route_kind:
 		"hazard":

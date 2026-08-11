@@ -35,12 +35,20 @@ func _run() -> void:
 	world.start_act("entry")
 	var start_position := leader.global_position
 	var viewport_size: Vector2 = world.get_viewport().get_visible_rect().size
-	world.set_drag_target(Vector2(viewport_size.x * 0.78, viewport_size.y * 0.68))
+	var drag_position := Vector2(viewport_size.x * 0.78, viewport_size.y * 0.68)
+	world.set_drag_target(drag_position)
+	var drag_target: Vector3 = world.get("_drag_target")
+	assert(is_equal_approx(drag_target.y, 0.56), "drag targets the floor plane")
+	assert(camera.unproject_position(drag_target).y < drag_position.y, "drag target stays above the finger")
 	for _frame in range(4):
 		await physics_frame
 	assert(leader.global_position.distance_to(start_position) > 0.01, "drag moves the real leader body")
 
 	world.set_physics_process(false)
+	var completed_routes: Array = []
+	world.act_completed.connect(
+		func(_act_id: String, result: Dictionary) -> void: completed_routes.append(result.route)
+	)
 	var rescue_area := world.get_node("Encounter/Rescue") as Area3D
 	rescue_area.global_position = leader.global_position
 	await physics_frame
@@ -48,7 +56,17 @@ func _run() -> void:
 	assert(rescue_area.overlaps_body(leader), "native physics reports the rescue overlap")
 	assert(state.companions.size() == 1, "the rescue overlap adds one companion")
 	assert(state.event_ledger.size() == 1, "the rescue overlap records one event")
+	assert(completed_routes.size() == 1, "the first route completes Approach once")
 	rescue_area.global_position += Vector3(0.0, 0.0, 4.0)
+	await physics_frame
+	await physics_frame
+	var score_area := world.get_node("Encounter/Score") as Area3D
+	score_area.global_position = leader.global_position
+	await physics_frame
+	await physics_frame
+	assert(state.event_ledger.size() == 1, "an adjacent route cannot resolve after the first")
+	assert(completed_routes.size() == 1, "an adjacent route cannot complete Approach twice")
+	score_area.global_position += Vector3(0.0, 0.0, 4.0)
 	await physics_frame
 	await physics_frame
 	rescue_area.global_position = leader.global_position
