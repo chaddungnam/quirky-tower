@@ -85,6 +85,11 @@ func _run() -> void:
 	var pigeon := companion_slots.get_node("CompanionSlot2/Pigeon") as CharacterBody3D
 	assert(goose.visible and pigeon.visible, "the actual rescue exposes both birds during Entry")
 	assert(completed_routes.is_empty() and state.act_id == "entry", "the rescue holds a renderable Entry beat before completion")
+	self.paused = true
+	await create_timer(0.18, true).timeout
+	var rescue_held_while_paused := completed_routes.is_empty() and state.act_id == "entry" and goose.visible and pigeon.visible
+	self.paused = false
+	assert(rescue_held_while_paused, "paused popup capture keeps the rescued birds in the Entry beat")
 	await process_frame
 	assert(completed_routes.is_empty(), "the rescue beat survives a render frame")
 	for _frame in range(60):
@@ -290,7 +295,6 @@ func _run() -> void:
 	assert(rebound_held_while_paused, "paused popup capture keeps the cyan rebound beat beyond its normal duration")
 
 	var weak_impulse_seen := weak_point.linear_velocity.z < -0.1
-	var post_contact_input_sent := true
 	world.set_drag_target(Vector2(320.0, 320.0))
 	world.release_swipe(Vector2(320.0, 320.0), Vector2.ZERO)
 	for _frame in range(120):
@@ -298,7 +302,6 @@ func _run() -> void:
 		weak_impulse_seen = weak_impulse_seen or weak_point.linear_velocity.z < -0.1
 		if not rewards.is_empty():
 			break
-	assert(post_contact_input_sent, "the regression releases input after real contact")
 	assert(dash_contacts.size() == 1, "the dash hitbox contacts one real rigid enemy")
 	assert(contact_records.size() == 1, "real collider contact exposes one contact beat")
 	assert(contact_records[0].visible and contact_records[0].on_camera, "the contact marker is visible on camera")
@@ -367,7 +370,7 @@ func _run() -> void:
 	var chain_completions: Array[Dictionary] = []
 	var chain_signal_order: Array[String] = []
 	var chain_flash_ids: Array[String] = []
-	var chain_capture := {"active": false}
+	var chain_capture := {"active": false, "pause_first": false, "first_paused": false}
 	world.act_completed.connect(
 		func(act_id: String, result: Dictionary) -> void:
 			if act_id == "chain":
@@ -520,6 +523,7 @@ func _run() -> void:
 	)
 	chain_flash_ids.clear()
 	chain_capture.active = true
+	chain_capture.pause_first = true
 	var goose_before_chain := goose.global_position
 	world.impact.connect(
 		func(kind: String, world_point: Vector3) -> void:
@@ -533,13 +537,34 @@ func _run() -> void:
 					"on_camera": _camera_contains(camera, visual_position, viewport_size),
 					"emissive": attack_orb_material.emission_enabled,
 				})
+				if chain_capture.pause_first and not chain_capture.first_paused:
+					chain_capture.first_paused = true
+					self.paused = true
 	)
 	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
 	assert(chain_mesh.get_surface_count() == 1, "the successful released path remains visible while striking")
 	for _frame in range(30):
 		await physics_frame
-		if world.get("_chain_struck_targets").has("antenna_a"):
+		if chain_capture.first_paused:
 			break
+	if not chain_capture.first_paused:
+		self.paused = false
+	assert(chain_capture.first_paused, "the first actual Chain strike pauses for popup capture")
+	await create_timer(0.1, true).timeout
+	var orb_held_while_paused := (
+		attack_orb.visible and attack_orb_visual.visible
+		and attack_orb.global_position.distance_to(antenna.global_position) < 0.05
+		and _camera_contains(camera, attack_orb.global_position, viewport_size)
+		and _camera_contains(camera, attack_orb_visual.global_position, viewport_size)
+	)
+	var strike_held_while_paused := (
+		antenna_material.albedo_color == Color(1.0, 0.95, 0.5)
+		and goose.visible and goose.global_position.is_equal_approx(goose_before_chain)
+		and success_overlap_ids == ["antenna_a"] and chain_strike_visuals.size() == 1
+	)
+	self.paused = false
+	assert(orb_held_while_paused, "paused popup capture keeps the first AttackOrb visible on camera")
+	assert(strike_held_while_paused, "paused popup capture keeps the target bright without trailing or a later strike")
 	assert(antenna_material.albedo_color == Color(1.0, 0.95, 0.5), "a fresh retry starts its own bright flash")
 	for _frame in range(3):
 		await process_frame

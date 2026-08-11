@@ -263,7 +263,7 @@ func _on_route_entered(body: Node3D, route_kind: String) -> void:
 			impact.emit("score", _leader.global_position)
 	cancel_gesture()
 	set_physics_process(false)
-	await get_tree().create_timer(RESCUE_BEAT_SECONDS).timeout
+	await get_tree().create_timer(RESCUE_BEAT_SECONDS, false).timeout
 	if _act_id != "entry" or _resolved_routes.get("resolved") != route_kind:
 		return
 	act_completed.emit("entry", result)
@@ -424,7 +424,7 @@ func _execute_chain(target_ids: Array[String], generation: int) -> void:
 				break
 		if not _chain_struck_targets.has(target_id):
 			continue
-		await get_tree().create_timer(CHAIN_TRAIL_DELAY).timeout
+		await get_tree().create_timer(CHAIN_TRAIL_DELAY, false).timeout
 		if generation != _chain_release_generation:
 			return
 		_set_chain_target_flash(target, false)
