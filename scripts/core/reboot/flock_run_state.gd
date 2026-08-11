@@ -27,7 +27,7 @@ func begin_act(next_act_id: String) -> void:
 
 
 func rescue(companion_id: String, species: String) -> bool:
-	if companion_id.is_empty() or species.is_empty() or companions.any(func(companion): return companion.id == companion_id):
+	if companions.size() >= 5 or companion_id.is_empty() or species.is_empty() or companions.any(func(companion): return companion.id == companion_id):
 		return false
 	companions.append({"id": companion_id, "species": species})
 	return true

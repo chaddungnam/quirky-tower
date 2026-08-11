@@ -47,7 +47,10 @@ if [[ -f "$project_root/docs/canonical/README.md" ]]; then
   done < <(sed -nE 's/.*\]\(([^)]+)\).*/\1/p' "$project_root/docs/canonical/README.md")
 fi
 
-if ! /Applications/Godot.app/Contents/MacOS/Godot --headless --path "$project_root" --script scripts_dev/qa/headless/flock_run_state_test.gd; then
+flock_test_output=$(/Applications/Godot.app/Contents/MacOS/Godot --headless --path "$project_root" --script scripts_dev/qa/headless/flock_run_state_test.gd 2>&1)
+flock_test_status=$?
+printf '%s\n' "$flock_test_output"
+if (( flock_test_status != 0 )) || grep -Eq 'SCRIPT ERROR|ERROR' <<<"$flock_test_output" || ! grep -Fxq 'PASS flock_run_state_test' <<<"$flock_test_output"; then
   echo "FAIL flock_run_state_test"
   failed=1
 fi
