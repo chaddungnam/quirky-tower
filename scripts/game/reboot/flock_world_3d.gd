@@ -384,6 +384,10 @@ func _execute_chain(target_ids: Array[String], generation: int) -> void:
 		await _collapse_tween.finished
 		if generation != _chain_release_generation:
 			return
+	for target_id in target_ids:
+		var target := _chain_targets[target_id] as RigidBody3D
+		target.freeze = true
+		target.position.y = minf(target.position.y, FLOOR_Y - 0.35)
 	_chain_expected_target_id = ""
 	_chain_attack_active = false
 	_attack_orb.visible = false
@@ -423,8 +427,6 @@ func _flash_chain_target(target: Node3D) -> void:
 		return
 	var material := visual.mesh.material as StandardMaterial3D
 	var base_color: Color = target.get_meta("chain_color")
-	(target as RigidBody3D).freeze = true
-	target.position.y = minf(target.position.y, FLOOR_Y - 0.35)
 	material.albedo_color = Color(1.0, 0.95, 0.5)
 	create_tween().tween_property(material, "albedo_color", base_color, 0.18)
 

@@ -242,6 +242,13 @@ func _run() -> void:
 	var antenna := chain_targets.antenna_a as RigidBody3D
 	var relay := chain_targets.relay_b as RigidBody3D
 	var vent := chain_targets.vent_c as RigidBody3D
+	for target_id in chain_ids:
+		var target := chain_targets[target_id] as RigidBody3D
+		target.gravity_scale = 0.0
+		target.linear_velocity = Vector3.ZERO
+		target.angular_velocity = Vector3.ZERO
+		target.freeze = false
+		target.sleeping = true
 	var antenna_screen := camera.unproject_position(antenna.global_position)
 	world.set_drag_target(antenna_screen)
 	world.set_drag_target(antenna_screen)
@@ -256,6 +263,10 @@ func _run() -> void:
 	var vent_collision := vent.get_node("Collision") as CollisionShape3D
 	vent_collision.set_deferred("disabled", true)
 	await process_frame
+	var before_miss: Dictionary = {}
+	for target_id in chain_ids:
+		var target := chain_targets[target_id] as RigidBody3D
+		before_miss[target_id] = {"transform": target.transform, "freeze": target.freeze}
 	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
 	for _frame in range(240):
 		await physics_frame
@@ -266,12 +277,21 @@ func _run() -> void:
 	assert(state.event_ledger.size() == ledger_before_chain, "a missed chain writes no discrete ledger")
 	assert(world.get("_chain_status") == "broken", "a missed target returns the chain to broken")
 	assert(not world.get("_chain_attack_consumed"), "a missed target refunds the chain attack")
+	for target_id in chain_ids:
+		var target := chain_targets[target_id] as RigidBody3D
+		var expected: Dictionary = before_miss[target_id]
+		assert(target.transform.is_equal_approx(expected.transform), "a missed chain preserves every target transform")
+		assert(target.freeze == expected.freeze, "a missed chain preserves every target freeze state")
 	vent_collision.set_deferred("disabled", false)
 	await process_frame
 	world.cancel_gesture()
 
 	world.set_drag_target(camera.unproject_position(antenna.global_position))
 	world.set_drag_target(camera.unproject_position(relay.global_position))
+	var before_cancel: Dictionary = {}
+	for target_id in chain_ids:
+		var target := chain_targets[target_id] as RigidBody3D
+		before_cancel[target_id] = {"transform": target.transform, "freeze": target.freeze}
 	world.release_swipe(Vector2.ZERO, Vector2.ZERO)
 	var canceled_after_overlap := false
 	for _frame in range(240):
@@ -287,6 +307,11 @@ func _run() -> void:
 	assert(rewards == [1], "cancel releases no Chain reward")
 	assert(state.event_ledger.size() == ledger_before_chain, "cancel writes no discrete chain ledger")
 	assert(not world.get("_chain_attack_consumed"), "cancel refunds an unfinished chain attack")
+	for target_id in chain_ids:
+		var target := chain_targets[target_id] as RigidBody3D
+		var expected: Dictionary = before_cancel[target_id]
+		assert(target.transform.is_equal_approx(expected.transform), "a canceled chain preserves every target transform")
+		assert(target.freeze == expected.freeze, "a canceled chain preserves every target freeze state")
 
 	for target_id in chain_ids:
 		var target := chain_targets[target_id] as RigidBody3D
