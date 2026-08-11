@@ -43,7 +43,7 @@ func _init() -> void:
 		"CHOOSE A FLOCK BUILD",
 		[
 			{"id": "dash", "label": ">> HEAVY FIRST WING\nBRAWL + CHAIN", "role": Tokens.PRIMARY},
-			{"id": "guard", "label": "[] GOOSE GUARD\nAPPROACH + BRAWL", "role": Tokens.SECONDARY},
+			{"id": "guard", "label": "<> GOOSE GUARD\nAPPROACH + BRAWL", "role": Tokens.SECONDARY},
 			{"id": "route", "label": "// PIGEON SHORTCUT\nAPPROACH + CHAIN", "role": Tokens.SECRET},
 		],
 		func(_id): pass
@@ -64,12 +64,14 @@ func _init() -> void:
 			"long translated choices wrap instead of clipping"
 		)
 		assert(button.text.split("\n").size() == 2, "each choice has one affected-act cue line")
+		assert(not button.text.contains("□") and not button.text.contains("�"), "choice labels never render tofu glyphs")
 		choice_labels[button.text] = true
 		var role := str(button.get_meta("role", ""))
 		choice_roles[role] = true
 		var style := button.get_theme_stylebox("normal") as StyleBoxFlat
 		assert(style.bg_color == Tokens.color(button, role), "each choice carries its role accent")
 	assert(choice_labels.size() == 3, "choice glyph labels are distinct")
+	assert(choice_labels.has("<> GOOSE GUARD\nAPPROACH + BRAWL"), "guard uses a supported ASCII glyph")
 	assert(choice_roles.keys().all(func(role): return role in [Tokens.PRIMARY, Tokens.SECONDARY, Tokens.SECRET]), "choice roles use existing theme accents")
 	assert(choice_roles.size() == 3, "each choice uses a distinct role")
 	var action_calls := [0]

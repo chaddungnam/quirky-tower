@@ -107,14 +107,23 @@ func _run() -> void:
 	assert(not trial_guide.visible, "choice hides the stale Chain guide")
 	var choice_actions := run_overlay.get_node("Center/Card/Content/ActionScroll/Actions") as VBoxContainer
 	assert(choice_actions.get_child_count() == 3, "run offers three choice cards")
+	await process_frame
 	var glyphs: Dictionary = {}
 	var roles: Dictionary = {}
 	for child in choice_actions.get_children():
 		var button := child as Button
 		assert(button.text.split("\n").size() == 2, "run choice shows an affected-act cue on line two")
+		assert(not button.text.contains("□") and not button.text.contains("�"), "run choices never render tofu glyphs")
 		glyphs[button.text.split(" ")[0]] = true
 		roles[str(button.get_meta("role", ""))] = true
 	assert(glyphs.size() == 3 and roles.size() == 3, "run choices have distinct glyphs and accents")
+	assert(glyphs.has("<>"), "guard uses a supported ASCII glyph")
+	var choice_content := run_overlay.get_node("Center/Card/Content") as Control
+	var third_choice := choice_actions.get_child(2) as Control
+	assert(
+		third_choice.get_global_rect().end.y <= choice_content.get_global_rect().end.y,
+		"third choice and its second line stay inside the panel content bottom"
+	)
 	(choice_actions.get_child(0) as Button).pressed.emit()
 	assert(not trial_guide.visible and overlay_guide.visible, "result keeps only the overlay guide")
 	app.get_node("RunScreen").restart_run(424245)

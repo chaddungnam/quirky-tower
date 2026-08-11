@@ -47,7 +47,10 @@ func show_actions(title: String, body: String, options: Array) -> void:
 			str(option.get("role", Tokens.WARNING))
 		)
 	var action_scroll := get_node("Center/Card/Content/ActionScroll") as ScrollContainer
-	action_scroll.custom_minimum_size.y = minf(600.0, options.size() * 110.0)
+	var actions := action_scroll.get_node("Actions") as VBoxContainer
+	action_scroll.custom_minimum_size.y = minf(
+		600.0, maxf(options.size() * 110.0, actions.get_combined_minimum_size().y)
+	)
 	show()
 	get_node("MascotGuide").say(_host_line(title))
 	get_node("MascotGuide").play_entrance()
