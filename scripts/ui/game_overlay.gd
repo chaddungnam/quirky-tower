@@ -122,6 +122,14 @@ func _play_entrance() -> void:
 
 
 func _host_line(title: String) -> String:
+	if title == "CHOOSE A FLOCK BUILD":
+		return "Pick one."
+	if title == "DISTRICT CLEARED":
+		return "Ready for another raid."
+	if title == "조류단 강화 선택":
+		return "하나 골라!"
+	if title == "구역 돌파":
+		return "다음 습격도 준비됐어."
 	if "QUIRK" in title:
 		return "하나쯤 이상해야지."
 	if "COMPLETE" in title:

@@ -34,8 +34,7 @@ func _run() -> void:
 		assert(world.find_child(legacy_name, true, false) == null, "the reboot world has no old mini-game child")
 
 	var state := FlockRunState.new_run(424242)
-	world.setup(state)
-	world.start_act("entry")
+	trial.begin(state)
 	var start_position := leader.global_position
 	var viewport_size: Vector2 = world.get_viewport().get_visible_rect().size
 	var drag_position := Vector2(viewport_size.x * 0.78, viewport_size.y * 0.68)
@@ -101,8 +100,13 @@ func _run() -> void:
 	var stage_records: Array[Dictionary] = []
 	var rewards: Array[int] = []
 	var dash_contacts: Array[Vector3] = []
+	var act_at_reward_stage := [""]
+	var brawl_reward_order: Array[String] = []
 	world.collapse_stage.connect(
 		func(stage: String) -> void:
+			if stage == "reward":
+				act_at_reward_stage[0] = str(trial.get_visual_state().act_id)
+				brawl_reward_order.append("stage")
 			var visible_pieces := 0
 			for piece in detached_pieces.get_children():
 				if piece.visible:
@@ -118,7 +122,10 @@ func _run() -> void:
 				"reward_count": rewards.size(),
 			})
 	)
-	world.reward_released.connect(func(value: int) -> void: rewards.append(value))
+	world.reward_released.connect(func(value: int) -> void:
+		rewards.append(value)
+		brawl_reward_order.append("signal")
+	)
 	world.impact.connect(
 		func(kind: String, world_point: Vector3) -> void:
 			if kind == "dash":
@@ -188,7 +195,10 @@ func _run() -> void:
 	assert(stage_records[4].target_y < 0.0, "collapse stage exposes the lowered target")
 	for index in range(5):
 		assert(stage_records[index].reward_count == 0, "reward is absent before the reward stage")
-	assert(stage_records[5].reward_count == 1, "reward appears only after collapse")
+	assert(stage_records[5].reward_count == 0, "the visible reward stage precedes reward delivery")
+	assert(brawl_reward_order == ["stage", "signal"], "the reward stage emits before reward delivery")
+	assert(act_at_reward_stage[0] == "brawl", "the visible reward stage still belongs to Brawl")
+	assert(state.act_id == "chain", "the reward signal advances to Chain after the reward stage")
 	assert(rewards == [1], "one collider-triggered collapse releases one reward")
 	assert(not world.trigger_collapse("antenna_a", Vector3.FORWARD), "a repeated trigger is rejected")
 	world.call("_on_dash_body_entered", weak_point)
@@ -453,6 +463,14 @@ func _run() -> void:
 	assert(integrated_state.act_id == "choice", "Chain completion, not its shared reward, opens the choice")
 	var overlay := run_screen.get_node("SafeFrame/GameOverlay") as Control
 	assert(overlay.visible, "district completion opens the reused overlay")
+	assert(integrated_trial.mouse_filter == Control.MOUSE_FILTER_IGNORE, "the choice disables full-height gameplay input")
+	var blocked_touch := InputEventScreenTouch.new()
+	blocked_touch.index = 9
+	blocked_touch.position = Vector2(80.0, 40.0)
+	blocked_touch.pressed = true
+	run_screen.get_viewport().push_input(blocked_touch)
+	await process_frame
+	assert(not integrated_trial.get_visual_state().pointer_active, "real viewport input cannot acquire gameplay during the choice")
 	var actions := overlay.get_node("Center/Card/Content/ActionScroll/Actions") as VBoxContainer
 	assert(actions.get_child_count() == 3, "the seeded offer has three actions")
 	for action in actions.get_children():
@@ -470,6 +488,7 @@ func _run() -> void:
 	assert(integrated_state.act_id == "complete", "one choice completes the Gate A run")
 	assert(actions.get_child_count() == 2, "the result replaces choices with two actions")
 	assert((actions.get_child(0) as Button).text == "PLAY AGAIN" and (actions.get_child(1) as Button).text == "HOME", "result actions stay stacked")
+	assert(overlay.get_node("Center/Card/Content/Body").text.contains(first_choice.text), "the result names the selected build")
 
 	var retired_trial := integrated_trial
 	run_screen.restart_run(424243)
@@ -478,6 +497,7 @@ func _run() -> void:
 	assert(run_screen.get_node("ChallengeSlot").get_child_count() == 1, "restart leaves exactly one trial")
 	assert(not is_instance_valid(retired_trial), "restart frees the old trial and its signals")
 	var restarted_trial := run_screen.get_node("ChallengeSlot").get_child(0) as Control
+	assert(restarted_trial.mouse_filter == Control.MOUSE_FILTER_STOP, "a new trial restores gameplay input")
 	var restarted_world := restarted_trial.get_node("FlockWorld3D") as Node3D
 	restarted_world.act_completed.emit("entry", {})
 	restarted_world.reward_released.emit(1)
@@ -493,7 +513,13 @@ func _run() -> void:
 	var home_count := [0]
 	run_screen.home_requested.connect(func() -> void: home_count[0] += 1)
 	(home_actions.get_child(1) as Button).pressed.emit()
-	assert(home_count[0] == 1 and not restarted_trial.get_visual_state().pointer_active, "Home cancels gameplay before navigation")
+	await process_frame
+	assert(home_count[0] == 1, "Home requests one navigation")
+	assert(run_screen.get_node("ChallengeSlot").get_child_count() == 0, "Home retires the active trial")
+	assert(not is_instance_valid(restarted_trial), "Home frees the old world and its signals")
+	run_screen.restart_run(424244)
+	await process_frame
+	assert(run_screen.get_node("ChallengeSlot").get_child_count() == 1, "the next Play still creates exactly one trial")
 	run_screen.free()
 	print("PASS flock_world_test")
 	quit(0)

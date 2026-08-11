@@ -49,6 +49,7 @@ func _on_district_finished() -> void:
 	if not is_instance_valid(_current_trial) or _state == null:
 		return
 	_current_trial.cancel_input()
+	_current_trial.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_update_hud()
 	var options: Array = []
 	for option in _state.choice_options():
@@ -64,9 +65,10 @@ func _choose_build(choice_id: String) -> void:
 		return
 	_state.begin_act("complete")
 	_update_hud()
+	var selected_label := UIText.text(_locale, "choice_%s" % choice_id)
 	get_node("SafeFrame/GameOverlay").show_actions(
 		UIText.text(_locale, "result_title"),
-		UIText.text(_locale, "result_body"),
+		"%s\n%s" % [UIText.text(_locale, "result_body"), selected_label],
 		[
 			{"label": UIText.text(_locale, "play_again"), "action": restart_run},
 			{"label": UIText.text(_locale, "home"), "action": _request_home},
@@ -75,8 +77,7 @@ func _choose_build(choice_id: String) -> void:
 
 
 func _request_home() -> void:
-	if is_instance_valid(_current_trial):
-		_current_trial.cancel_input()
+	_clear_trial()
 	get_node("SafeFrame/GameOverlay").close()
 	home_requested.emit()
 

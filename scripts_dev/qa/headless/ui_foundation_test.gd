@@ -28,6 +28,14 @@ func _init() -> void:
 		overlay.get_node("Center/Card/Content/ActionScroll/Actions").get_child_count() == 1,
 		"one action is shown"
 	)
+	overlay.show_actions("CHOOSE A FLOCK BUILD", "", [{"label": "BUILD", "action": func(): pass}])
+	assert(overlay.get_node("MascotGuide/Bubble/Text").text == "Pick one.", "English choice copy keeps the mascot English")
+	overlay.show_actions("DISTRICT CLEARED", "", [{"label": "HOME", "action": func(): pass}])
+	assert(overlay.get_node("MascotGuide/Bubble/Text").text == "Ready for another raid.", "English result copy keeps the mascot English")
+	overlay.show_actions("조류단 강화 선택", "", [{"label": "강화", "action": func(): pass}])
+	assert(overlay.get_node("MascotGuide/Bubble/Text").text == "하나 골라!", "Korean choice copy keeps the mascot Korean")
+	overlay.show_actions("구역 돌파", "", [{"label": "홈", "action": func(): pass}])
+	assert(overlay.get_node("MascotGuide/Bubble/Text").text == "다음 습격도 준비됐어.", "Korean result copy keeps the mascot Korean")
 	overlay.show_choices(
 		"QUIRK",
 		[

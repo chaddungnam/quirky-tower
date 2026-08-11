@@ -271,8 +271,8 @@ func _lower_collapse_target() -> void:
 	collapse_stage.emit("collapse")
 
 func _emit_collapse_reward() -> void:
-	reward_released.emit(1)
 	collapse_stage.emit("reward")
+	reward_released.emit(1)
 
 func _on_dash_body_entered(body: Node3D) -> void:
 	if not _dash_active or body != _weak_point:
