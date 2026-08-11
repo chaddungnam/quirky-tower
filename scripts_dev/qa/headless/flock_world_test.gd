@@ -143,6 +143,11 @@ func _run() -> void:
 	var dash_contacts: Array[Vector3] = []
 	var contact_records: Array[Dictionary] = []
 	var rebound_records: Array[Dictionary] = []
+	var pause_feedback_capture := {
+		"enabled": false,
+		"contact_paused": false,
+		"rebound_paused": false,
+	}
 	var act_at_reward_stage := [""]
 	var brawl_reward_order: Array[String] = []
 	var reward_signal_frame := [-1]
@@ -188,6 +193,9 @@ func _run() -> void:
 					"on_camera": _camera_contains(camera, contact_marker.global_position, viewport_size),
 					"color": contact_material.albedo_color,
 				})
+				if pause_feedback_capture.enabled:
+					pause_feedback_capture.contact_paused = true
+					self.paused = true
 			elif kind == "rebound":
 				rebound_records.append({
 					"frame": Engine.get_process_frames(),
@@ -197,6 +205,9 @@ func _run() -> void:
 					"on_camera": _camera_contains(camera, rebound_marker.global_position, viewport_size),
 					"color": rebound_material.albedo_color,
 				})
+				if pause_feedback_capture.enabled:
+					pause_feedback_capture.rebound_paused = true
+					self.paused = true
 	)
 	world.start_act("brawl")
 	assert(not route_markers.visible, "Brawl hides the Entry lanes")
@@ -233,21 +244,58 @@ func _run() -> void:
 	weak_point.global_position = leader.global_position + Vector3(0.0, 0.0, -1.8)
 	weak_point.linear_velocity = Vector3.ZERO
 	weak_point.angular_velocity = Vector3.ZERO
+	pause_feedback_capture.enabled = true
 	world.set_drag_target(Vector2(300.0, 300.0))
 	world.release_swipe(Vector2(300.0, 100.0), Vector2(0.0, -2000.0))
 	assert(world.get("_dash_active"), "a long high-velocity swipe starts one dash")
 	assert(dash_collision.disabled, "the real-contact dash also waits for deferred hitbox enable")
 	await process_frame
 	assert(not dash_collision.disabled, "the real-contact dash enables the leader hitbox")
-	var weak_impulse_seen := false
-	var post_contact_input_sent := false
+	var contact_pause_reached := false
+	for _frame in range(120):
+		await physics_frame
+		if pause_feedback_capture.contact_paused:
+			contact_pause_reached = true
+			break
+	if not contact_pause_reached:
+		self.paused = false
+	assert(contact_pause_reached, "real contact pauses the tree for popup capture")
+	await create_timer(0.1, true).timeout
+	var contact_held_while_paused := (
+		contact_marker.visible
+		and contact_material.albedo_color == Color(1.0, 0.9, 0.2)
+		and not rebound_marker.visible
+		and rebound_records.is_empty()
+	)
+	self.paused = false
+	assert(contact_held_while_paused, "paused popup capture keeps the yellow contact beat and defers rebound")
+
+	var rebound_pause_reached := false
+	for _frame in range(120):
+		await physics_frame
+		if pause_feedback_capture.rebound_paused:
+			rebound_pause_reached = true
+			break
+	if not rebound_pause_reached:
+		self.paused = false
+	assert(rebound_pause_reached, "unpausing advances contact to the rebound beat")
+	await create_timer(0.16, true).timeout
+	var rebound_held_while_paused := (
+		rebound_marker.visible
+		and rebound_material.albedo_color == Color(0.2, 0.9, 1.0)
+		and not contact_marker.visible
+	)
+	self.paused = false
+	pause_feedback_capture.enabled = false
+	assert(rebound_held_while_paused, "paused popup capture keeps the cyan rebound beat beyond its normal duration")
+
+	var weak_impulse_seen := weak_point.linear_velocity.z < -0.1
+	var post_contact_input_sent := true
+	world.set_drag_target(Vector2(320.0, 320.0))
+	world.release_swipe(Vector2(320.0, 320.0), Vector2.ZERO)
 	for _frame in range(120):
 		await physics_frame
 		weak_impulse_seen = weak_impulse_seen or weak_point.linear_velocity.z < -0.1
-		if not dash_contacts.is_empty() and not post_contact_input_sent:
-			post_contact_input_sent = true
-			world.set_drag_target(Vector2(320.0, 320.0))
-			world.release_swipe(Vector2(320.0, 320.0), Vector2.ZERO)
 		if not rewards.is_empty():
 			break
 	assert(post_contact_input_sent, "the regression releases input after real contact")

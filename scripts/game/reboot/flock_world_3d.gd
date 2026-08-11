@@ -336,7 +336,7 @@ func _on_dash_body_entered(body: Node3D) -> void:
 	trigger_collapse(str(_weak_point.get_meta("target_id")), _dash_direction)
 
 func _show_rebound(direction: Vector3, generation: int) -> void:
-	await get_tree().create_timer(0.07).timeout
+	await get_tree().create_timer(0.07, false).timeout
 	if _act_id != "brawl" or generation != _feedback_generation:
 		return
 	_contact_marker.visible = false
@@ -346,7 +346,7 @@ func _show_rebound(direction: Vector3, generation: int) -> void:
 	)
 	_rebound_marker.visible = true
 	impact.emit("rebound", _leader.global_position)
-	await get_tree().create_timer(0.12).timeout
+	await get_tree().create_timer(0.12, false).timeout
 	if generation == _feedback_generation:
 		_rebound_marker.visible = false
 
